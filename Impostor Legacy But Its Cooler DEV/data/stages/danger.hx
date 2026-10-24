@@ -6,6 +6,7 @@ import flixel.addons.display.FlxRuntimeShader;
 import openfl.filters.ShaderFilter;
 using StringTools;
 
+var legs:Character;
 var bfRim:ExtraDropShadowShader;
 var gfRim:ExtraDropShadowShader;
 var dadRim:ExtraDropShadowShader;
@@ -547,7 +548,7 @@ function onLoad()
 	airshipPlatform.updateHitbox();
 	add(airshipPlatform);
 
-	bfPlatform = new FlxSprite(1542, 350);
+	bfPlatform = new FlxSprite(1542 -1645, 350 - -120);
 	bfPlatform.zIndex = boyfriendGroup.zIndex - 1;
 	bfPlatform.frames = Paths.getSparrowAtlas('stages/common/platform-dark');
 	bfPlatform.animation.addByPrefix('bop', 'danger', 24, true);
@@ -568,7 +569,7 @@ function onLoad()
 	petBoard.animation.play('bop');
 	petBoard.visible = false;
 
-	add(bfPlatform);
+	boyfriendGroup.add(bfPlatform);
 	add(gfBoard);
 	add(petBoard);
 
@@ -583,30 +584,9 @@ function onLoad()
 
 function onCreatePost()
 {
-	if (hasBfSkin && bfLegs != null)
-	{
-		bfLegs.visible = false;
-
-		legs = new Character(
-			0,
-			0,
-			boyfriend.curCharacter,
-			true
-		);
-
-		boyfriendGroup.insert(0, legs);
-
-		legs.animation.pause();
-		setLegsAnim('legs');
-
-		bfAnchorPoint[0] =
-			legs.x =
-			boyfriend.x;
-
-		bfAnchorPoint[1] =
-			legs.y =
-			boyfriend.y;
-	}
+	for (member in boyfriendGroup.members)
+		if (member != boyfriend && Std.isOfType(member, Character))
+			legs = member;
 
 	var hud = game.playHUD;
 
@@ -991,98 +971,27 @@ function opponentNoteHit(note)
 
 function onUpdate(elapsed)
 {
-	if (legs != null)
-	{
-		if (
-			!boyfriend.getAnimName().contains('miss') &&
-			legs.getAnimName() == 'legs-miss'
-		)
-		{
-			setLegsAnim(
-				'legs'
-			);
-		}
-
-		legs.animCurFrame =
-			Math.floor(
-				FlxMath.mod(
-					curDecBeat,
-					2
-				) /
-				2 *
-				legs.animation.curAnim.numFrames
-			);
-
-		if (boyfriend.animation.curAnim.looped)
-		{
-			boyfriend.animation.curAnim.pause();
-
-			boyfriend.animCurFrame =
-				legs.animCurFrame;
-		}
-
-		boyfriend.y =
-			bfAnchorPoint[1] +
-			legPosY[
-				legs.animCurFrame
-			];
-
-		legs.setPosition(
-			boyfriend.x,
-			bfAnchorPoint[1]
-		);
-	}
-
 	updateIconsPosition();
 
-	if (hasBfSkin)
-	{
-		var skinTargetX:Float =
-			FlxMath.remapToRange(
-				game.health,
+	var bfTargetX:Float =
+		FlxMath.remapToRange(
+			game.health,
+			0,
+			2,
+			game.BF_X - 202,
+			game.BF_X + 202
+		);
+
+	boyfriendGroup.x =
+		FlxMath.lerp(
+			boyfriendGroup.x,
+			bfTargetX + 30,
+			FlxMath.bound(
+				4.5 * elapsed,
 				0,
-				2,
-				baseBfX - 202,
-				baseBfX + 202
-			);
-
-		boyfriend.x =
-			FlxMath.lerp(
-				game.boyfriend.x,
-				skinTargetX + 30,
-				FlxMath.bound(
-					4.5 * elapsed,
-					0,
-					1
-				)
-			);
-
-		if (
-			boyfriend.getFlag('floating') != true &&
-			boyfriend.getFlag('runner') != true
-		)
-		{
-			var platformTargetX:Float =
-				FlxMath.remapToRange(
-					game.health,
-					0,
-					2,
-					1542 - 202,
-					1542 + 202
-				);
-
-			bfPlatform.x =
-				FlxMath.lerp(
-					bfPlatform.x,
-					platformTargetX,
-					FlxMath.bound(
-						4.5 * elapsed,
-						0,
-						1
-					)
-				);
-		}
-	}
+				1
+			)
+		);
 
 	if (ClientPrefs.inDevMode)
 	{
@@ -2117,43 +2026,6 @@ public function updateIconsPosition()
 		healthBar.barCenter -
 		(150 * iconP2.scale.x) / 2 -
 		iconOffset * 2;
-}
-
-function noteMiss(daNote:Note):Void
-{
-	if (legs == null)
-		return;
-
-	setLegsAnim(
-		'legs'
-	);
-
-	new FlxTimer().start(
-		1 / 24,
-		function()
-		{
-			setLegsAnim(
-				'legs-miss'
-			);
-		}
-	);
-}
-
-function setLegsAnim(anim:String):Void
-{
-	if (legs == null)
-		return;
-
-	var lastFrame:Int =
-		legs.animCurFrame;
-
-	legs.playAnim(
-		anim,
-		true
-	);
-
-	legs.animCurFrame =
-		lastFrame;
 }
 
 function setLightningRim(
