@@ -1,0 +1,17 @@
+{
+    "lang": {
+        "comms": "Comunicaciones saboteadas",
+        "stage_defeat": "Derrota",
+
+	"dialogue_reactor0": "menos mal que pudimos llegar aquí a salvo",
+	"dialogue_reactor1": "gracias a mi",
+	"dialogue_reactor2": "habilidad de ingeniero",
+	"dialogue_reactor3": "estoy justo aquí imbéciles",
+	"dialogue_reactor4": ".",
+
+        "dialogue_stealth0": "eres una perra genial!",
+        "dialogue_stealth1": "puedes dejar de llamarme perra?",
+        "dialogue_stealth2": "no",
+        "dialogue_stealth3": "cantemos otra canción"
+    }
+}		

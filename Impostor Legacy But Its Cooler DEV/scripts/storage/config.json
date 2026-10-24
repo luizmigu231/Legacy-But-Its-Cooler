@@ -1,0 +1,10 @@
+{
+	"defeat": {
+		"source": "data/storage/settings/defeat/base.json",
+		"destination": "songs/defeat/data/normal.json",
+		"stage": {
+			"On": "defeat",
+			"Off": "defeat_nobacklit"
+		}
+	}
+}

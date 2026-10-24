@@ -1,0 +1,184 @@
+{
+  "ATLAS": {
+    "SPRITES": [
+      {
+        "SPRITE": {
+          "name": "0",
+          "x": 659,
+          "y": 537,
+          "w": 194,
+          "h": 85,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "1",
+          "x": 659,
+          "y": 431,
+          "w": 177,
+          "h": 105,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "2",
+          "x": 837,
+          "y": 431,
+          "w": 109,
+          "h": 100,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "3",
+          "x": 2,
+          "y": 2,
+          "w": 338,
+          "h": 274,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "4",
+          "x": 465,
+          "y": 398,
+          "w": 188,
+          "h": 125,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "5",
+          "x": 465,
+          "y": 524,
+          "w": 193,
+          "h": 104,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "6",
+          "x": 2,
+          "y": 518,
+          "w": 234,
+          "h": 131,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "7",
+          "x": 237,
+          "y": 518,
+          "w": 227,
+          "h": 123,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "8",
+          "x": 666,
+          "y": 209,
+          "w": 208,
+          "h": 116,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "9",
+          "x": 654,
+          "y": 326,
+          "w": 188,
+          "h": 104,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "10",
+          "x": 2,
+          "y": 277,
+          "w": 381,
+          "h": 240,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "11",
+          "x": 465,
+          "y": 268,
+          "w": 185,
+          "h": 129,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "12",
+          "x": 854,
+          "y": 532,
+          "w": 97,
+          "h": 111,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "13",
+          "x": 666,
+          "y": 2,
+          "w": 339,
+          "h": 206,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "14",
+          "x": 875,
+          "y": 209,
+          "w": 92,
+          "h": 101,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "15",
+          "x": 341,
+          "y": 2,
+          "w": 324,
+          "h": 265,
+          "rotated": false
+        }
+      },
+      {
+        "SPRITE": {
+          "name": "16",
+          "x": 843,
+          "y": 326,
+          "w": 101,
+          "h": 95,
+          "rotated": false
+        }
+      }
+    ]
+  },
+  "meta": {
+    "app": "Adobe Animate (Better TA Extension)",
+    "version": "22.0.5.191",
+    "image": "spritemap1.png",
+    "format": "RGBA8888",
+    "size": { "w": 1007, "h": 651 },
+    "resolution": "1"
+  }
+}

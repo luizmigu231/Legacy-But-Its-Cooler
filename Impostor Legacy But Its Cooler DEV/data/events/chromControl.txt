@@ -1,0 +1,6 @@
+Functionality: global
+tween the chromatic aberration
+- value1: amount
+- value2: duration,tween
+for a list of tweens, check out this vvv
+https://haxeflixel.com/demos/FlxTween/

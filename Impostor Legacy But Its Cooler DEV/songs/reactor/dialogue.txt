@@ -1,0 +1,5 @@
+:gf:neutral:dialogue_reactor0
+:bf:uwu:dialogue_reactor1
+:bf:happy:dialogue_reactor2
+:gi:iupset:dialogue_reactor3
+:bf:q:dialogue_reactor4

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="gray_squidboy84_eggus_ghostus.png">
+	<!-- Created with Adobe Animate version 21.0.6.41649 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="gray, squidboy84 & eggus ghosus0000" x="0" y="0" width="787" height="501" frameX="-5" frameY="0" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0001" x="787" y="0" width="787" height="499" frameX="-5" frameY="0" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0002" x="1574" y="0" width="789" height="481" frameX="0" frameY="-21" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0003" x="2363" y="0" width="789" height="478" frameX="0" frameY="-21" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0004" x="3152" y="0" width="786" height="471" frameX="-1" frameY="-25" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0005" x="0" y="501" width="786" height="470" frameX="-1" frameY="-25" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0006" x="786" y="501" width="781" height="489" frameX="-5" frameY="-4" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0007" x="1567" y="501" width="781" height="490" frameX="-5" frameY="-4" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0008" x="2348" y="501" width="785" height="496" frameX="0" frameY="-4" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0009" x="3133" y="501" width="785" height="497" frameX="0" frameY="-4" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0010" x="0" y="998" width="784" height="495" frameX="-1" frameY="-5" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0011" x="784" y="998" width="784" height="497" frameX="-1" frameY="-5" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0012" x="1568" y="998" width="780" height="497" frameX="-5" frameY="-5" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0013" x="2348" y="998" width="780" height="499" frameX="-5" frameY="-5" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0014" x="3128" y="998" width="785" height="503" frameX="0" frameY="-5" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0015" x="3128" y="998" width="785" height="503" frameX="0" frameY="-5" frameWidth="792" frameHeight="508"/>
+	<SubTexture name="gray, squidboy84 & eggus ghosus0016" x="0" y="1501" width="784" height="499" frameX="-1" frameY="-5" frameWidth="792" frameHeight="508"/>
+</TextureAtlas>

@@ -1,0 +1,87 @@
+{
+	"pausePortrait": "",
+	"animations": [
+		{
+			"loop": false,
+			"offsets": [
+				0,
+				0
+			],
+			"anim": "idle",
+			"fps": 24,
+			"name": "animations/impostor idle",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-10,
+				-10
+			],
+			"anim": "singRIGHT",
+			"fps": 24,
+			"name": "animations/impostor right",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				20,
+				-30
+			],
+			"anim": "singDOWN",
+			"fps": 24,
+			"name": "animations/impostor down",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				250,
+				0
+			],
+			"anim": "singLEFT",
+			"fps": 24,
+			"name": "animations/imposter left",
+			"indices": []
+		},
+		{
+			"offsets": [
+				150,
+				130
+			],
+			"flipY": false,
+			"loop": false,
+			"fps": 24,
+			"anim": "singUP",
+			"flipX": false,
+			"indices": [],
+			"name": "animations/impostor up2"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/story/green/greenunshaded",
+	"position": [
+		-96,
+		362
+	],
+	"dance_every": 2,
+	"gameover_intial_sound": null,
+	"flags": {},
+	"scalableOffsets": false,
+	"gameover_confirm_sound": null,
+	"healthicon": "green",
+	"afterimages": true,
+	"gameover_character": null,
+	"vslice_sustains": true,
+	"flip_x": false,
+	"healthbar_colour": -14718165,
+	"camera_position": [
+		-130,
+		-100
+	],
+	"gameover_loop_sound": null,
+	"sing_duration": 6,
+	"scale": 1,
+	"_editor_isPlayer": false
+}

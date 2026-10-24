@@ -1,0 +1,53 @@
+{
+    "name": "dialogue_bf",
+    "side": 2,
+    "asset": "boyfriend_sabotage",
+    "boxColor": "0xFF52D9FF",
+    "boxShadeColor": "0xFF408CFF", 
+    "icon": "bf",
+    "sound": "bf",
+    "animations": [
+        {
+            "anim": "happy",
+            "name": "BF happy",
+            "loop": false,
+            "offsets": [0,0] 
+        },
+        {
+            "anim": "mad",
+            "name": "BF mad",
+            "loop": true,
+            "offsets": [0,0] 
+        },
+        {
+            "anim": "angry",
+            "name": "BF angry",
+            "loop": false,
+            "offsets": [0,0] 
+        },
+        {
+            "anim": "neutral",
+            "name": "BF neutral",
+            "loop": false,
+            "offsets": [0,0] 
+        },
+        {
+            "anim": "q",
+            "name": "BF q",
+            "loop": false,
+            "offsets": [0,0] 
+        },
+        {
+            "anim": "realization",
+            "name": "BF realization",
+            "loop": false,
+            "offsets": [0,-50] 
+        },
+        {
+            "anim": "sad",
+            "name": "BF sad",
+            "loop": false,
+            "offsets": [0,0]
+        }
+    ]
+}

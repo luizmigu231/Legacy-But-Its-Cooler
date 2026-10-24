@@ -1,0 +1,14 @@
+{
+  "contributors": [
+    {
+      "name": " MrFred",
+      "roles": "Creator of WEEK 3 but it's Cooler",
+      "discord": "mrfred_yt"
+    },
+    {
+      "name": "Eyeburive",
+      "roles": "Creator of Danger But It's a STORM",
+      "url": "https://www.youtube.com/@eyeburive"
+    }
+  ]
+} 

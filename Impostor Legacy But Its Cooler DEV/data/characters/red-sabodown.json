@@ -1,0 +1,95 @@
+{
+	"pausePortrait": "",
+	"animations": [
+		{
+			"offsets": [
+				-78,
+				-183
+			],
+			"flipY": false,
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHT",
+			"flipX": false,
+			"indices": [],
+			"name": "impostor right"
+		},
+		{
+			"offsets": [
+				-64,
+				-174
+			],
+			"flipY": false,
+			"loop": false,
+			"fps": 24,
+			"anim": "singUP",
+			"flipX": false,
+			"indices": [],
+			"name": "impostor up"
+		},
+		{
+			"offsets": [
+				-3,
+				-233
+			],
+			"flipY": false,
+			"loop": false,
+			"fps": 24,
+			"anim": "idle",
+			"flipX": false,
+			"indices": [],
+			"name": "impostor idle"
+		},
+		{
+			"offsets": [
+				-85,
+				-185
+			],
+			"flipY": false,
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWN",
+			"flipX": false,
+			"indices": [],
+			"name": "impostor down"
+		},
+		{
+			"offsets": [
+				133,
+				-233
+			],
+			"flipY": false,
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFT",
+			"flipX": false,
+			"indices": [],
+			"name": "imposter left"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/story/red/red_slightly_scared",
+	"position": [
+		-35,
+		150
+	],
+	"dance_every": 2,
+	"gameover_intial_sound": null,
+	"flags": {},
+	"scalableOffsets": false,
+	"gameover_confirm_sound": null,
+	"healthicon": "red",
+	"afterimages": true,
+	"gameover_character": null,
+	"vslice_sustains": true,
+	"flip_x": false,
+	"healthbar_colour": -4510419,
+	"camera_position": [
+		-139,
+		257
+	],
+	"gameover_loop_sound": null,
+	"sing_duration": 6,
+	"scale": 1,
+	"_editor_isPlayer": false
+}
