@@ -23,15 +23,6 @@ function onCreatePost():Void
 
 function onUpdatePost(elapsed):Void
 {
-        var targetX = FlxMath.remapToRange(
-         game.health,
-         0, 2,
-         bfAnchorPoint[0] - 202, bfAnchorPoint[0] + 202
-        );
-
-        game.boyfriend.x = FlxMath.lerp(game.boyfriend.x, targetX, FlxMath.bound(9 * elapsed, 0, 1));
-        legs.x = FlxMath.lerp(game.boyfriend.x, targetX, FlxMath.bound(9 * elapsed, 0, 1));
-
 	if (!parent.getAnimName().contains('miss') && legs.getAnimName() == 'legs-miss') setLegsAnim('legs');
 	
 	legs.animCurFrame = Math.floor(FlxMath.mod(curDecBeat, 2) / 2 * legs.animation.curAnim.numFrames);
