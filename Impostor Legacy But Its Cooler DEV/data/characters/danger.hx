@@ -47,11 +47,10 @@ function onUpdate(elapsed)
         var targetX = FlxMath.remapToRange(
          game.health,
          0, 2,
-         dadAnchorPoint[0] + 308, dadAnchorPoint[0] - 108
+         DAD_X + 404, DAD_X - 404
         );
 
-        game.dad.x = FlxMath.lerp(game.dad.x, targetX, FlxMath.bound(4.5 * elapsed, 0, 1));
-        legs.x = FlxMath.lerp(game.dad.x, targetX, FlxMath.bound(4.5 * elapsed, 0, 1));
+        dadGroup.x = FlxMath.lerp(dadGroup.x, targetX, FlxMath.bound(4.5 * elapsed, 0, 1));
 
 	legs.animation.pause();
 	
