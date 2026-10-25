@@ -558,7 +558,7 @@ function opponentNoteHitPre(note)
     {
         note.owner = black;
     }
-    else if (bothSing || note.noteType == 'Both Opponents Sing')
+    else if (note.noteType == 'Both Opponents Sing')
     {
         characterSing(dad, note);
         characterSing(black, note);

@@ -134,6 +134,9 @@ function onEvent(eventName, value1, value2)
 					
 					if (yellow != null) yellow.kill();
 					if (ClientPrefs.downScroll) playHUD.scoreTxt.y = FlxG.height * 0.06;
+					if (hasColor) FlxG.signals.postUpdate.addOnce(()->{
+						playHUD.scoreTxt.color = black.healthColour;
+					});
 					defeatDKoverlay.alpha = .1;
 					lightoverlayDK.alpha = 0;
 					cargoDark.alpha = 1;
@@ -150,6 +153,7 @@ function onEvent(eventName, value1, value2)
 				case 'ending':
 					FlxTween.tween(game, {defaultCamZoom: .6}, Conductor.crotchet * .004 * 16);
 					FlxTween.tween(defeatDKoverlay, {alpha: 1}, Conductor.crotchet * .004 * 20, {ease: FlxEase.sineInOut});
+					FlxTween.color(playHUD.scoreTxt, Conductor.crotchet * .004 * 20, black.healthColour, FlxColor.RED, {ease: FlxEase.sineInOut});
 					FlxTween.tween(mainoverlayDK.scale, {y: mainoverlayDK.scale.y * 2}, Conductor.crotchet * .004 * 24, {ease: FlxEase.sineInOut});
 				
 				case 'endingcam':
@@ -241,10 +245,9 @@ function onEvent(eventName, value1, value2)
 
 function defeatness():Void
 {
-	if (!ClientPrefs.shaders) return;
-	
-	playHUD.scoreTxt.color = FlxColor.RED;
 	playHUD.scoreTxt.y -= 90;
+
+	if (!ClientPrefs.shaders) return;
 	
 	var defeat:Null<String> = boyfriend.getFlag('variants')?.defeat;
 	if (defeat != null) changeCharacter(defeat, 0);
@@ -296,11 +299,11 @@ function defeatness():Void
 	}
 	
 	gfRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(blackRimlightBase);
-gfRim.attachedSprite = gf;
-gf.useRenderTexture = true;
-gf.shader = gfRim;
-gfRim.layers[0].angle = 90;
-		gfRim.layers[1].angle = 90;
+	gfRim.attachedSprite = gf;
+	gf.useRenderTexture = true;
+	gf.shader = gfRim;
+	gfRim.layers[0].angle = 90;
+	gfRim.layers[1].angle = 90;
 }
 
 function setVignette(yea:Bool):Void
