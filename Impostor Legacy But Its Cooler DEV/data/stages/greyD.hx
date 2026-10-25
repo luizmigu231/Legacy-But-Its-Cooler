@@ -137,19 +137,19 @@ function onCreatePost()
 			0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0,
 			0, 0, 0, 1, 0
-		], 200, 22, 0);
+		], 210, 22, 0);
 		grayShader.addLayer([
 			0, 0, 0, 0, 255,
 			0, 0, 0, 0, 255,
 			0, 0, 0, 0, 255,
 			0, 0, 0, 1, 0
-		], 410, 10, 0);
+		], 420, 10, 0);
 		grayShader.addLayer([
 			0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0,
 			0, 0, 0, 1, 0
-		], 238, 12, 0);
+		], 248, 12, 0);
 
 		darkShader.attachedSprite = boyfriend;
                 grayShader.attachedSprite = dad;
@@ -366,6 +366,8 @@ function onEvent(eventName, value1, value2)
 		case 'Lights out':
 			if (value1 == '2' /* ????? */ || (value1 == '1' && !ClientPrefs.flashing)) return;
 
+			pauseOverride = 'grey-dark';
+
 			isDark = true;
                         isChrom = false;
 			
@@ -445,6 +447,8 @@ function onEvent(eventName, value1, value2)
 
 		case 'Lights on':
 			if (value1 == '1' && !ClientPrefs.flashing) return;
+
+			pauseOverride = '';
 
 			isDark = false;
 			
