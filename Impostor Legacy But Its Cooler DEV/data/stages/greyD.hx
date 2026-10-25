@@ -63,6 +63,7 @@ function onLoad()
 function onCreatePost()
 {
 	forcedBotColor = true;
+	botplayTxt.color = dad.healthColour;
 
         if (ClientPrefs.shaders) {
 		var dark:Null<String> = boyfriend.getFlag('variants')?.dark;
@@ -283,6 +284,7 @@ gfRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(rimlightBase);
 function onUpdatePost()
 {
 	if (ClientPrefs.inDevMode && showDevInfo) dbText = dbText + ('\nchrom (am, freq): ' + [chromAmount, chromFreq]);
+	if (isDark) updateIconsAnimation();
 }
 
 function applyDarkShader(sprite:FlxSprite)
@@ -438,6 +440,9 @@ function onEvent(eventName, value1, value2)
 				if (ClientPrefs.inDevMode && Std.isOfType(member, FlxSprite) && member.camera == camOther && member.alpha == 0.3)
 					member.loadGraphic(Paths.image('menu/pause/looksie_extreme_demon-dark'));
 
+			playHUD.updateIconAnimation = false;
+			playHUD.iconP2.updateIconAnim(1);
+
 		case 'Lights on':
 			if (value1 == '1' && !ClientPrefs.flashing) return;
 
@@ -461,24 +466,25 @@ function onEvent(eventName, value1, value2)
 			
 			if (noshader) changeCharacter(hasBfSkin ? ClientPrefs.bfSkin : PlayState.SONG.player1, 0);
                         boyfriend.shader = null;
-dad.shader = null;
+			dad.shader = null;
 
-if (hasBfSkin && boyfriend.curCharacter != 'bfairship' && boyfriend.getFlag('backlit') != true)
-{
-    if (bfRim != null)
-    {
-        boyfriend.shader = bfRim;
-        bfRim.attachedSprite = boyfriend;
-        bfRim.updateFrameInfo(boyfriend.frame);
-    }
+			if (hasBfSkin && boyfriend.curCharacter != 'bfairship' && boyfriend.getFlag('backlit') != true)
+			{
+				if (bfRim != null)
+				{
+        				boyfriend.shader = bfRim;
+        				bfRim.attachedSprite = boyfriend;
+        				bfRim.updateFrameInfo(boyfriend.frame);
+    				}
 
-    if (dadRim != null)
-    {
-        dad.shader = dadRim;
-        dadRim.attachedSprite = dad;
-        dadRim.updateFrameInfo(dad.frame);
-    }
-}
+    				if (dadRim != null)
+    				{
+        				dad.shader = dadRim;
+        				dadRim.attachedSprite = dad;
+        				dadRim.updateFrameInfo(dad.frame);
+    				}
+			}
+
 			playHUD.timeBar.setColors(
 				0xFF44d844,
 				0xFF2e412e
@@ -491,7 +497,7 @@ if (hasBfSkin && boyfriend.curCharacter != 'bfairship' && boyfriend.getFlag('bac
 			playHUD.scoreTxt.color = dad.healthColour;
 			
 			game.botplayTxt.borderColor = FlxColor.BLACK;
-			game.botplayTxt.color = FlxColor.WHITE;
+			game.botplayTxt.color = dad.healthColour;
 			
 			for (i in opponentStrums)
 				i.visible = true;
@@ -516,7 +522,7 @@ if (hasBfSkin && boyfriend.curCharacter != 'bfairship' && boyfriend.getFlag('bac
 			for (member in members)
 				if (ClientPrefs.inDevMode && Std.isOfType(member, FlxSprite) && member.camera == camOther && member.alpha == 0.3)
 					member.loadGraphic(Paths.image('menu/pause/looksie_extreme_demon'));
-
+			playHUD.updateIconAnimation = true;
 	}
 }
 
@@ -598,4 +604,9 @@ function onSpawnSustainSplash(splash:SustainSplash, note:Note)
 function onGhostAnim(anim, note)
 {
 	if (isDark) return Function_Stop;
+}
+
+function updateIconsAnimation()
+{
+	playHUD.iconP1.updateIconAnim(healthBar.percent * 0.01);
 }
