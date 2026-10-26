@@ -34,23 +34,18 @@ var sunRiseTween:FlxTween;
 var sunRiseStartY:Float = 0;
 var sunRiseTargetY:Float = 0;
 var sunRiseActive:Bool = false;
-var futureTransitionStep:Int = 785;
-var stageRimEntries:Array<Dynamic> = [];
-var stageColorEntries:Array<Dynamic> = [];
-var rimTransitionPhase:Int = 0;
-var rimTransitionTime:Float = 0;
-var rimTransitionStarted:Bool = false;
-var rimMatrixStartStep:Int = -1;
-var rimTransitionDuration:Float = 1;
 var combosPadding:Float = 0;
 var pinkCanPulse:Bool = false;
 var heartColorShader:ColorSwap;
 
+var sun:FlxSprite;
+var moonlight:FlxSprite;
 var cloud1:FlxSprite;
 var cloud2:FlxSprite;
 var cloud3:FlxSprite;
 var cloud4:FlxSprite;
 var cloudbig:FlxSprite;
+var pretendSky:FlxSprite;
 var greenhouseSky:FlxSprite;
 var greenhouseSun:FlxSprite;
 var greenhouseCloudfar:FlxSprite;
@@ -107,44 +102,6 @@ var SHADOW_ANCHOR_ADJUST_RHM:Float = 0;
 var silhouetteShadowShader:Dynamic = null;
 var silhouetteShadowEntries:Array<Dynamic> = [];
 
-function interpolateRimMatrix(from:Array<Float>, to:Array<Float>, progress:Float):Array<Float>
-{
-	var result:Array<Float> = [];
-	for (i in 0...20)
-		result.push(from[i] + (to[i] - from[i]) * progress);
-	return result;
-}
-
-function interpolateStageColor(from:Int, to:Int, progress:Float):Int
-{
-	var r1:Int = (from >> 16) & 0xFF;
-	var g1:Int = (from >> 8) & 0xFF;
-	var b1:Int = from & 0xFF;
-	var r2:Int = (to >> 16) & 0xFF;
-	var g2:Int = (to >> 8) & 0xFF;
-	var b2:Int = to & 0xFF;
-	var r:Int = Std.int(r1 + (r2 - r1) * progress);
-	var g:Int = Std.int(g1 + (g2 - g1) * progress);
-	var b:Int = Std.int(b1 + (b2 - b1) * progress);
-	return 0xFF000000 | (r << 16) | (g << 8) | b;
-}
-
-function registerStageColor(sprite:FlxSprite, targetColor:Int)
-{
-	if (sprite == null)
-		return;
-	stageColorEntries.push({sprite: sprite, startColor: sprite.color, targetColor: targetColor});
-}
-
-function updateStageColors(progress:Float)
-{
-	for (entry in stageColorEntries)
-	{
-		if (entry.sprite != null)
-			entry.sprite.color = interpolateStageColor(entry.startColor, entry.targetColor, progress);
-	}
-}
-
 function createStageRims(sprite:FlxSprite, ?rimType:String = 'object')
 {
 	if (sprite == null || !ClientPrefs.shaders)
@@ -188,153 +145,6 @@ function createStageRims(sprite:FlxSprite, ?rimType:String = 'object')
 	var layer1 = rim.addLayer(rimLayerMatrix.copy(), 90, 15, 0.01, 0.38);
 	var layer2 = rim.addLayer(rimLayerMatrix.copy(), 90, 25, 0.01, 0.18);
 	rim.attachedSprite = sprite;
-	stageRimEntries.push({
-		shader: rim,
-		baseMatrix: baseMatrix.copy(),
-		layerMatrix1: rimLayerMatrix.copy(),
-		layerMatrix2: rimLayerMatrix.copy(),
-		layer1: layer1,
-		layer2: layer2,
-		baseThreshold: 0.02,
-		baseStrength: 0.7,
-		layer1Angle: 90.0,
-		layer1Distance: 15.0,
-		layer1Threshold: 0.01,
-		layer1Strength: 0.38,
-		layer2Angle: 90.0,
-		layer2Distance: 25.0,
-		layer2Threshold: 0.01,
-		layer2Strength: 0.18,
-		targetLayer1Angle: targetLayer1Angle,
-		targetLayer1Distance: targetLayer1Distance,
-		targetLayer2Angle: targetLayer2Angle,
-		targetLayer2Distance: targetLayer2Distance
-	});
-}
-
-function startRimTransition()
-{
-	if (rimTransitionStarted || (stageRimEntries.length <= 0 && stageColorEntries.length <= 0))
-		return;
-
-	rimTransitionStarted = true;
-	rimTransitionPhase = 1;
-	rimTransitionTime = 0;
-}
-
-function updateRimTransition(elapsed:Float)
-{
-	if (rimTransitionPhase <= 0 || (stageRimEntries.length <= 0 && stageColorEntries.length <= 0))
-		return;
-
-	rimTransitionTime += elapsed;
-	var p:Float = Math.max(0, Math.min(1, rimTransitionTime / rimTransitionDuration));
-	if (rimTransitionPhase == 2)
-	{
-		if (rimMatrixStartStep < 0)
-			rimMatrixStartStep = curStep;
-		var matrixSteps:Int = 900 - rimMatrixStartStep;
-		p = (matrixSteps <= 0) ? 1 : Math.max(0, Math.min(1, (curStep - rimMatrixStartStep) / matrixSteps));
-	}
-	var targetBaseMatrix:Array<Float> = [
-		1, 0, 0, 0, 0,
-		0, 1, 0, 0, 0,
-		0, 0, 1, 0, 0,
-		0, 0, 0, 1, 0
-	];
-	var targetLayerMatrix:Array<Float> = [
-		1.35, 0, 0, 0, 0,
-		0, 0.92, 0, 0, 0,
-		0, 0, 0.98, 0, 0,
-		0, 0, 0, 1, 0
-	];
-
-	if (rimTransitionPhase == 2)
-		updateStageColors(p);
-
-	for (entry in stageRimEntries)
-	{
-		var rim = entry.shader;
-		var layer1 = entry.layer1;
-		var layer2 = entry.layer2;
-
-		if (rim == null || layer1 == null || layer2 == null)
-			continue;
-
-		if (rimTransitionPhase == 1)
-		{
-			layer1.strength = entry.layer1Strength * (1 - p);
-			layer2.strength = entry.layer2Strength * (1 - p);
-		}
-		else if (rimTransitionPhase == 2)
-		{
-			rim.setColorMatrix(interpolateRimMatrix(entry.baseMatrix, targetBaseMatrix, p));
-			layer1.colorMatrix = interpolateRimMatrix(entry.layerMatrix1, targetLayerMatrix, p);
-			layer2.colorMatrix = interpolateRimMatrix(entry.layerMatrix2, targetLayerMatrix, p);
-			rim.threshold = entry.baseThreshold + (0.035 - entry.baseThreshold) * p;
-			rim.strength = entry.baseStrength + (0.55 - entry.baseStrength) * p;
-			layer1.angle = entry.layer1Angle + (entry.targetLayer1Angle - entry.layer1Angle) * p;
-			layer1.distance = entry.layer1Distance + (entry.targetLayer1Distance - entry.layer1Distance) * p;
-			layer1.threshold = entry.layer1Threshold + (0.025 - entry.layer1Threshold) * p;
-			layer2.angle = entry.layer2Angle + (entry.targetLayer2Angle - entry.layer2Angle) * p;
-			layer2.distance = entry.layer2Distance + (entry.targetLayer2Distance - entry.layer2Distance) * p;
-			layer2.threshold = entry.layer2Threshold + (0.025 - entry.layer2Threshold) * p;
-			layer1.strength = 0;
-			layer2.strength = 0;
-		}
-		else if (rimTransitionPhase == 3)
-		{
-			layer1.strength = p;
-			layer2.strength = p;
-		}
-	}
-
-	if (p >= 1)
-	{
-		rimTransitionTime = 0;
-		if (rimTransitionPhase == 1)
-		{
-			for (entry in stageRimEntries)
-			{
-				if (entry.layer1 != null) entry.layer1.strength = 0;
-				if (entry.layer2 != null) entry.layer2.strength = 0;
-			}
-			rimTransitionPhase = 2;
-			rimMatrixStartStep = curStep;
-			rimTransitionTime = 0;
-		}
-		else if (rimTransitionPhase == 2)
-		{
-			for (entry in stageRimEntries)
-			{
-				if (entry.shader != null)
-				{
-					entry.shader.setColorMatrix(targetBaseMatrix.copy());
-					entry.shader.threshold = 0.035;
-					entry.shader.strength = 0.55;
-				}
-				if (entry.layer1 != null)
-				{
-					entry.layer1.colorMatrix = targetLayerMatrix.copy();
-					entry.layer1.angle = entry.targetLayer1Angle;
-					entry.layer1.distance = entry.targetLayer1Distance;
-					entry.layer1.threshold = 0.025;
-					entry.layer1.strength = 0;
-				}
-				if (entry.layer2 != null)
-				{
-					entry.layer2.colorMatrix = targetLayerMatrix.copy();
-					entry.layer2.angle = entry.targetLayer2Angle;
-					entry.layer2.distance = entry.targetLayer2Distance;
-					entry.layer2.threshold = 0.025;
-					entry.layer2.strength = 0;
-				}
-			}
-			rimTransitionPhase = 3;
-		}
-		else
-			rimTransitionPhase = 0;
-	}
 }
 
 function layoutHeartsHUD()
@@ -638,11 +448,25 @@ function onLoad()
 {
 	heartColorShader = new ColorSwap();
 
+	pretendSky = new FlxSprite(-1500, -800).loadGraphic(Paths.image(ext + 'pretender/bg sky'));
+	pretendSky.antialiasing = ClientPrefs.globalAntialiasing;
+	add(pretendSky);
+	pretendSky.alpha = 0;
+
 	greenhouseSky = new FlxSprite(-1500, -800).loadGraphic(Paths.image(ext + 'bg sky'));
 	greenhouseSky.antialiasing = ClientPrefs.globalAntialiasing;
 	greenhouseSky.cameras = [camGame];
 	greenhouseSky.scrollFactor.set(0.8, 0.8);
 	add(greenhouseSky);
+
+	moonlight = new FlxSprite(0, 0).loadGraphic(Paths.image(ext + 'pretender/moon light'));
+	moonlight.scrollFactor.set(0.8, 0.8);
+	moonlight.blend = BlendMode.ADD;
+	add(moonlight);
+
+	sun = new FlxSprite(0, 0).loadGraphic(Paths.image(ext + 'pretender/the sun'));
+	sun.scrollFactor.set(0.8, 0.8);
+	add(sun);
 
 	greenhouseSun = new FlxSprite(-400, -1100).loadGraphic(Paths.image(ext + 'the sun'));
 	greenhouseSun.cameras = [camGame];
@@ -956,40 +780,12 @@ function onCreatePost()
 			createStageRims(pet, 'character');
 	}
 
-	stageColorEntries = [];
-	registerStageColor(greenhouseSky, 0xFFFFFFFF);
-	registerStageColor(greenhouseSun, 0xFFFFFFFF);
-	registerStageColor(greenhouseCloudfar, 0xFF963F47);
-	registerStageColor(greenhouseCloudfront, 0xFFA4464E);
-	registerStageColor(greenhouseCloudFill, 0xFF963F47);
-	registerStageColor(cloud1, 0xFF9B424A);
-	registerStageColor(cloud2, 0xFF914049);
-	registerStageColor(cloud3, 0xFF9F4149);
-	registerStageColor(cloud4, 0xFF89363F);
-	registerStageColor(cloudbig, 0xFF924049);
-	registerStageColor(greenhouseGlasses, 0xFF713039);
-	registerStageColor(greymira, 0xFF8A3943);
-	registerStageColor(longus, 0xFF8A3943);
-	registerStageColor(tomato, 0xFF8A3943);
-	registerStageColor(ventNotSus, 0xFF8A3943);
-	registerStageColor(bluemira, 0xFF8A3943);
-	registerStageColor(rhmmira, 0xFF8A3943);
-	registerStageColor(pot, 0xFF6D282F);
-	registerStageColor(vines, 0xFF512128);
-	registerStageColor(dad, 0xFF8A3943);
-	registerStageColor(gf, 0xFF8A3943);
-	registerStageColor(boyfriend, 0xFF8A3943);
-	if (hasPet && pet != null)
-		registerStageColor(pet, 0xFF8A3943);
-
 	snapCamToPos(450, 300);
 	camSpecialThing([160, 200], [380, 200], 0.5);
 }
 
 function onUpdate(elapsed:Float)
 {
-	updateRimTransition(elapsed);
-
 	if (sunRiseActive && greenhouseSun != null)
 	{
 		var progress:Float = Math.max(0, Math.min(1, curStep / 900));
@@ -1127,12 +923,6 @@ function updateSilhouetteShadows()
 	}
 }
 
-function onStepHit()
-{
-	if (curStep == futureTransitionStep)
-		startRimTransition();
-}
-
 function onBeatHit()
 {
 	if (curBeat % 2 == (curSong == 'Pinkwave' ? 0 : 1) && pinkCanPulse)
@@ -1173,7 +963,7 @@ function onBeatHit()
 			greymira.animation.play('bop', true);
 			rhmmira.animation.play('bop', true);
 		}
-		bluemira.animation.play('bop', true);
+		//bluemira.animation.play('bop', true);
 	}
 }
 
@@ -1265,6 +1055,113 @@ function onPopUpScorePost(note, rating)
 
 function onSongStart()
 {
+	if (PlayState.SONG.song == "Pinkwave")
+	{
+		var dur = 141125.350400001 / 1000;
+
+		if (cloud1 != null)
+		{
+			FlxTween.color(cloud1, dur, cloud1.color, 0xFF192141, {ease: FlxEase.linear});
+		}
+		if (cloud2 != null)
+		{
+			FlxTween.color(cloud2, dur, cloud2.color, 0xFF192141, {ease: FlxEase.linear});
+		}
+		if (cloud3 != null)
+		{
+			FlxTween.color(cloud3, dur, cloud3.color, 0xFF192141, {ease: FlxEase.linear});
+		}
+		if (cloud4 != null)
+		{
+			FlxTween.color(cloud4, dur, cloud4.color, 0xFF192141, {ease: FlxEase.linear});
+		}
+		if (cloudbig != null)
+		{
+			FlxTween.color(cloudbig, dur, cloudbig.color, 0xFF192141, {ease: FlxEase.linear});
+		}
+		if (greenhouseSky != null)
+			FlxTween.tween(greenhouseSky, {alpha: 0}, dur, {ease: FlxEase.linear});
+		if (pretendSky != null)
+			FlxTween.tween(pretendSky, {alpha: 1}, dur, {ease: FlxEase.linear});
+		if (greenhouseGlasses != null)
+			FlxTween.color(greenhouseGlasses, dur, greenhouseGlasses.color, 0xFF192141, {ease: FlxEase.linear});
+		if (greenhouseMystery != null)
+		{
+			FlxTween.color(greenhouseMystery, dur, greenhouseMystery.color, 0xFF192141, {ease: FlxEase.linear});
+			FlxTween.tween(greenhouseMystery.shader, {threshold: .01, strength: 1}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(greenhouseMystery.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(greenhouseMystery.shader.layers[0], [getBaseMatrix()], dur, FlxEase.linear);
+			tweenShadowLayer(greenhouseMystery.shader.layers[1], [getBaseMatrix()], dur, FlxEase.linear);
+		}
+		if (greenhouseLmao != null)
+			FlxTween.color(greenhouseLmao, dur, greenhouseLmao.color, 0xFF192141, {ease: FlxEase.linear});
+		if (greenhouseHelp != null)
+			FlxTween.color(greenhouseHelp, dur, greenhouseHelp.color, 0xFF192141, {ease: FlxEase.linear});
+		if (greymira != null)
+		{
+			FlxTween.color(greymira, dur, greymira.color, 0xFF192141, {ease: FlxEase.linear});
+			FlxTween.tween(greymira.shader, {threshold: .01, strength: 1}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(greymira.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(greymira.shader.layers[0], [getBaseMatrix()], dur, FlxEase.linear);
+			tweenShadowLayer(greymira.shader.layers[1], [getBaseMatrix()], dur, FlxEase.linear);
+		}
+		if (bluemira != null)
+		{
+			FlxTween.color(bluemira, dur, bluemira.color, 0xFF192141, {ease: FlxEase.linear});
+			FlxTween.tween(bluemira.shader, {threshold: .01, strength: 1}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(bluemira.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(bluemira.shader.layers[0], [getBaseMatrix()], dur, FlxEase.linear);
+			tweenShadowLayer(bluemira.shader.layers[1], [getBaseMatrix()], dur, FlxEase.linear);
+		}
+		if (tomato != null)
+		{
+			FlxTween.color(tomato, dur, tomato.color, 0xFF192141, {ease: FlxEase.linear});
+			FlxTween.tween(tomato.shader, {threshold: .01, strength: 1}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(tomato.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(tomato.shader.layers[0], [getBaseMatrix()], dur, FlxEase.linear);
+			tweenShadowLayer(tomato.shader.layers[1], [getBaseMatrix()], dur, FlxEase.linear);
+		}
+		if (longus != null)
+		{
+			FlxTween.color(longus, dur, longus.color, 0xFF192141, {ease: FlxEase.linear});
+			FlxTween.tween(longus.shader, {threshold: .01, strength: 1}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(longus.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(longus.shader.layers[0], [getBaseMatrix()], dur, FlxEase.linear);
+			tweenShadowLayer(longus.shader.layers[1], [getBaseMatrix()], dur, FlxEase.linear);
+		}
+		if (rhmmira != null)
+		{
+			FlxTween.color(rhmmira, dur, rhmmira.color, 0xFF192141, {ease: FlxEase.linear});
+			FlxTween.tween(rhmmira.shader, {threshold: .01, strength: 1}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(rhmmira.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(rhmmira.shader.layers[0], [getBaseMatrix()], dur, FlxEase.linear);
+			tweenShadowLayer(rhmmira.shader.layers[1], [getBaseMatrix()], dur, FlxEase.linear);
+		}
+		if (boyfriend != null)
+		{
+			FlxTween.color(boyfriend, dur, boyfriend.color, 0xFF192141, {ease: FlxEase.linear});
+			FlxTween.tween(boyfriend.shader, {threshold: .01, strength: 1}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(boyfriend.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(boyfriend.shader.layers[0], [getBaseMatrix()], dur, FlxEase.linear);
+			tweenShadowLayer(boyfriend.shader.layers[1], [getBaseMatrix()], dur, FlxEase.linear);
+		}
+		if (gf != null)
+		{
+			FlxTween.color(gf, dur, gf.color, 0xFF192141, {ease: FlxEase.linear});
+			FlxTween.tween(gf.shader, {threshold: .01, strength: 1}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(gf.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(gf.shader.layers[0], [getBaseMatrix()], dur, FlxEase.linear);
+			tweenShadowLayer(gf.shader.layers[1], [getBaseMatrix()], dur, FlxEase.linear);
+		}
+		if (dad != null)
+		{
+			FlxTween.color(dad, dur, dad.color, 0xFF192141, {ease: FlxEase.linear});
+			FlxTween.tween(dad.shader, {threshold: .01, strength: 1}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(dad.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(dad.shader.layers[0], [getBaseMatrix()], dur, FlxEase.linear);
+			tweenShadowLayer(dad.shader.layers[1], [getBaseMatrix()], dur, FlxEase.linear);
+		}
+	}
 	if (greenhouseSun != null)
 	{
 		if (sunRiseTween != null)
@@ -1272,5 +1169,217 @@ function onSongStart()
 		sunRiseStartY = greenhouseSun.y;
 		sunRiseTargetY = greenhouseSun.y - FlxG.height - greenhouseSun.height - 200;
 		sunRiseActive = true;
+	}
+}
+
+function onSectionHit()
+{
+	if (curSection == 74 && PlayState.SONG.song == "Pinkwave")
+	{
+		var curTime:Float = Math.max(0, Conductor.songPosition - ClientPrefs.noteOffset);
+		trace(curTime);
+		var dur = (songLength - curTime) / 1000;
+
+		if (sun != null)
+		{
+			FlxTween.tween(sun, {y: -350}, dur, {ease: FlxEase.linear});
+		}
+		if (moonlight != null)
+		{
+			FlxTween.tween(moonlight, {y: -350}, dur, {ease: FlxEase.linear});
+		}
+		if (cloud1 != null)
+		{
+			FlxTween.color(cloud1, dur, cloud1.color, 0xFF9B424A, {ease: FlxEase.linear});
+			FlxTween.tween(cloud1, {alpha: 0.6}, dur, {ease: FlxEase.linear});
+		}
+		if (cloud2 != null)
+		{
+			FlxTween.color(cloud2, dur, cloud2.color, 0xFF914049, {ease: FlxEase.linear});
+			FlxTween.tween(cloud2, {alpha: 0.6}, dur, {ease: FlxEase.linear});
+		}
+		if (cloud3 != null)
+		{
+			FlxTween.color(cloud3, dur, cloud3.color, 0xFF9F4149, {ease: FlxEase.linear});
+			FlxTween.tween(cloud3, {alpha: 0.6}, dur, {ease: FlxEase.linear});
+		}
+		if (cloud4 != null)
+		{
+			FlxTween.color(cloud4, dur, cloud4.color, 0xFF89363F, {ease: FlxEase.linear});
+			FlxTween.tween(cloud4, {alpha: 0.6}, dur, {ease: FlxEase.linear});
+		}
+		if (cloudbig != null)
+		{
+			FlxTween.color(cloudbig, dur, cloudbig.color, 0xFF924049, {ease: FlxEase.linear});
+			FlxTween.tween(cloudbig, {alpha: 0.6}, dur, {ease: FlxEase.linear});
+		}
+		if (greenhouseGlasses != null)
+			FlxTween.color(greenhouseGlasses, dur, greenhouseGlasses.color, 0xFF713039, {ease: FlxEase.linear});
+		if (greenhouseMystery != null)
+		{
+			FlxTween.color(greenhouseMystery, dur, greenhouseMystery.color, 0xFF5D252D, {ease: FlxEase.linear});
+			FlxTween.tween(greenhouseMystery.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(greenhouseMystery.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(greenhouseMystery.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(greenhouseMystery.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 120, 25, .025], dur, FlxEase.linear);
+		}
+		if (greenhouseLmao != null)
+			FlxTween.color(greenhouseLmao, dur, greenhouseLmao.color, 0xFF702A32, {ease: FlxEase.linear});
+		if (greenhouseHelp != null)
+			FlxTween.color(greenhouseHelp, dur, greenhouseHelp.color, 0xFF702A32, {ease: FlxEase.linear});
+		if (greymira != null)
+		{
+			FlxTween.color(greymira, dur, greymira.color, 0xFF8A3943, {ease: FlxEase.linear});
+			FlxTween.tween(greymira.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(greymira.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(greymira.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(greymira.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 120, 25, .025], dur, FlxEase.linear);
+		}
+		if (bluemira != null)
+		{
+			FlxTween.color(bluemira, dur, bluemira.color, 0xFF8A3943, {ease: FlxEase.linear});
+			FlxTween.tween(bluemira.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(bluemira.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(bluemira.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(bluemira.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 120, 25, .025], dur, FlxEase.linear);
+		}
+		if (tomato != null)
+		{
+			FlxTween.color(tomato, dur, tomato.color, 0xFF843039, {ease: FlxEase.linear});
+			FlxTween.tween(tomato.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(tomato.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(tomato.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(tomato.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 120, 25, .025], dur, FlxEase.linear);
+		}
+		if (longus != null)
+		{
+			FlxTween.color(longus, dur, longus.color, 0xFF843039, {ease: FlxEase.linear});
+			FlxTween.tween(longus.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(longus.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(longus.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(longus.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 120, 25, .025], dur, FlxEase.linear);
+		}
+		if (rhmmira != null)
+		{
+			FlxTween.color(rhmmira, dur, rhmmira.color, 0xFF59242C, {ease: FlxEase.linear});
+			FlxTween.tween(rhmmira.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(rhmmira.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(rhmmira.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(rhmmira.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 120, 25, .025], dur, FlxEase.linear);
+		}
+		if (boyfriend != null)
+		{
+			FlxTween.color(boyfriend, dur, boyfriend.color, 0xFF8A3943, {ease: FlxEase.linear});
+			FlxTween.tween(boyfriend.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(boyfriend.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(boyfriend.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(boyfriend.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 90, 12, .025], dur, FlxEase.linear);
+		}
+		if (gf != null)
+		{
+			FlxTween.color(gf, dur, gf.color, 0xFF8A3943, {ease: FlxEase.linear});
+			FlxTween.tween(gf.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(gf.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(gf.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(gf.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 90, 12, .025], dur, FlxEase.linear);
+		}
+		if (dad != null)
+		{
+			FlxTween.color(dad, dur, dad.color, 0xFF8A3943, {ease: FlxEase.linear});
+			FlxTween.tween(dad.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenColorMatrix(dad.shader, getBaseMatrix(), dur, FlxEase.linear);
+			tweenShadowLayer(dad.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(dad.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 90, 12, .025], dur, FlxEase.linear);
+		}
 	}
 }
