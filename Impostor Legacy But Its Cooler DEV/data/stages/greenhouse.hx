@@ -963,7 +963,7 @@ function onBeatHit()
 			greymira.animation.play('bop', true);
 			rhmmira.animation.play('bop', true);
 		}
-		//bluemira.animation.play('bop', true);
+		bluemira.animation.play('bop', true);
 	}
 }
 
