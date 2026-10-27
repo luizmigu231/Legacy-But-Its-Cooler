@@ -17,7 +17,7 @@ function onUpdate(elapsed:Float)
 	}
 
 	txt.y = botplayBaseY + botplayOffsetY;
-	if (!forcedBotColor) txt.color = dad.healthColour;
+	if (!forcedBotColor) txt.color = playHUD.scoreTxt.color;
 	txt.text = "Be_Impostor.exe";
 	txt.size = 26;
 }

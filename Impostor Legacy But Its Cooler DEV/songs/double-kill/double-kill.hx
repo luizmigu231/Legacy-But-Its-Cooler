@@ -96,6 +96,12 @@ function onEvent(eventName, value1, value2)
         	                        FlxTween.tween(playHUD.scoreTxt, { alpha: 0 }, 0.5, { ease: FlxEase.quadOut });
 					cargoDarken = true;
 					camGame.flash(FlxColor.BLACK, 0.55);
+					if (!ClientPrefs.middleScroll)
+					{
+  						FlxTween.num(0, 0.5, 0.7, {ease: FlxEase.quadInOut, onUpdate: function(twn:FlxTween) modManager.setValue('opponentSwap', twn.value, -1)});
+  						FlxTween.num(0, 1, 0.7, {ease: FlxEase.quadInOut, onUpdate: function(twn:FlxTween) modManager.setValue('alpha', twn.value, 1)});
+						comboX = 440;
+					}
 				case 'airship':
         	                        playHUD.scoreTxt.color = -1001146;
                                         playHUD.healthBar.leftBar.color = -1001146;
@@ -118,8 +124,17 @@ function onEvent(eventName, value1, value2)
 					dad.alpha = 1;
 					black.alpha = 1;
 					// pet.alpha = 1;
-					lightoverlayDK.alpha = 0.6;
-					mainoverlayDK.alpha = 0.51;
+					FlxG.signals.postUpdate.addOnce(()->
+					{
+						lightoverlayDK.alpha = 0.4;
+						mainoverlayDK.alpha = 0.51;
+					});
+					if (!ClientPrefs.middleScroll)
+					{
+  						modManager.setValue('opponentSwap', 0, -1);
+  						modManager.setValue('alpha', 0, 1);
+						comboX = 0;
+					}
 				case 'gonnakill':
 					FlxTween.tween(game, {defaultCamZoom: 1}, Conductor.crotchet * .004, {ease: FlxEase.sineInOut});
 					FlxTween.tween(cargoDarkFG, {alpha: 1}, Conductor.crotchet * .004);
@@ -289,7 +304,7 @@ function defeatness():Void
 		black.useRenderTexture = true;
 		dadRim.layers[0].angle = 170;
 		dadRim.layers[1].angle = 88;
-	}
+	} else dad.shader = null;
 	
 	if (hasPet)
 	{

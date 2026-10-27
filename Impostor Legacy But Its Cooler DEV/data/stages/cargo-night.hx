@@ -76,7 +76,9 @@ function onBeatHit()
             blackanim.setPosition(black.x, black.y - 1400);
             blackanim.animation.play('intro');
             blackanim.alpha = 1;
-            blackanim.animation.onFinish.addOnce((anim)->{ blackanim.alpha = 0.001; black.alpha = 1; });
+	case 36:
+	    blackanim.visible = false;
+	    black.alpha = 1;
         case 196, 228, 272, 288, 488, 520, 756, 764, 784, 816:
             extraStrums(true);
         case 212, 244, 276, 292, 504, 536, 760, 768, 800, 832:
@@ -94,7 +96,7 @@ function onCreatePost()
     startCharacterPos(black);
     stage.insert(stage.members.indexOf(dadGroup), black);
 
-    blackanim = new FlxSprite(0,0);
+    blackanim = new FunkinSprite(0,0);
     blackanim.frames = Paths.getSparrowAtlas('characters/story/black/black_anim');
     blackanim.animation.addByPrefix('intro', 'black anim', 24, false);
     blackanim.alpha = 0.001;
@@ -510,6 +512,8 @@ function applyBLACKEffect()
 {
     if (black == null) return;
     blackRim = applyDarkLightEffect(black, -85, -25);
+    applyDarkLightEffect(blackanim, -85, -25);
+
 }
 
 function applyGFEffect()
@@ -542,6 +546,12 @@ function onEvent(eventName, value1, value2)
         case 'Both Opponents':
             bothSing = Std.int(value1) == 1;
             playHUD.iconP2.changeIcon(bothSing ? 'double-kill' : (twoSing ? 'black' : 'white'));
+	    if (bothSing)
+	    {
+		playHUD.healthBar.setColors(black.healthColour, boyfriend.healthColour);
+		if (hasColor) playHUD.scoreTxt.color = black.healthColour;
+	    }
+	    else refreshDoubleKillIcon();
     }
 }
 
