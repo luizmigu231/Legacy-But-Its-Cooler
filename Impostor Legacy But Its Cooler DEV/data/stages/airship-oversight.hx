@@ -320,27 +320,7 @@ function configureShaderPartSymbol(item:Dynamic, mode:String, glowScale:Float):V
 	var cacheTrue:Array<String> = [];
 	var cacheFalse:Array<String> = [];
 	if (mode == 'excluded' && shaderExcludedParts.indexOf(symbolName) != -1)
-	{
-		if (glowScale > 1 && symbolName == 'halo')
-		{
-			var bounds:Dynamic = item.timeline.getWholeBounds(false, null, null, true);
-			if (bounds != null && bounds.width > 0 && bounds.height > 0)
-			{
-				var centerX:Float = bounds.x + bounds.width * 0.5;
-				var centerY:Float = bounds.y + bounds.height * 0.5;
-				for (layer in item.timeline.layers)
-				{
-					if (layer == null) continue;
-					layer.forEachFrame(function(frame)
-					{
-						if (frame == null || frame.elements == null) return;
-						for (element in frame.elements) scaleShaderElementAroundParentCenter(element, glowScale, centerX, centerY);
-					});
-				}
-			}
-		}
 		return;
-	}
 	for (layer in item.timeline.layers)
 	{
 		if (layer == null) continue;
@@ -366,7 +346,8 @@ function configureShaderPartSymbol(item:Dynamic, mode:String, glowScale:Float):V
 				var childItem:Dynamic = element.libraryItem;
 				var hasExcluded:Bool = isExcluded || shaderPartItemContainsExcluded(childItem, cacheTrue, cacheFalse, []);
 				element.visible = hasExcluded;
-				if (glowScale > 1 && isExcluded && childName != 'halo' && symbolName != 'halo' && element.matrix != null && childItem != null && childItem.timeline != null)
+				var isBrokenDownAltHalo:Bool = childName == 'halo' && StringTools.startsWith(symbolName.toLowerCase(), 'down alt');
+				if (glowScale > 1 && isExcluded && symbolName != 'halo' && !isBrokenDownAltHalo && element.matrix != null && childItem != null && childItem.timeline != null)
 				{
 					var localBounds:Dynamic = childItem.timeline.getWholeBounds(false, null, null, true);
 					if (localBounds != null && localBounds.width > 0 && localBounds.height > 0)
@@ -487,6 +468,38 @@ function filterShaderPartsOverlay(sprite:Dynamic, rootSymbols:Array<String>):Voi
 		filterShaderPartsSymbol(sprite, symbolName, true, visited, cacheTrue, cacheFalse);
 }
 
+function symbolContainsShaderHalo(sprite:Dynamic, symbolName:String, stack:Array<String>):Bool
+{
+	if (symbolName == 'halo') return true;
+	if (symbolName == null || symbolName == '' || stack.indexOf(symbolName) != -1) return false;
+	var library:Dynamic = shaderPartLibrary(sprite);
+	if (library == null) return false;
+	var symbol = library.getSymbol(symbolName);
+	if (symbol == null || symbol.timeline == null) return false;
+	stack.push(symbolName);
+	var found:Bool = false;
+	for (layer in symbol.timeline.layers)
+	{
+		if (layer == null) continue;
+		layer.forEachFrame(function(frame)
+		{
+			if (found || frame == null || frame.elements == null) return;
+			for (element in frame.elements)
+			{
+				var childName:String = shaderPartChildName(element);
+				if (childName != '' && symbolContainsShaderHalo(sprite, childName, stack))
+				{
+					found = true;
+					break;
+				}
+			}
+		});
+		if (found) break;
+	}
+	stack.pop();
+	return found;
+}
+
 function shaderPartTargetLayer(sprite:Dynamic, symbolName:String, cacheTrue:Array<String>, cacheFalse:Array<String>):Int
 {
 	var library:Dynamic = shaderPartLibrary(sprite);
@@ -494,6 +507,7 @@ function shaderPartTargetLayer(sprite:Dynamic, symbolName:String, cacheTrue:Arra
 	var symbol = library.getSymbol(symbolName);
 	if (symbol == null || symbol.timeline == null) return -1;
 	var targetLayer:Int = -1;
+	var targetHaloOnly:Bool = StringTools.startsWith(symbolName.toLowerCase(), 'down alt');
 	for (layerOrder in 0...symbol.timeline.layers.length)
 	{
 		var layerIndex:Int = symbol.timeline.layers.length - 1 - layerOrder;
@@ -505,7 +519,7 @@ function shaderPartTargetLayer(sprite:Dynamic, symbolName:String, cacheTrue:Arra
 			for (element in frame.elements)
 			{
 				var childName:String = shaderPartChildName(element);
-				if (childName != '' && symbolContainsShaderExcludedPart(sprite, childName, cacheTrue, cacheFalse, []))
+				if (childName != '' && (targetHaloOnly ? symbolContainsShaderHalo(sprite, childName, []) : symbolContainsShaderExcludedPart(sprite, childName, cacheTrue, cacheFalse, [])))
 				{
 					targetLayer = layerIndex;
 					break;
@@ -524,6 +538,7 @@ function shaderPartTargetElement(sprite:Dynamic, symbolName:String, targetLayer:
 	var symbol = library.getSymbol(symbolName);
 	if (symbol == null || symbol.timeline == null || targetLayer >= symbol.timeline.layers.length) return -1;
 	var targetElement:Int = -1;
+	var targetHaloOnly:Bool = StringTools.startsWith(symbolName.toLowerCase(), 'down alt');
 	var layer = symbol.timeline.layers[targetLayer];
 	if (layer == null) return -1;
 	layer.forEachFrame(function(frame)
@@ -532,7 +547,7 @@ function shaderPartTargetElement(sprite:Dynamic, symbolName:String, targetLayer:
 		for (i in 0...frame.elements.length)
 		{
 			var childName:String = shaderPartChildName(frame.elements[i]);
-			if (childName != '' && symbolContainsShaderExcludedPart(sprite, childName, cacheTrue, cacheFalse, []))
+			if (childName != '' && (targetHaloOnly ? symbolContainsShaderHalo(sprite, childName, []) : symbolContainsShaderExcludedPart(sprite, childName, cacheTrue, cacheFalse, [])))
 			{
 				targetElement = i;
 				break;
@@ -600,6 +615,7 @@ function filterShaderPartsDepth(sprite:Dynamic, rootSymbols:Array<String>, showF
 			}
 			continue;
 		}
+		var targetHaloOnly:Bool = StringTools.startsWith(symbolName.toLowerCase(), 'down alt');
 		var targetElement:Int = shaderPartTargetElement(sprite, symbolName, targetLayer, cacheTrue, cacheFalse);
 		if (targetElement < 0) continue;
 		for (layerIndex in 0...symbol.timeline.layers.length)
@@ -615,7 +631,7 @@ function filterShaderPartsDepth(sprite:Dynamic, rootSymbols:Array<String>, showF
 					for (i in 0...frame.elements.length)
 					{
 						var targetChild:String = shaderPartChildName(frame.elements[i]);
-						if (targetChild != '' && symbolContainsShaderExcludedPart(sprite, targetChild, cacheTrue, cacheFalse, []))
+						if (targetChild != '' && (targetHaloOnly ? symbolContainsShaderHalo(sprite, targetChild, []) : symbolContainsShaderExcludedPart(sprite, targetChild, cacheTrue, cacheFalse, [])))
 						{
 							frameTargetElement = i;
 							break;
@@ -909,6 +925,28 @@ function syncShaderPartSprite(sprite:FunkinSprite, shouldShow:Bool):Void
 	sprite.visible = shouldShow;
 }
 
+function isShaderDownAltAnimation():Bool
+{
+	if (dad == null) return false;
+	var animName:String = dad.getAnimName();
+	if ((animName == null || animName == '') && dad.animation.curAnim != null)
+		animName = dad.animation.curAnim.name;
+	if (animName == null || animName == '') return false;
+	var normalized:String = animName.toLowerCase();
+	return StringTools.contains(normalized, 'down') && StringTools.contains(normalized, 'alt');
+}
+
+function updateShaderPartOverlayDepth():Void
+{
+	if (shaderPartsLayer == null || shaderPartsOverlay == null) return;
+	var desiredZ:Int = isShaderDownAltAnimation() ? 6 : 4;
+	if (shaderPartsOverlay.zIndex != desiredZ)
+	{
+		shaderPartsOverlay.zIndex = desiredZ;
+		refreshZ(shaderPartsLayer);
+	}
+}
+
 function updateShaderExcludedParts():Void
 {
 	if (dad == null) return;
@@ -966,6 +1004,7 @@ function updateShaderExcludedParts():Void
 	syncShaderPartSprite(shaderPartsGlowOverlay, shaderPartsOriginalVisible);
 	syncShaderPartSprite(shaderPartsOverlay, shaderPartsOriginalVisible);
 	syncShaderPartSprite(shaderPartsOcclusionOverlay, shaderPartsOriginalVisible);
+	updateShaderPartOverlayDepth();
 	shaderPartsGlowWideOverlay.color = 0xFFFFD34A;
 	shaderPartsGlowWideOverlay.alpha = dad.alpha * 0.10;
 	shaderPartsGlowWideOverlay.blend = BlendMode.ADD;
