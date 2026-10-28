@@ -47,7 +47,7 @@ function onUpdate(elapsed)
         var targetX = FlxMath.remapToRange(
          game.health,
          0, 2,
-         DAD_X + 404, DAD_X - 404
+         DAD_X + 480, DAD_X - 480
         );
 
         dadGroup.x = FlxMath.lerp(dadGroup.x, targetX, FlxMath.bound(4.5 * elapsed, 0, 1));

@@ -38,6 +38,9 @@ var airshipPlatform:FlxBackdrop;
 var airSpeedlines:FlxBackdrop;
 var airBigCloud:FlxSprite;
 
+var edgeglow1:FlxSprite;
+var edgeglow2:FlxSprite;
+
 public var bfPlatform:FlxSprite;
 public var gfBoard:FlxSprite;
 public var petBoard:FlxSprite;
@@ -588,6 +591,43 @@ function onCreatePost()
 		if (member != boyfriend && Std.isOfType(member, Character))
 			legs = member;
 
+	edgeglow1 =
+		new FlxSprite(0, -60).loadGraphic(
+			Paths.image('stages/airship/danger/edgeglow')
+		);
+
+	edgeglow1.blend = BlendMode.ADD;
+
+	edgeglow1.setGraphicSize(FlxG.width * 1.1);
+	edgeglow1.screenCenter(FlxAxes.X);
+
+	edgeglow1.antialiasing =
+		ClientPrefs.globalAntialiasing;
+
+	edgeglow1.scrollFactor.set(0,0);
+	edgeglow1.alpha = 1;
+	game.add(edgeglow1);
+	edgeglow1.camera = camHUD;
+
+	edgeglow2 =
+		new FlxSprite(0, FlxG.height - 290).loadGraphic(
+			Paths.image('stages/airship/danger/edgeglow')
+		);
+
+	edgeglow2.blend = BlendMode.ADD;
+
+	edgeglow2.setGraphicSize(FlxG.width * 1.1);
+	edgeglow2.screenCenter(FlxAxes.X);
+	edgeglow2.flipY = true;
+
+	edgeglow2.antialiasing =
+		ClientPrefs.globalAntialiasing;
+
+	edgeglow2.scrollFactor.set(0,0);
+	edgeglow2.alpha = 1;
+	game.add(edgeglow2);
+	edgeglow2.camera = camHUD;
+
 	var hud = game.playHUD;
 
 	hud.updateIconPos = false;
@@ -992,6 +1032,8 @@ function onUpdate(elapsed)
 				1
 			)
 		);
+
+	edgeglow1.alpha = edgeglow2.alpha = FlxMath.remapToRange(health + 1.1, 2, 1, 0, 1);
 
 	if (ClientPrefs.inDevMode)
 	{
