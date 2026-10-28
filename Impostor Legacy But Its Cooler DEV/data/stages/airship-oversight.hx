@@ -199,7 +199,7 @@ function turnShader(should:Bool = false)
 		if (gf != null) gf.shader = null;
 		if (pet != null) pet.shader = null;
 		if (deadbody != null) deadbody.shader = null;
-		updateShaderExcludedParts();
+		refreshParts();
 		return;
 	}
 	if (boyfriend != null && bfRim != null)
@@ -211,7 +211,7 @@ function turnShader(should:Bool = false)
 	if (pet != null) pet.shader = petRim;
 	if (deadbody != null) deadbody.shader = deadbodyRim;
 	hideRim();
-	updateShaderExcludedParts();
+	refreshParts();
 }
 
 function setShaderLayersThreshold(shader:ExtraDropShadowShader, value:Float):Void
@@ -250,7 +250,7 @@ function setRimThreshold(value:Float)
 	setShaderLayersThreshold(deadbodyRim, value);
 }
 
-function shaderPartLibrary(sprite:Dynamic):Dynamic
+function getLibrary(sprite:Dynamic):Dynamic
 {
 	if (sprite == null) return null;
 	var library:Dynamic = sprite.library;
@@ -258,7 +258,7 @@ function shaderPartLibrary(sprite:Dynamic):Dynamic
 	return library;
 }
 
-function shaderPartChildName(element:Dynamic):String
+function getElementName(element:Dynamic):String
 {
 	if (element == null) return '';
 	var kind:String = '' + element.elementType;
@@ -270,7 +270,7 @@ function shaderPartChildName(element:Dynamic):String
 	return result;
 }
 
-function shaderPartItemContainsExcluded(item:Dynamic, cacheTrue:Array<String>, cacheFalse:Array<String>, stack:Array<String>):Bool
+function checkItem(item:Dynamic, cacheTrue:Array<String>, cacheFalse:Array<String>, stack:Array<String>):Bool
 {
 	if (item == null || item.name == null) return false;
 	var name:String = '' + item.name;
@@ -293,9 +293,9 @@ function shaderPartItemContainsExcluded(item:Dynamic, cacheTrue:Array<String>, c
 			if (found || frame == null || frame.elements == null) return;
 			for (element in frame.elements)
 			{
-				var childName:String = shaderPartChildName(element);
+				var childName:String = getElementName(element);
 				if (childName == '') continue;
-				if (shaderExcludedParts.indexOf(childName) != -1 || shaderPartItemContainsExcluded(element.libraryItem, cacheTrue, cacheFalse, stack))
+				if (shaderExcludedParts.indexOf(childName) != -1 || checkItem(element.libraryItem, cacheTrue, cacheFalse, stack))
 				{
 					found = true;
 					break;
@@ -313,7 +313,7 @@ function shaderPartItemContainsExcluded(item:Dynamic, cacheTrue:Array<String>, c
 	return found;
 }
 
-function configureShaderPartSymbol(item:Dynamic, mode:String, glowScale:Float):Void
+function setupSymbol(item:Dynamic, mode:String, glowScale:Float):Void
 {
 	if (item == null || item.timeline == null) return;
 	var symbolName:String = '' + item.name;
@@ -330,7 +330,7 @@ function configureShaderPartSymbol(item:Dynamic, mode:String, glowScale:Float):V
 			for (element in frame.elements)
 			{
 				if (element == null) continue;
-				var childName:String = shaderPartChildName(element);
+				var childName:String = getElementName(element);
 				if (mode != 'excluded')
 				{
 					if (childName != '' && shaderExcludedParts.indexOf(childName) != -1)
@@ -344,37 +344,37 @@ function configureShaderPartSymbol(item:Dynamic, mode:String, glowScale:Float):V
 				}
 				var isExcluded:Bool = shaderExcludedParts.indexOf(childName) != -1;
 				var childItem:Dynamic = element.libraryItem;
-				var hasExcluded:Bool = isExcluded || shaderPartItemContainsExcluded(childItem, cacheTrue, cacheFalse, []);
+				var hasExcluded:Bool = isExcluded || checkItem(childItem, cacheTrue, cacheFalse, []);
 				element.visible = hasExcluded;
 				var isBrokenDownAltHalo:Bool = childName == 'halo' && StringTools.startsWith(symbolName.toLowerCase(), 'down alt');
 				if (glowScale > 1 && isExcluded && symbolName != 'halo' && !isBrokenDownAltHalo && element.matrix != null && childItem != null && childItem.timeline != null)
 				{
 					var localBounds:Dynamic = childItem.timeline.getWholeBounds(false, null, null, true);
 					if (localBounds != null && localBounds.width > 0 && localBounds.height > 0)
-						scaleShaderElementAroundCenter(element, glowScale, localBounds.x + localBounds.width * 0.5, localBounds.y + localBounds.height * 0.5);
+						scaleAround(element, glowScale, localBounds.x + localBounds.width * 0.5, localBounds.y + localBounds.height * 0.5);
 				}
 			}
 		});
 	}
 }
 
-function hasShaderExcludedParts(sprite:Dynamic):Bool
+function hasParts(sprite:Dynamic):Bool
 {
-	var library:Dynamic = shaderPartLibrary(sprite);
+	var library:Dynamic = getLibrary(sprite);
 	if (library == null) return false;
 	for (part in shaderExcludedParts)
 		if (library.getSymbol(part) == null) return false;
 	return true;
 }
 
-function symbolContainsShaderExcludedPart(sprite:Dynamic, symbolName:String, cacheTrue:Array<String>, cacheFalse:Array<String>, stack:Array<String>):Bool
+function checkSymbol(sprite:Dynamic, symbolName:String, cacheTrue:Array<String>, cacheFalse:Array<String>, stack:Array<String>):Bool
 {
 	if (symbolName == null || symbolName == '') return false;
 	if (shaderExcludedParts.indexOf(symbolName) != -1) return true;
 	if (cacheTrue.indexOf(symbolName) != -1) return true;
 	if (cacheFalse.indexOf(symbolName) != -1) return false;
 	if (stack.indexOf(symbolName) != -1) return false;
-	var library:Dynamic = shaderPartLibrary(sprite);
+	var library:Dynamic = getLibrary(sprite);
 	if (library == null) return false;
 	var symbol = library.getSymbol(symbolName);
 	if (symbol == null || symbol.timeline == null)
@@ -392,9 +392,9 @@ function symbolContainsShaderExcludedPart(sprite:Dynamic, symbolName:String, cac
 			if (found || frame == null || frame.elements == null) return;
 			for (element in frame.elements)
 			{
-				var childName:String = shaderPartChildName(element);
+				var childName:String = getElementName(element);
 				if (childName == '') continue;
-				if (symbolContainsShaderExcludedPart(sprite, childName, cacheTrue, cacheFalse, stack))
+				if (checkSymbol(sprite, childName, cacheTrue, cacheFalse, stack))
 				{
 					found = true;
 					break;
@@ -412,12 +412,12 @@ function symbolContainsShaderExcludedPart(sprite:Dynamic, symbolName:String, cac
 	return found;
 }
 
-function filterShaderPartsSymbol(sprite:Dynamic, symbolName:String, onlyExcluded:Bool, visited:Array<String>, cacheTrue:Array<String>, cacheFalse:Array<String>):Void
+function filterSymbol(sprite:Dynamic, symbolName:String, onlyExcluded:Bool, visited:Array<String>, cacheTrue:Array<String>, cacheFalse:Array<String>):Void
 {
 	if (symbolName == null || symbolName == '' || visited.indexOf(symbolName) != -1) return;
 	visited.push(symbolName);
 	if (onlyExcluded && shaderExcludedParts.indexOf(symbolName) != -1) return;
-	var library:Dynamic = shaderPartLibrary(sprite);
+	var library:Dynamic = getLibrary(sprite);
 	if (library == null) return;
 	var symbol = library.getSymbol(symbolName);
 	if (symbol == null || symbol.timeline == null) return;
@@ -431,7 +431,7 @@ function filterShaderPartsSymbol(sprite:Dynamic, symbolName:String, onlyExcluded
 			for (element in frame.elements)
 			{
 				if (element == null) continue;
-				var childName:String = shaderPartChildName(element);
+				var childName:String = getElementName(element);
 				if (childName == '')
 				{
 					if (onlyExcluded) element.visible = false;
@@ -439,7 +439,7 @@ function filterShaderPartsSymbol(sprite:Dynamic, symbolName:String, onlyExcluded
 				}
 				var isExcluded:Bool = shaderExcludedParts.indexOf(childName) != -1;
 				if (onlyExcluded)
-					element.visible = isExcluded || symbolContainsShaderExcludedPart(sprite, childName, cacheTrue, cacheFalse, []);
+					element.visible = isExcluded || checkSymbol(sprite, childName, cacheTrue, cacheFalse, []);
 				else if (isExcluded)
 					element.visible = false;
 				if (children.indexOf(childName) == -1) children.push(childName);
@@ -447,32 +447,32 @@ function filterShaderPartsSymbol(sprite:Dynamic, symbolName:String, onlyExcluded
 		});
 	}
 	for (childName in children)
-		filterShaderPartsSymbol(sprite, childName, onlyExcluded, visited, cacheTrue, cacheFalse);
+		filterSymbol(sprite, childName, onlyExcluded, visited, cacheTrue, cacheFalse);
 }
 
-function filterShaderPartsBody(sprite:Dynamic, rootSymbols:Array<String>):Void
+function filterBody(sprite:Dynamic, rootSymbols:Array<String>):Void
 {
 	var visited:Array<String> = [];
 	var cacheTrue:Array<String> = [];
 	var cacheFalse:Array<String> = [];
 	for (symbolName in rootSymbols)
-		filterShaderPartsSymbol(sprite, symbolName, false, visited, cacheTrue, cacheFalse);
+		filterSymbol(sprite, symbolName, false, visited, cacheTrue, cacheFalse);
 }
 
-function filterShaderPartsOverlay(sprite:Dynamic, rootSymbols:Array<String>):Void
+function filterOverlay(sprite:Dynamic, rootSymbols:Array<String>):Void
 {
 	var visited:Array<String> = [];
 	var cacheTrue:Array<String> = [];
 	var cacheFalse:Array<String> = [];
 	for (symbolName in rootSymbols)
-		filterShaderPartsSymbol(sprite, symbolName, true, visited, cacheTrue, cacheFalse);
+		filterSymbol(sprite, symbolName, true, visited, cacheTrue, cacheFalse);
 }
 
-function symbolContainsShaderHalo(sprite:Dynamic, symbolName:String, stack:Array<String>):Bool
+function hasHalo(sprite:Dynamic, symbolName:String, stack:Array<String>):Bool
 {
 	if (symbolName == 'halo') return true;
 	if (symbolName == null || symbolName == '' || stack.indexOf(symbolName) != -1) return false;
-	var library:Dynamic = shaderPartLibrary(sprite);
+	var library:Dynamic = getLibrary(sprite);
 	if (library == null) return false;
 	var symbol = library.getSymbol(symbolName);
 	if (symbol == null || symbol.timeline == null) return false;
@@ -486,8 +486,8 @@ function symbolContainsShaderHalo(sprite:Dynamic, symbolName:String, stack:Array
 			if (found || frame == null || frame.elements == null) return;
 			for (element in frame.elements)
 			{
-				var childName:String = shaderPartChildName(element);
-				if (childName != '' && symbolContainsShaderHalo(sprite, childName, stack))
+				var childName:String = getElementName(element);
+				if (childName != '' && hasHalo(sprite, childName, stack))
 				{
 					found = true;
 					break;
@@ -500,14 +500,22 @@ function symbolContainsShaderHalo(sprite:Dynamic, symbolName:String, stack:Array
 	return found;
 }
 
-function shaderPartTargetLayer(sprite:Dynamic, symbolName:String, cacheTrue:Array<String>, cacheFalse:Array<String>):Int
+function getDepthSymbol(symbolName:String):String
 {
-	var library:Dynamic = shaderPartLibrary(sprite);
+	if (symbolName == null || symbolName == '') return symbolName;
+	var normalized:String = symbolName.toLowerCase();
+	if (normalized == 'aldown') return 'down alt';
+	return symbolName;
+}
+
+function findLayer(sprite:Dynamic, symbolName:String, cacheTrue:Array<String>, cacheFalse:Array<String>):Int
+{
+	symbolName = getDepthSymbol(symbolName);
+	var library:Dynamic = getLibrary(sprite);
 	if (library == null) return -1;
 	var symbol = library.getSymbol(symbolName);
 	if (symbol == null || symbol.timeline == null) return -1;
 	var targetLayer:Int = -1;
-	var targetHaloOnly:Bool = StringTools.startsWith(symbolName.toLowerCase(), 'down alt');
 	for (layerOrder in 0...symbol.timeline.layers.length)
 	{
 		var layerIndex:Int = symbol.timeline.layers.length - 1 - layerOrder;
@@ -518,8 +526,8 @@ function shaderPartTargetLayer(sprite:Dynamic, symbolName:String, cacheTrue:Arra
 			if (targetLayer >= 0 || frame == null || frame.elements == null) return;
 			for (element in frame.elements)
 			{
-				var childName:String = shaderPartChildName(element);
-				if (childName != '' && (targetHaloOnly ? symbolContainsShaderHalo(sprite, childName, []) : symbolContainsShaderExcludedPart(sprite, childName, cacheTrue, cacheFalse, [])))
+				var childName:String = getElementName(element);
+				if (childName != '' && checkSymbol(sprite, childName, cacheTrue, cacheFalse, []))
 				{
 					targetLayer = layerIndex;
 					break;
@@ -531,14 +539,14 @@ function shaderPartTargetLayer(sprite:Dynamic, symbolName:String, cacheTrue:Arra
 	return targetLayer;
 }
 
-function shaderPartTargetElement(sprite:Dynamic, symbolName:String, targetLayer:Int, cacheTrue:Array<String>, cacheFalse:Array<String>):Int
+function findElement(sprite:Dynamic, symbolName:String, targetLayer:Int, cacheTrue:Array<String>, cacheFalse:Array<String>):Int
 {
-	var library:Dynamic = shaderPartLibrary(sprite);
+	symbolName = getDepthSymbol(symbolName);
+	var library:Dynamic = getLibrary(sprite);
 	if (library == null || targetLayer < 0) return -1;
 	var symbol = library.getSymbol(symbolName);
 	if (symbol == null || symbol.timeline == null || targetLayer >= symbol.timeline.layers.length) return -1;
 	var targetElement:Int = -1;
-	var targetHaloOnly:Bool = StringTools.startsWith(symbolName.toLowerCase(), 'down alt');
 	var layer = symbol.timeline.layers[targetLayer];
 	if (layer == null) return -1;
 	layer.forEachFrame(function(frame)
@@ -546,8 +554,8 @@ function shaderPartTargetElement(sprite:Dynamic, symbolName:String, targetLayer:
 		if (targetElement >= 0 || frame == null || frame.elements == null) return;
 		for (i in 0...frame.elements.length)
 		{
-			var childName:String = shaderPartChildName(frame.elements[i]);
-			if (childName != '' && (targetHaloOnly ? symbolContainsShaderHalo(sprite, childName, []) : symbolContainsShaderExcludedPart(sprite, childName, cacheTrue, cacheFalse, [])))
+			var childName:String = getElementName(frame.elements[i]);
+			if (childName != '' && checkSymbol(sprite, childName, cacheTrue, cacheFalse, []))
 			{
 				targetElement = i;
 				break;
@@ -557,11 +565,11 @@ function shaderPartTargetElement(sprite:Dynamic, symbolName:String, targetLayer:
 	return targetElement;
 }
 
-function hideShaderExcludedInstances(sprite:Dynamic, symbolName:String, visited:Array<String>):Void
+function hideNested(sprite:Dynamic, symbolName:String, visited:Array<String>):Void
 {
 	if (sprite == null || symbolName == null || symbolName == '' || visited.indexOf(symbolName) != -1) return;
 	visited.push(symbolName);
-	var library:Dynamic = shaderPartLibrary(sprite);
+	var library:Dynamic = getLibrary(sprite);
 	if (library == null) return;
 	var symbol = library.getSymbol(symbolName);
 	if (symbol == null || symbol.timeline == null) return;
@@ -575,7 +583,7 @@ function hideShaderExcludedInstances(sprite:Dynamic, symbolName:String, visited:
 			for (element in frame.elements)
 			{
 				if (element == null) continue;
-				var childName:String = shaderPartChildName(element);
+				var childName:String = getElementName(element);
 				if (childName == '') continue;
 				if (shaderExcludedParts.indexOf(childName) != -1)
 					element.visible = false;
@@ -584,20 +592,21 @@ function hideShaderExcludedInstances(sprite:Dynamic, symbolName:String, visited:
 			}
 		});
 	}
-	for (childName in children) hideShaderExcludedInstances(sprite, childName, visited);
+	for (childName in children) hideNested(sprite, childName, visited);
 }
 
-function filterShaderPartsDepth(sprite:Dynamic, rootSymbols:Array<String>, showForeground:Bool):Void
+function setLayerOrder(sprite:Dynamic, rootSymbols:Array<String>, showForeground:Bool):Void
 {
 	for (symbolName in rootSymbols)
 	{
-		var library:Dynamic = shaderPartLibrary(sprite);
+		var depthSymbolName:String = getDepthSymbol(symbolName);
+		var library:Dynamic = getLibrary(sprite);
 		if (library == null) return;
-		var symbol = library.getSymbol(symbolName);
+		var symbol = library.getSymbol(depthSymbolName);
 		if (symbol == null || symbol.timeline == null) continue;
 		var cacheTrue:Array<String> = [];
 		var cacheFalse:Array<String> = [];
-		var targetLayer:Int = shaderPartTargetLayer(sprite, symbolName, cacheTrue, cacheFalse);
+		var targetLayer:Int = findLayer(sprite, depthSymbolName, cacheTrue, cacheFalse);
 		if (targetLayer < 0)
 		{
 			if (showForeground)
@@ -615,8 +624,7 @@ function filterShaderPartsDepth(sprite:Dynamic, rootSymbols:Array<String>, showF
 			}
 			continue;
 		}
-		var targetHaloOnly:Bool = StringTools.startsWith(symbolName.toLowerCase(), 'down alt');
-		var targetElement:Int = shaderPartTargetElement(sprite, symbolName, targetLayer, cacheTrue, cacheFalse);
+		var targetElement:Int = findElement(sprite, depthSymbolName, targetLayer, cacheTrue, cacheFalse);
 		if (targetElement < 0) continue;
 		for (layerIndex in 0...symbol.timeline.layers.length)
 		{
@@ -630,8 +638,8 @@ function filterShaderPartsDepth(sprite:Dynamic, rootSymbols:Array<String>, showF
 				{
 					for (i in 0...frame.elements.length)
 					{
-						var targetChild:String = shaderPartChildName(frame.elements[i]);
-						if (targetChild != '' && (targetHaloOnly ? symbolContainsShaderHalo(sprite, targetChild, []) : symbolContainsShaderExcludedPart(sprite, targetChild, cacheTrue, cacheFalse, [])))
+						var targetChild:String = getElementName(frame.elements[i]);
+						if (targetChild != '' && checkSymbol(sprite, targetChild, cacheTrue, cacheFalse, []))
 						{
 							frameTargetElement = i;
 							break;
@@ -643,7 +651,7 @@ function filterShaderPartsDepth(sprite:Dynamic, rootSymbols:Array<String>, showF
 				{
 					var element = frame.elements[i];
 					if (element == null) continue;
-					var childName:String = shaderPartChildName(element);
+					var childName:String = getElementName(element);
 					if (childName != '' && shaderExcludedParts.indexOf(childName) != -1)
 					{
 						element.visible = false;
@@ -659,25 +667,25 @@ function filterShaderPartsDepth(sprite:Dynamic, rootSymbols:Array<String>, showF
 	}
 }
 
-function destroyShaderPartSprite(sprite:FunkinSprite):Void
+function disposePart(sprite:FunkinSprite):Void
 {
 	if (sprite == null) return;
 	if (shaderPartsLayer != null) shaderPartsLayer.remove(sprite, true);
 	sprite.destroy();
 }
 
-function destroyShaderPartsOverlays():Void
+function disposeLayers():Void
 {
 	if (dadRim != null && shaderPartsBodyOverlay != null && dadRim.attachedSprite == shaderPartsBodyOverlay)
 		dadRim.attachedSprite = null;
 	if (dadForegroundRim != null && shaderPartsOcclusionOverlay != null && dadForegroundRim.attachedSprite == shaderPartsOcclusionOverlay)
 		dadForegroundRim.attachedSprite = null;
-	destroyShaderPartSprite(shaderPartsBodyOverlay);
-	destroyShaderPartSprite(shaderPartsGlowWideOverlay);
-	destroyShaderPartSprite(shaderPartsGlowMidOverlay);
-	destroyShaderPartSprite(shaderPartsGlowOverlay);
-	destroyShaderPartSprite(shaderPartsOverlay);
-	destroyShaderPartSprite(shaderPartsOcclusionOverlay);
+	disposePart(shaderPartsBodyOverlay);
+	disposePart(shaderPartsGlowWideOverlay);
+	disposePart(shaderPartsGlowMidOverlay);
+	disposePart(shaderPartsGlowOverlay);
+	disposePart(shaderPartsOverlay);
+	disposePart(shaderPartsOcclusionOverlay);
 	if (shaderPartsLayer != null)
 	{
 		if (game != null && game.dadGroup != null) game.dadGroup.remove(shaderPartsLayer, true);
@@ -693,7 +701,7 @@ function destroyShaderPartsOverlays():Void
 	shaderPartsOverlayCharacter = '';
 }
 
-function scaleShaderElementAroundCenter(element:Dynamic, factor:Float, centerX:Float, centerY:Float):Void
+function scaleAround(element:Dynamic, factor:Float, centerX:Float, centerY:Float):Void
 {
 	if (element == null || element.matrix == null) return;
 	var a:Float = element.matrix.a;
@@ -708,7 +716,7 @@ function scaleShaderElementAroundCenter(element:Dynamic, factor:Float, centerX:F
 	element.matrix.d = d * factor;
 }
 
-function scaleShaderElementAroundParentCenter(element:Dynamic, factor:Float, centerX:Float, centerY:Float):Void
+function scaleNested(element:Dynamic, factor:Float, centerX:Float, centerY:Float):Void
 {
 	if (element == null || element.matrix == null) return;
 	element.matrix.tx = centerX + (element.matrix.tx - centerX) * factor;
@@ -719,11 +727,11 @@ function scaleShaderElementAroundParentCenter(element:Dynamic, factor:Float, cen
 	element.matrix.d = element.matrix.d * factor;
 }
 
-function scaleShaderExcludedElements(sprite:FunkinSprite, symbolName:String, factor:Float, visited:Array<String>, insideExcluded:Bool, scaledHalo:Array<String>):Void
+function scaleParts(sprite:FunkinSprite, symbolName:String, factor:Float, visited:Array<String>, insideExcluded:Bool, scaledHalo:Array<String>):Void
 {
 	if (sprite == null || symbolName == null || symbolName == '' || visited.indexOf(symbolName) != -1) return;
 	visited.push(symbolName);
-	var library:Dynamic = shaderPartLibrary(sprite);
+	var library:Dynamic = getLibrary(sprite);
 	if (library == null) return;
 	var symbol = library.getSymbol(symbolName);
 	if (symbol == null || symbol.timeline == null) return;
@@ -742,7 +750,7 @@ function scaleShaderExcludedElements(sprite:FunkinSprite, symbolName:String, fac
 					layer.forEachFrame(function(frame)
 					{
 						if (frame == null || frame.elements == null) return;
-						for (element in frame.elements) scaleShaderElementAroundParentCenter(element, factor, centerX, centerY);
+						for (element in frame.elements) scaleNested(element, factor, centerX, centerY);
 					});
 				}
 			}
@@ -760,7 +768,7 @@ function scaleShaderExcludedElements(sprite:FunkinSprite, symbolName:String, fac
 			for (element in frame.elements)
 			{
 				if (element == null) continue;
-				var childName:String = shaderPartChildName(element);
+				var childName:String = getElementName(element);
 				if (childName == '') continue;
 				var isExcluded:Bool = shaderExcludedParts.indexOf(childName) != -1;
 				if (isExcluded && childName != 'halo' && element.matrix != null)
@@ -770,22 +778,22 @@ function scaleShaderExcludedElements(sprite:FunkinSprite, symbolName:String, fac
 					if (childSymbol != null && childSymbol.timeline != null)
 						localBounds = childSymbol.timeline.getWholeBounds(false, null, null, true);
 					if (localBounds != null && localBounds.width > 0 && localBounds.height > 0)
-						scaleShaderElementAroundCenter(element, factor, localBounds.x + localBounds.width * 0.5, localBounds.y + localBounds.height * 0.5);
+						scaleAround(element, factor, localBounds.x + localBounds.width * 0.5, localBounds.y + localBounds.height * 0.5);
 				}
 				if (children.indexOf(childName) == -1) children.push(childName);
 			}
 		});
 	}
 	for (childName in children)
-		scaleShaderExcludedElements(sprite, childName, factor, visited, shaderExcludedParts.indexOf(childName) != -1, scaledHalo);
+		scaleParts(sprite, childName, factor, visited, shaderExcludedParts.indexOf(childName) != -1, scaledHalo);
 }
 
-function createShaderPartSprite(mode:String, suffix:String, glowScale:Float = 1):FunkinSprite
+function buildPart(mode:String, suffix:String, glowScale:Float = 1):FunkinSprite
 {
 	var atlasPath:String = Paths.getPath('images/${dad.imageFile}', null, PathsTestMode.LOOSE);
 	var settings:Dynamic = {
 		cacheOnLoad: mode != 'excluded',
-		onSymbolCreate: function(item:Dynamic) configureShaderPartSymbol(item, mode, glowScale)
+		onSymbolCreate: function(item:Dynamic) setupSymbol(item, mode, glowScale)
 	};
 	var frames:FlxAnimateFrames = FlxAnimateFrames.fromAnimate(atlasPath, null, null, 'shaderParts_${suffix}_${dad.curCharacter}', true, settings);
 	if (frames == null) return null;
@@ -822,7 +830,7 @@ function createShaderPartSprite(mode:String, suffix:String, glowScale:Float = 1)
 		sprite.destroy();
 		return null;
 	}
-	if (mode != 'excluded') filterShaderPartsDepth(sprite, rootSymbols, mode == 'foreground');
+	if (mode != 'excluded') setLayerOrder(sprite, rootSymbols, mode == 'foreground');
 	sprite.shader = null;
 	sprite.useRenderTexture = false;
 	sprite.cameras = [camGame];
@@ -834,24 +842,24 @@ function createShaderPartSprite(mode:String, suffix:String, glowScale:Float = 1)
 	return sprite;
 }
 
-function ensureShaderPartsOverlays():Bool
+function setupParts():Bool
 {
-	if (!hasShaderExcludedParts(dad) || dadRim == null || dadForegroundRim == null || game == null || game.dadGroup == null) return false;
+	if (!hasParts(dad) || dadRim == null || dadForegroundRim == null || game == null || game.dadGroup == null) return false;
 	if (shaderPartsLayer != null && shaderPartsOverlay != null && shaderPartsGlowOverlay != null && shaderPartsGlowMidOverlay != null && shaderPartsGlowWideOverlay != null && shaderPartsBodyOverlay != null && shaderPartsOcclusionOverlay != null && shaderPartsOverlayCharacter == dad.curCharacter) return true;
-	destroyShaderPartsOverlays();
+	disposeLayers();
 	shaderPartsLayer = new FlxSpriteGroup(0, 0);
 	shaderPartsLayer.zIndex = dad.zIndex;
 	shaderPartsLayer.visible = false;
 	game.dadGroup.add(shaderPartsLayer);
-	shaderPartsBodyOverlay = createShaderPartSprite('background', 'body_back', 1);
-	shaderPartsGlowWideOverlay = createShaderPartSprite('excluded', 'excluded_glow_wide', 1.34);
-	shaderPartsGlowMidOverlay = createShaderPartSprite('excluded', 'excluded_glow_mid', 1.20);
-	shaderPartsGlowOverlay = createShaderPartSprite('excluded', 'excluded_glow_near', 1.075);
-	shaderPartsOverlay = createShaderPartSprite('excluded', 'excluded', 1);
-	shaderPartsOcclusionOverlay = createShaderPartSprite('foreground', 'body_front', 1);
+	shaderPartsBodyOverlay = buildPart('background', 'body_back', 1);
+	shaderPartsGlowWideOverlay = buildPart('excluded', 'excluded_glow_wide', 1.34);
+	shaderPartsGlowMidOverlay = buildPart('excluded', 'excluded_glow_mid', 1.20);
+	shaderPartsGlowOverlay = buildPart('excluded', 'excluded_glow_near', 1.075);
+	shaderPartsOverlay = buildPart('excluded', 'excluded', 1);
+	shaderPartsOcclusionOverlay = buildPart('foreground', 'body_front', 1);
 	if (shaderPartsBodyOverlay == null || shaderPartsGlowWideOverlay == null || shaderPartsGlowMidOverlay == null || shaderPartsGlowOverlay == null || shaderPartsOverlay == null || shaderPartsOcclusionOverlay == null)
 	{
-		destroyShaderPartsOverlays();
+		disposeLayers();
 		return false;
 	}
 	shaderPartsBodyOverlay.zIndex = 0;
@@ -866,7 +874,7 @@ function ensureShaderPartsOverlays():Bool
 	return true;
 }
 
-function syncShaderPartSprite(sprite:FunkinSprite, shouldShow:Bool):Void
+function syncPart(sprite:FunkinSprite, shouldShow:Bool):Void
 {
 	if (sprite == null || dad == null) return;
 	if (!shaderPartsOriginalVisible || !dad.exists || dad.alpha <= 0)
@@ -925,7 +933,7 @@ function syncShaderPartSprite(sprite:FunkinSprite, shouldShow:Bool):Void
 	sprite.visible = shouldShow;
 }
 
-function isShaderDownAltAnimation():Bool
+function isAltDown():Bool
 {
 	if (dad == null) return false;
 	var animName:String = dad.getAnimName();
@@ -936,10 +944,10 @@ function isShaderDownAltAnimation():Bool
 	return StringTools.contains(normalized, 'down') && StringTools.contains(normalized, 'alt');
 }
 
-function updateShaderPartOverlayDepth():Void
+function setPartDepth():Void
 {
 	if (shaderPartsLayer == null || shaderPartsOverlay == null) return;
-	var desiredZ:Int = isShaderDownAltAnimation() ? 6 : 4;
+	var desiredZ:Int = isAltDown() ? 6 : 4;
 	if (shaderPartsOverlay.zIndex != desiredZ)
 	{
 		shaderPartsOverlay.zIndex = desiredZ;
@@ -947,22 +955,22 @@ function updateShaderPartOverlayDepth():Void
 	}
 }
 
-function updateShaderExcludedParts():Void
+function refreshParts():Void
 {
 	if (dad == null) return;
-	if (hasShaderExcludedParts(dad)) dad.shader = null;
+	if (hasParts(dad)) dad.shader = null;
 	if (shaderPartsSource != dad || shaderPartsSourceCharacter != dad.curCharacter)
 	{
 		if (shaderPartsHidden && shaderPartsSource != null) shaderPartsSource.visible = shaderPartsOriginalVisible;
-		destroyShaderPartsOverlays();
+		disposeLayers();
 		shaderPartsSource = dad;
 		shaderPartsSourceCharacter = dad.curCharacter;
 		shaderPartsHidden = false;
 	}
-	var hasExcludedAtlas:Bool = hasShaderExcludedParts(dad);
+	var hasExcludedAtlas:Bool = hasParts(dad);
 	if (hasExcludedAtlas) dad.shader = null;
 	var shouldHide:Bool = ClientPrefs.shaders && rimEnabled && hasDarkened && hasExcludedAtlas && dadRim != null;
-	if (shouldHide && !ensureShaderPartsOverlays()) shouldHide = false;
+	if (shouldHide && !setupParts()) shouldHide = false;
 	if (!shouldHide)
 	{
 		dad.shader = null;
@@ -998,13 +1006,13 @@ function updateShaderExcludedParts():Void
 		shaderPartsLayer.zIndex = dad.zIndex;
 		refreshZ(game.dadGroup);
 	}
-	syncShaderPartSprite(shaderPartsBodyOverlay, shaderPartsOriginalVisible);
-	syncShaderPartSprite(shaderPartsGlowWideOverlay, shaderPartsOriginalVisible);
-	syncShaderPartSprite(shaderPartsGlowMidOverlay, shaderPartsOriginalVisible);
-	syncShaderPartSprite(shaderPartsGlowOverlay, shaderPartsOriginalVisible);
-	syncShaderPartSprite(shaderPartsOverlay, shaderPartsOriginalVisible);
-	syncShaderPartSprite(shaderPartsOcclusionOverlay, shaderPartsOriginalVisible);
-	updateShaderPartOverlayDepth();
+	syncPart(shaderPartsBodyOverlay, shaderPartsOriginalVisible);
+	syncPart(shaderPartsGlowWideOverlay, shaderPartsOriginalVisible);
+	syncPart(shaderPartsGlowMidOverlay, shaderPartsOriginalVisible);
+	syncPart(shaderPartsGlowOverlay, shaderPartsOriginalVisible);
+	syncPart(shaderPartsOverlay, shaderPartsOriginalVisible);
+	syncPart(shaderPartsOcclusionOverlay, shaderPartsOriginalVisible);
+	setPartDepth();
 	shaderPartsGlowWideOverlay.color = 0xFFFFD34A;
 	shaderPartsGlowWideOverlay.alpha = dad.alpha * 0.10;
 	shaderPartsGlowWideOverlay.blend = BlendMode.ADD;
@@ -1038,11 +1046,11 @@ function onCreatePost()
 	for (sprite in lightningLighten)
 		if (sprite != null) lightningLightenBaseColors.push(sprite.color);
 	turnShader(false);
-	if (ClientPrefs.shaders && dad != null && hasShaderExcludedParts(dad))
+	if (ClientPrefs.shaders && dad != null && hasParts(dad))
 	{
 		shaderPartsSource = dad;
 		shaderPartsSourceCharacter = dad.curCharacter;
-		ensureShaderPartsOverlays();
+		setupParts();
 	}
 }
 
@@ -1151,7 +1159,7 @@ function onUpdate()
 
 function onUpdatePost()
 {
-	updateShaderExcludedParts();
+	refreshParts();
 }
 
 function onEndSong()
@@ -1338,7 +1346,7 @@ function onDestroy()
 {
 	if (shaderPartsHidden && shaderPartsSource != null) shaderPartsSource.visible = shaderPartsOriginalVisible;
 	shaderPartsHidden = false;
-	destroyShaderPartsOverlays();
+	disposeLayers();
 	shaderPartsSource = null;
 	shaderPartsSourceCharacter = '';
 }
