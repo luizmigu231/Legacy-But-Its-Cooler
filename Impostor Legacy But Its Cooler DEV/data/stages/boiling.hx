@@ -18,6 +18,7 @@ var ground:FlxSprite;
 var groundBroken1:FlxSprite;
 var groundBroken2:FlxSprite;
 var bubbles:FlxSprite;
+var lavaSplash:FlxSprite;
 var playerBaseX:Array<Float> = [];
 var oppBaseX:Array<Float> = [];
 var startedSong:Bool = false;
@@ -555,6 +556,13 @@ function onCreatePost()
 {
 	camSpecialThing([1760, 300], [1900, 400]);
 
+	lavaSplash = new FlxSprite(1400, 530);
+	lavaSplash.frames = Paths.getSparrowAtlas(ext + 'lava_splash');
+	lavaSplash.scale.set(0.6,0.6);
+	add(lavaSplash);
+	lavaSplash.animation.addByPrefix('splash', 'lava splash', 24, false);
+	lavaSplash.alpha = 0;
+
 	lavaOverlay = new FlxSprite(1000, -100).loadGraphic(Paths.image(ext + 'overlaythjing'));
 	lavaOverlay.scale.set(1.5, 1.5);
 	lavaOverlay.blend = BlendMode.ADD;
@@ -584,65 +592,7 @@ function onCreatePost()
 	if (ClientPrefs.shaders)
 	{
 		blackRimlightBase = new ExtraDropShadowShader();
-		blackRimlightBase.addLayer([
-			8, 18, 0, -1, 0,
-			0.3, 2.5, -1.5, 0, 85,
-			0, -1.5, -5.5, 0, -5,
-			0, 9, 0, 9, 0
-		], 330, 25, .01, 0.80);
-
-		if (hasBfSkin && boyfriend.getFlag('backlit') != true)
-		{
-			setupBFRim();
-			FlxTween.num(0, 1, 2.54 * 60, {
-				onUpdate: function(twn:FlxTween)
-				{
-					var v = twn.value;
-					bfRim.setColorMatrix([
-						1 + (0.8 - 1) * v, 0, 0, 0, 16 * v,
-						-0.1 * v, 1 + (0.6 - 1) * v, -0.1 * v, 0, 0,
-						0, 0, 1 + (0.6 - 1) * v, 0, 8 * v,
-						0, 0, 0, 1, 0
-					]);
-				}
-			});
-		}
-		else FlxTween.color(boyfriend, 2.54 * 60, FlxColor.WHITE, 0xFFFF8A98);
-
-		if (hasPet)
-		{
-			setupPetRim();
-			FlxTween.num(0, 1, 2.54 * 60, {
-				onUpdate: function(twn:FlxTween)
-				{
-					var v = twn.value;
-					petRim.setColorMatrix([
-						1 + (0.8 - 1) * v, 0, 0, 0, 16 * v,
-						-0.1 * v, 1 + (0.6 - 1) * v, -0.1 * v, 0, 0,
-						0, 0, 1 + (0.6 - 1) * v, 0, 8 * v,
-						0, 0, 0, 1, 0
-					]);
-				}
-			});
-		}
-
-		if (hasBfSkin && boyfriend.getFlag('backlit') != true)
-		{
-			setupDadRim();
-			FlxTween.num(0, 1, 2.54 * 60, {
-				onUpdate: function(twn:FlxTween)
-				{
-					var v = twn.value;
-					dadRim.setColorMatrix([
-						1 + (0.8 - 1) * v, 0, 0, 0, 16 * v,
-						-0.1 * v, 1 + (0.6 - 1) * v, -0.1 * v, 0, 0,
-						0, 0, 1 + (0.6 - 1) * v, 0, 8 * v,
-						0, 0, 0, 1, 0
-					]);
-				}
-			});
-		}
-		else FlxTween.color(dad, 2.54 * 60, FlxColor.WHITE, 0xFFFF8A98);
+		blackRimlightBase.addLayer(getBaseMatrix(), 330, 25, .01, 0);
 
 		updateRimFrame(boyfriend, bfRim);
 		updateRimFrame(dad, dadRim);
@@ -652,14 +602,27 @@ function onCreatePost()
 
 function onSongStart()
 {
-	FlxTween.tween(boyfriend, {y: boyfriend.y + 133 / 2}, 2.54 * 60);
-	FlxTween.tween(dad, {y: dad.y + 133 / 2}, 2.54 * 60);
-	FlxTween.tween(pet, {y: pet.y + 133 / 2}, 2.54 * 60);
-	FlxTween.tween(ground, {y: ground.y + 133 / 2}, 2.54 * 60);
-	FlxTween.tween(groundBroken1, {y: groundBroken1.y + 133 / 2}, 2.54 * 60);
-	FlxTween.tween(groundBroken2, {y: groundBroken2.y + 133 / 2}, 2.54 * 60);
+	var dur = songLength / 1000;
+
+	FlxTween.tween(boyfriend, {y: boyfriend.y + 133 / 2}, dur);
+	FlxTween.tween(dad, {y: dad.y + 133 / 2}, dur);
+	FlxTween.tween(pet, {y: pet.y + 133 / 2}, dur);
+	FlxTween.tween(ground, {y: ground.y + 133 / 2}, dur);
+	FlxTween.tween(groundBroken1, {y: groundBroken1.y + 133 / 2}, dur);
+	FlxTween.tween(groundBroken2, {y: groundBroken2.y + 133 / 2}, dur);
+
 	for (sprite in [lava, lava2, ground, groundBroken1, groundBroken2, bubbles])
-		FlxTween.color(sprite, 2.54 * 60, FlxColor.WHITE, 0xFFFF8A5A);
+		FlxTween.color(sprite, dur, FlxColor.WHITE, 0xFFFF8A5A);
+	for (char in [boyfriend, dad, pet]) 
+	{
+		FlxTween.color(char, 2.54 * 60, FlxColor.WHITE, 0xFFFF8A98);
+		tweenShadowLayer(char.shader.layers[0], [[
+			8, 18, 0, -1, 0,
+			0.3, 2.5, -1.5, 0, 85,
+			0, -1.5, -5.5, 0, -5,
+			0, 9, 0, 9, 0
+		], 330, 25, .01, 0.80], songLength / 1000, FlxEase.linear);
+	}
 }
 
 function onCountdownTick(tick:Int)
@@ -700,12 +663,22 @@ function onBeatHit()
 		FlxTween.tween(boyfriend, {"y": boyfriend.y - 100}, 2, {ease: FlxEase.quadOut});
 		FlxTween.tween(dad, {"y": dad.y - 100}, 2, {ease: FlxEase.quadOut});
 		FlxTween.tween(pet, {"y": pet.y + 900}, 1, {ease: FlxEase.quadOut, startDelay: 0.3});
+		new FlxTimer().start(0.3, ()-> { lavaSplash.alpha = 1; lavaSplash.animation.play('splash'); });
 		new FlxTimer().start(2, () ->
 		{
-			FlxTween.tween(groundBroken1, {"y": groundBroken1.y + 200}, 80);
-			FlxTween.tween(dad, {"y": dad.y + 200}, 80);
+			var curTime:Float = Math.max(0, Conductor.songPosition - ClientPrefs.noteOffset);
+
+			FlxTween.tween(groundBroken1, {"y": groundBroken1.y + 90}, 80);
+			FlxTween.tween(dad, {"y": dad.y + 90}, 80);
 			FlxTween.tween(groundBroken2, {"y": groundBroken2.y + 90}, 80);
 			FlxTween.tween(boyfriend, {"y": boyfriend.y + 90}, 80);
+	
+			FlxTween.tween(dadGroup, {"angle": -10}, (songLength - curTime) / 1000);
+			FlxTween.tween(groundBroken1, {"angle": -10}, (songLength - curTime) / 1000);
+	
+			boyfriendGroup.origin.set(0,0);
+			FlxTween.tween(boyfriendGroup, {"angle": 10}, (songLength - curTime) / 1000);
+			FlxTween.tween(groundBroken2, {"angle": 10}, (songLength - curTime) / 1000);
 		});
 	}
 }
