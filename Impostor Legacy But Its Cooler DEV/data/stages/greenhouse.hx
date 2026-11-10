@@ -109,6 +109,7 @@ function createStageRims(sprite:FlxSprite, ?rimType:String = 'object')
 	var layer1 = rim.addLayer(rimLayerMatrix.copy(), 90, 15, 0.01, 0.38);
 	var layer2 = rim.addLayer(rimLayerMatrix.copy(), 90, 25, 0.01, 0.18);
 	rim.attachedSprite = sprite;
+	sprite.shader = rim;
 }
 
 function layoutHeartsHUD()

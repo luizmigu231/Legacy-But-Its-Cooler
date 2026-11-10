@@ -24,11 +24,11 @@ public function tweenShadowLayer(layer1:Dynamic, layer2:Array<Dynamic>, duration
     }
 
     FlxTween.tween(layer1, {
-        angle: layer2[1] ?? 0,
-        distance: layer2[2] ?? 20,
-        threshold: layer2[3] ?? .01,
-        strength: layer2[4] ?? 1,
-        roughness: layer2[5] ?? 1
+        angle: layer2[1] ?? layer1.angle,
+        distance: layer2[2] ?? layer1.distance,
+        threshold: layer2[3] ?? layer1.threshold,
+        strength: layer2[4] ?? layer1.strength,
+        roughness: layer2[5] ?? layer1.roughness
     }, duration, {ease: ease});
 }
 
