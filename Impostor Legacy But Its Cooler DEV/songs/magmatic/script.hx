@@ -7,6 +7,7 @@ var chromTween:FlxTween;
 var caShader:ChromaticAbberation;
 var heatwaveShader:HeatwaveShader;
 var ref:FlxSprite;
+var stealth:Bool = false;
 
 function onCreatePost()
 {
@@ -29,5 +30,9 @@ function onCreatePost()
 
 function onUpdate(elapsed)
 {
-	if (curBeat >= 296 && PlayState.isStoryMode && controls.NOTE_TAUNT) PlayState.storyMeta.playlist.insert(1, 'stealth');
+	if (!stealth && curBeat >= 296 && PlayState.isStoryMode && controls.NOTE_TAUNT)
+	{
+		PlayState.storyMeta.playlist.insert(1, 'stealth');
+		stealth = true;
+	}
 }
