@@ -7,7 +7,6 @@ public var cargoDark:FlxSprite;
 public var lightoverlayDK:FlxSprite;
 public var mainoverlayDK:FlxSprite;
 var cargoAirship:FlxSprite;
-var blackanim:FlxSprite;
 var ext = 'stages/airship/double-kill/';
 public var yellow:Character;
 public var isBfGhost:Bool = false;
@@ -73,12 +72,11 @@ function onBeatHit()
     switch(curBeat)
     {
         case 32:
-            blackanim.setPosition(black.x, black.y - 1400);
-            blackanim.animation.play('intro');
-            blackanim.alpha = 1;
+            black.alpha = 1;
+	    black.canDance = false;
+            black.playAnim('fall');
 	case 36:
-	    blackanim.visible = false;
-	    black.alpha = 1;
+	    black.canDance = true;
         case 196, 228, 272, 288, 488, 520, 756, 764, 784, 816:
             extraStrums(true);
         case 212, 244, 276, 292, 504, 536, 760, 768, 800, 832:
@@ -95,12 +93,7 @@ function onCreatePost()
     black = new Character(1550, 600, "blackdk");
     startCharacterPos(black);
     stage.insert(stage.members.indexOf(dadGroup), black);
-
-    blackanim = new FunkinSprite(0,0);
-    blackanim.frames = Paths.getSparrowAtlas('characters/story/black/black_anim');
-    blackanim.animation.addByPrefix('intro', 'black anim', 24, false);
-    blackanim.alpha = 0.001;
-    stage.insert(stage.members.indexOf(black) + 1, blackanim);
+    black.playAnim('fall');
 
     createBlackDkEyeOverlay();
 
@@ -197,7 +190,7 @@ function createBlackDkEyeOverlay():Void
 
     var char = black;
     var atlasPath:String = Paths.getPath(
-        'images/${char.imageFile}',
+        'images/characters/story/black/blackdk',
         null,
         PathsTestMode.LOOSE
     );
@@ -287,7 +280,7 @@ function createBlackDkEyeOverlay():Void
         'Capa 2'
     ]);
 
-    stage.insert(stage.members.indexOf(blackanim), overlay);
+    stage.insert(stage.members.indexOf(black) + 1, overlay);
     blackDkEyeOverlay = overlay;
 
     hideOriginalBlackDkEye();
@@ -463,7 +456,7 @@ function syncBlackDkEyeOverlay():Void
     overlay.blend = black.blend;
     overlay.scrollFactor.set(black.scrollFactor.x, black.scrollFactor.y);
     overlay.antialiasing = black.antialiasing;
-    overlay.zIndex = black.zIndex + 0.01;
+    overlay.zIndex = black.zIndex + 1;
     overlay.shader = null;
     overlay.useRenderTexture = false;
     overlay.cameras = [camGame];
@@ -512,8 +505,6 @@ function applyBLACKEffect()
 {
     if (black == null) return;
     blackRim = applyDarkLightEffect(black, -85, -25);
-    applyDarkLightEffect(blackanim, -85, -25);
-
 }
 
 function applyGFEffect()
@@ -567,16 +558,19 @@ function opponentNoteHitPre(note)
     if (note.noteType == 'Opponent 2 Sing')
     {
         note.owner = black;
+	health -= 0.01;
     }
     else if (note.noteType == 'Both Opponents Sing')
     {
         characterSing(dad, note);
         characterSing(black, note);
         note.noAnimation = true;
+	health -= 0.015;
     }
     else if (twoSing)
     {
         note.owner = black;
+	health -= 0.01;
     }
     if (note.noteType == 'Opponent 1 Sing')
     {

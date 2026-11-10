@@ -42,10 +42,14 @@ function onLoad()
 {
 	healthLoss = 0;
 
-	bg = new FlxSprite(-700, -640).loadGraphic(Paths.image(ext + 'TripleKillBG'));
+	bg = new FlxSprite(-700,-720).loadGraphic(
+		Paths.image(ext + 'TripleKillBG')
+	);
 	bg.antialiasing = ClientPrefs.globalAntialiasing;
-	bg.scrollFactor.set(0, 0);
-	bg.setGraphicSize(Std.int(bg.width * 1.3));
+	bg.scrollFactor.set(0.9,0.9);
+	bg.setGraphicSize(
+		Std.int(bg.width * 1.3)
+	);
 	bg.updateHitbox();
 	bg.alpha = 0.001;
 	add(bg);

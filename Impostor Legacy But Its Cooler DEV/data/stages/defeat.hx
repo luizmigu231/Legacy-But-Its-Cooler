@@ -59,11 +59,11 @@ function onLoad()
 {
 	healthLoss = 0;
 
-	bg = new FlxSprite(-700,-640).loadGraphic(
+	bg = new FlxSprite(-700,-790).loadGraphic(
 		Paths.image(ext + 'TripleKillBG')
 	);
 	bg.antialiasing = ClientPrefs.globalAntialiasing;
-	bg.scrollFactor.set(0,0);
+	bg.scrollFactor.set(0.9,0.9);
 	bg.setGraphicSize(
 		Std.int(bg.width * 1.3)
 	);
@@ -455,8 +455,16 @@ function createDadEyeOverlay(
 	if (char == null)
 		return null;
 
-	var atlasPath:String =
-		Paths.getPath(
+	var atlasPath:String = '';
+
+	if (characterName == ('blackdk'))
+		atlasPath = Paths.getPath(
+			'images/characters/story/black/blackdk',
+			null,
+			PathsTestMode.LOOSE
+		);
+	else
+		atlasPath = Paths.getPath(
 			'images/${char.imageFile}',
 			null,
 			PathsTestMode.LOOSE

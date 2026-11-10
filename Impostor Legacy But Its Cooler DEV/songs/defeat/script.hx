@@ -1,3 +1,4 @@
+import funkin.states.substates.PauseSubState;
 import openfl.filters.ShaderFilter;
 
 var distortionShader:FlxRuntimeShader;
@@ -11,7 +12,9 @@ function onCreatePost()
 {
 	camHUD.alpha = 0;
 	dad.color = FlxColor.BLACK;
+	dad.x -= 80;
 	boyfriend.color = FlxColor.BLACK;
+	gf.color = FlxColor.BLACK;
 	pet.color = FlxColor.BLACK;
 	health = 1; // hmm
 	playHUD.updateIconsPosition();
@@ -22,6 +25,7 @@ function onCreatePost()
         	colorShader.data.colSet.value = [true];
         	colorShader.data.funnyColor.value = [1.0, 1.0, 1.0, 1.0];
         	colorShader.data.strength.value = [0];
+		boyfriend.useRenderTexture = true;
 		boyfriend.shader = colorShader;
 	}
 	boyfriend.alpha = 0;
@@ -142,16 +146,16 @@ function onBeatHit()
 			});
 			FlxG.sound.play(Paths.sound('join'));
 		case 32:
-			comboX = 440;
 			if (!ClientPrefs.middleScroll)
 			{
-  				FlxTween.num(0, 0.5, 0.7, {ease: FlxEase.quadOut, onUpdate: function(twn:FlxTween) 								modManager.setValue('opponentSwap', twn.value, -1)
+  				FlxTween.num(0, 0.5, 0.45, {ease: FlxEase.quadInOut, onUpdate: function(twn:FlxTween) 								modManager.setValue('opponentSwap', twn.value, -1)
 				});
-  				FlxTween.num(0, 1, 0.7, {ease: FlxEase.quadOut, onUpdate: function(twn:FlxTween) 								modManager.setValue('alpha', twn.value, 1)
+  				FlxTween.num(0, 1, 0.45, {ease: FlxEase.quadInOut, onUpdate: function(twn:FlxTween) 								modManager.setValue('alpha', twn.value, 1)
 				});
 				comboX = 440;
 			}
 			FlxTween.color(boyfriend, 1, FlxColor.BLACK, FlxColor.WHITE);
+			FlxTween.color(gf, 1, FlxColor.BLACK, FlxColor.WHITE);
 			FlxTween.color(dad, 1, FlxColor.BLACK, FlxColor.WHITE);
 			FlxTween.color(pet, 1, FlxColor.BLACK, FlxColor.WHITE);
 			defaultCamZoom = 0.7;
@@ -230,4 +234,24 @@ function onDestroy()
 
 	if (camGame != null)
 		camGame.filters = [];
+}
+
+function onSubstateOpen()
+{
+	FlxG.signals.postUpdate.addOnce(() -> {
+		
+		if (PauseSubState.instance != null)
+		{
+			var pause = PauseSubState.instance;
+			
+			for (option in pause.optionText)
+			{
+				option.color = FlxColor.RED;
+			}
+			
+			pause.infoTitle.color = FlxColor.RED;
+			pause.infoSubtext.color = FlxColor.RED;
+			pause.looksie.loadGraphic(Paths.image('menu/pause/looksie-defeat'));
+		}
+	});
 }

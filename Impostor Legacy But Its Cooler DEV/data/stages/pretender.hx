@@ -41,12 +41,12 @@ function onLoad()
 	sky.antialiasing = ClientPrefs.globalAntialiasing;
 	add(sky);
 	
-	moonlight = new FlxSprite(0, -350).loadGraphic(Paths.image(ext + 'moon light'));
+	moonlight = new FlxSprite(0, 250).loadGraphic(Paths.image(ext + 'moon light'));
 	moonlight.scrollFactor.set(0.8, 0.8);
 	moonlight.blend = BlendMode.ADD;
 	add(moonlight);
 
-	sun = new FlxSprite(0, -350).loadGraphic(Paths.image(ext + 'the sun'));
+	sun = new FlxSprite(0, 250).loadGraphic(Paths.image(ext + 'the sun'));
 	sun.scrollFactor.set(0.8, 0.8);
 	add(sun);
 
@@ -122,7 +122,7 @@ function onLoad()
 	ripbozo.visible = false;
 	add(ripbozo);
 
-	rhmdead = new FlxSprite(1150, 630).loadGraphic(Paths.image(ext + 'rhm dead'));
+	rhmdead = new FlxSprite(1150, 630).loadGraphic(Paths.image(ext + 'rhmdead dead'));
 	rhmdead.scrollFactor.set(1.1, 1);
 	rhmdead.antialiasing = ClientPrefs.globalAntialiasing;
 	add(rhmdead);
@@ -204,12 +204,7 @@ function onCreatePost()
 		rimlightBase.strength = .55;
 
 		rimlightBase.addLayer(
-			rimlightBase.addLayer([
-				1.35, 0, 0, 0, 0,
-				0, 0.92, 0, 0, 0,
-				0, 0, 0.98, 0, 0,
-				0, 0, 0, 1, 0
-			], 20, 18, .025).colorMatrix,
+			rimlightBase.addLayer(getBaseMatrix(), 20, 18, .025).colorMatrix,
 			90,
 			12,
 			.025
@@ -221,12 +216,7 @@ function onCreatePost()
 		objectsRim.strength = .55;
 
 		objectsRim.addLayer(
-			objectsRim.addLayer([
-				1.35, 0, 0, 0, 0,
-				0, 0.92, 0, 0, 0,
-				0, 0, 0.98, 0, 0,
-				0, 0, 0, 1, 0
-			], 20, 18, .025).colorMatrix,
+			objectsRim.addLayer(getBaseMatrix(), 20, 18, .025).colorMatrix,
 			120,
 			25,
 			.025
@@ -244,9 +234,10 @@ function onCreatePost()
 
 			gfRim.attachedSprite = gf;
 			gf.useRenderTexture = true;
+			gf.shader = gfRim;
 		}
 
-		if (boyfriend.curCharacter != 'pretender')
+		if (boyfriend.getFlag('backlit') != true)
 		{
 			bfRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(rimlightBase);
 
@@ -258,8 +249,22 @@ function onCreatePost()
 
 			bfRim.attachedSprite = boyfriend;
 			boyfriend.useRenderTexture = true;
+			boyfriend.shader = bfRim;
 		}
 
+			dadRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(rimlightBase);
+
+			dadRim.layers[0].distance = 25;
+			dadRim.layers[1].distance = 25;
+
+			dadRim.layers[0].angle = 120;
+			dadRim.layers[1].angle = 120;
+
+			dadRim.attachedSprite = dad;
+			dad.useRenderTexture = true;
+			dad.shader = dadRim;
+
+		if (hasPet)
 		{
 			petRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(rimlightBase);
 
@@ -271,54 +276,63 @@ function onCreatePost()
 
 			petRim.attachedSprite = pet;
 			pet.useRenderTexture = true;
+			pet.shader = petRim;
 		}
 
 		if (ripbozo != null && ripbozo.visible)
 		{
 			ripbozoRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(objectsRim);
 			ripbozoRim.attachedSprite = ripbozo;
+			ripbozo.shader = ripbozoRim;
 		}
 
 		if (blueMira != null)
 		{
 			blueMiraRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(objectsRim);
 			blueMiraRim.attachedSprite = blueMira;
+			blueMira.shader = blueMiraRim;
 		}
 
 		if (rhmdead != null)
 		{
 			rhmdeadRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(objectsRim);
 			rhmdeadRim.attachedSprite = rhmdead;
+			rhmdead.shader = rhmdeadRim;
 		}
 
 		if (deadmungus != null)
 		{
 			deadmungusRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(objectsRim);
 			deadmungusRim.attachedSprite = deadmungus;
+			deadmungus.shader = deadmungusRim;
 		}
 
 		if (plant1 != null)
 		{
 			plant1Rim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(objectsRim);
 			plant1Rim.attachedSprite = plant1;
+			plant1.shader = plant1Rim;
 		}
 
 		if (plant2 != null)
 		{
 			plant2Rim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(objectsRim);
 			plant2Rim.attachedSprite = plant2;
+			plant2.shader = plant2Rim;
 		}
 
 		if (pot != null)
 		{
 			potRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(objectsRim);
 			potRim.attachedSprite = pot;
+			pot.shader = potRim;
 		}
 		
 		if (plantfront != null)
 		{
 			plantfrontRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(objectsRim);
 			plantfrontRim.attachedSprite = plantfront;
+			plantfront.shader = plantfrontRim;
 		}
 	}
 
@@ -353,37 +367,37 @@ function onCreatePost()
 
 	
 
-	cloudfar.color = 0xFF963F47;
-	cloudfront.color = 0xFFA4464E;
+	cloudfar.color = 0xFF192141;
+	cloudfront.color = 0xFF192141;
 
-	cloud1.color = 0xFF9B424A;
-	cloud2.color = 0xFF914049;
-	cloud3.color = 0xFF9F4149;
-	cloud4.color = 0xFF89363F;
-	cloudbig.color = 0xFF924049;
+	cloud1.color = 0xFF192141;
+	cloud2.color = 0xFF192141;
+	cloud3.color = 0xFF192141;
+	cloud4.color = 0xFF192141;
+	cloudbig.color = 0xFF192141;
 
-	ground.color = 0xFF713039;
-	plantfront.color = 0xFF5D252D;
+	ground.color = 0xFF192141;
+	plantfront.color = 0xFF192141;
 
-	plant1.color = 0xFF702A32;
-	plant2.color = 0xFF702A32;
+	plant1.color = 0xFF192141;
+	plant2.color = 0xFF192141;
 
-	deadmungus.color = 0xFF843039;
+	deadmungus.color = 0xFF192141;
 
 	if (ripbozo != null)
-		ripbozo.color = 0xFF60272F;
+		ripbozo.color = 0xFF192141;
 
-	rhmdead.color = 0xFF59242C;
+	rhmdead.color = 0xFF192141;
 
-	blueMira.color = 0xFF8A3943;
+	blueMira.color = 0xFF192141;
 
-	dad.color = 0xFF8A3943;
-	gf.color = 0xFF8A3943;
-	boyfriend.color = 0xFF8A3943;
-	pet.color = 0xFF8A3943;
+	dad.color = 0xFF192141;
+	gf.color = 0xFF192141;
+	boyfriend.color = 0xFF192141;
+	pet.color = 0xFF192141;
 
-	pot.color = 0xFF6D282F;
-	vines.color = 0xFF512128;
+	pot.color = 0xFF192141;
+	vines.color = 0xFF192141;
 
 	super1.color = 0xFFD9434B;
 	super2.color = 0xFF7B282F;
@@ -419,4 +433,198 @@ function onSongStart()
 	{
 		game.unlockAchievementPopup('lets_be_friends');
 	}
+		var dur = 17282.5355 / 1000;
+
+		var layerMatrix = [
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			];
+
+		if (sun != null)
+		{
+			FlxTween.tween(sun, {y: -1350}, dur * 3.3, {ease: FlxEase.linear});
+		}
+		if (moonlight != null)
+		{
+			FlxTween.tween(moonlight, {y: -1350}, dur * 3.3, {ease: FlxEase.linear});
+		}
+		if (cloudfar != null)
+		{
+			FlxTween.color(cloudfar, dur, cloudfar.color, 0xFF963F47, {ease: FlxEase.linear});
+		}
+		if (cloudfront != null)
+		{
+			FlxTween.color(cloudfront, dur, cloudfront.color, 0xFFA4464E, {ease: FlxEase.linear});
+		}
+		if (cloud1 != null)
+		{
+			FlxTween.color(cloud1, dur, cloud1.color, 0xFF9B424A, {ease: FlxEase.linear});
+			FlxTween.tween(cloud1, {alpha: 0.6}, dur, {ease: FlxEase.linear});
+		}
+		if (cloud2 != null)
+		{
+			FlxTween.color(cloud2, dur, cloud2.color, 0xFF914049, {ease: FlxEase.linear});
+			FlxTween.tween(cloud2, {alpha: 0.6}, dur, {ease: FlxEase.linear});
+		}
+		if (cloud3 != null)
+		{
+			FlxTween.color(cloud3, dur, cloud3.color, 0xFF9F4149, {ease: FlxEase.linear});
+			FlxTween.tween(cloud3, {alpha: 0.6}, dur, {ease: FlxEase.linear});
+		}
+		if (cloud4 != null)
+		{
+			FlxTween.color(cloud4, dur, cloud4.color, 0xFF89363F, {ease: FlxEase.linear});
+			FlxTween.tween(cloud4, {alpha: 0.6}, dur, {ease: FlxEase.linear});
+		}
+		if (cloudbig != null)
+		{
+			FlxTween.color(cloudbig, dur, cloudbig.color, 0xFF924049, {ease: FlxEase.linear});
+			FlxTween.tween(cloudbig, {alpha: 0.6}, dur, {ease: FlxEase.linear});
+		}
+		if (ground != null)
+			FlxTween.color(ground, dur, ground.color, 0xFF713039, {ease: FlxEase.linear});
+		if (plantfront != null)
+		{
+			FlxTween.color(plantfront, dur, plantfront.color, 0xFF5D252D, {ease: FlxEase.linear});
+			FlxTween.tween(plantfront.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenShadowLayer(plantfront.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(plantfront.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 120, 25, .025], dur, FlxEase.linear);
+		}
+		if (plant1 != null)
+			FlxTween.color(plant1, dur, plant1.color, 0xFF702A32, {ease: FlxEase.linear});
+		if (plant2 != null)
+			FlxTween.color(plant2, dur, plant2.color, 0xFF702A32, {ease: FlxEase.linear});
+		if (blueMira != null)
+		{
+			FlxTween.color(blueMira, dur, blueMira.color, 0xFF8A3943, {ease: FlxEase.linear});
+			FlxTween.tween(blueMira.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenShadowLayer(blueMira.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(blueMira.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 120, 25, .025], dur, FlxEase.linear);
+		}
+		if (deadmungus != null)
+		{
+			FlxTween.color(deadmungus, dur, deadmungus.color, 0xFF843039, {ease: FlxEase.linear});
+			FlxTween.tween(deadmungus.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenShadowLayer(deadmungus.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(deadmungus.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 120, 25, .025], dur, FlxEase.linear);
+		}
+		if (rhmdead != null)
+		{
+			FlxTween.color(rhmdead, dur, rhmdead.color, 0xFF59242C, {ease: FlxEase.linear});
+			FlxTween.tween(rhmdead.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenShadowLayer(rhmdead.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(rhmdead.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 120, 25, .025], dur, FlxEase.linear);
+		}
+		if (vines != null)
+			FlxTween.color(vines, dur, vines.color, 0xFF512128, {ease: FlxEase.linear});
+		if (boyfriend != null)
+		{
+			FlxTween.color(boyfriend, dur, boyfriend.color, 0xFF8A3943, {ease: FlxEase.linear});
+			FlxTween.tween(boyfriend.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenShadowLayer(boyfriend.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(boyfriend.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 90, 12, .025], dur, FlxEase.linear);
+		}
+		if (pet != null)
+		{
+			FlxTween.color(pet, dur, pet.color, 0xFF8A3943, {ease: FlxEase.linear});
+			FlxTween.tween(pet.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenShadowLayer(pet.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(pet.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 90, 12, .025], dur, FlxEase.linear);
+		}
+		if (gf != null)
+		{
+			FlxTween.color(gf, dur, gf.color, 0xFF8A3943, {ease: FlxEase.linear});
+			FlxTween.tween(gf.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenShadowLayer(gf.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(gf.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 90, 12, .025], dur, FlxEase.linear);
+		}
+		if (dad != null)
+		{
+			FlxTween.color(dad, dur, dad.color, 0xFF8A3943, {ease: FlxEase.linear});
+			FlxTween.tween(dad.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
+			tweenShadowLayer(dad.shader.layers[0], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 20, 18, .025], dur, FlxEase.linear);
+			tweenShadowLayer(dad.shader.layers[1], [[
+				1.35, 0, 0, 0, 0,
+				0, 0.92, 0, 0, 0,
+				0, 0, 0.98, 0, 0,
+				0, 0, 0, 1, 0
+			], 90, 12, .025], dur, FlxEase.linear);
+		}
 }
