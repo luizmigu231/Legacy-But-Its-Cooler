@@ -329,7 +329,8 @@
 						6150,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						6300,
@@ -341,7 +342,8 @@
 						6450,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						6600,
@@ -353,7 +355,8 @@
 						6675,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						6750,
@@ -365,7 +368,8 @@
 						6825,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						6900,
@@ -395,7 +399,8 @@
 						7350,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						7500,
@@ -407,7 +412,8 @@
 						7650,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						7800,
@@ -425,37 +431,43 @@
 						7950,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						8025,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						8100,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						8175,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						8250,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						8325,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -467,7 +479,8 @@
 						8400,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						8550,
@@ -479,7 +492,8 @@
 						8700,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						8850,
@@ -491,31 +505,36 @@
 						9000,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						9075,
 						1,
 						0,
-						""
+						"",
+						true
 					],
 					[
 						9150,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						9225,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						9300,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						9450,
@@ -533,7 +552,7 @@
 						9600,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -547,7 +566,7 @@
 						9900,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -561,7 +580,7 @@
 						10200,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -575,7 +594,7 @@
 						10350,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -596,7 +615,7 @@
 						10650,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -924,54 +943,54 @@
 						16200,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						16275,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						16350,
-						2,
 						0,
-						"",
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						16425,
-						3,
+						2,
 						0,
 						"",
 						true
 					],
 					[
 						16500,
-						1,
 						0,
-						"",
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						16575,
-						0,
+						3,
 						0,
 						"",
 						true
 					],
 					[
 						16650,
-						2,
 						0,
-						"",
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						16725,
-						3,
+						2,
 						0,
 						"",
 						true
@@ -987,7 +1006,7 @@
 						16800,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1006,16 +1025,16 @@
 					],
 					[
 						17250,
-						3,
+						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						17400,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1036,7 +1055,7 @@
 						17625,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1050,7 +1069,7 @@
 						17775,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1077,14 +1096,14 @@
 						18000,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						18150,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1098,7 +1117,7 @@
 						18450,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1112,7 +1131,7 @@
 						18675,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1126,14 +1145,14 @@
 						18825,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						18900,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1147,7 +1166,7 @@
 						19050,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1181,7 +1200,7 @@
 						19500,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1195,14 +1214,14 @@
 						19800,
 						1,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						20100,
-						3,
+						2,
 						225,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -1593,15 +1612,15 @@
 				"sectionNotes": [
 					[
 						30000,
-						6,
-						450,
-						"",
+						1,
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						30000,
-						1,
-						0,
+						6,
+						450,
 						"",
 						true
 					],
@@ -1623,21 +1642,21 @@
 						30300,
 						2,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						30600,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						30600,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1679,7 +1698,7 @@
 						31650,
 						2,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1720,14 +1739,14 @@
 						32550,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						32700,
 						0,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1746,14 +1765,14 @@
 					],
 					[
 						33450,
-						3,
+						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						33450,
-						2,
+						3,
 						0,
 						"",
 						true
@@ -1796,7 +1815,7 @@
 						34500,
 						2,
 						225,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -1828,30 +1847,44 @@
 					],
 					[
 						35400,
+						1,
 						0,
-						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						35400,
-						1,
 						0,
-						"",
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						35700,
 						2,
 						0,
-						"",
+						"Alt Animation",
+						true
+					],
+					[
+						35700,
+						3,
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						35850,
-						3,
 						0,
-						"",
+						0,
+						"Alt Animation",
+						true
+					],
+					[
+						35850,
+						1,
+						0,
+						"Alt Animation",
 						true
 					]
 				],
@@ -1863,9 +1896,9 @@
 				"sectionNotes": [
 					[
 						36000,
+						2,
 						0,
-						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1893,14 +1926,14 @@
 						36900,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						37050,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -1913,7 +1946,7 @@
 						37200,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1927,7 +1960,7 @@
 						37500,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -1989,7 +2022,7 @@
 						39000,
 						2,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -2175,7 +2208,7 @@
 						44400,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -2210,7 +2243,7 @@
 						45300,
 						2,
 						225,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -2223,35 +2256,42 @@
 						45600,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
-						46050,
-						3,
-						0,
-						"",
-						true
-					],
-					[
-						46050,
+						45600,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
-						46500,
+						46050,
 						2,
 						0,
-						"",
+						"Alt Animation",
+						true
+					],
+					[
+						46050,
+						0,
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						46500,
 						3,
 						0,
-						"",
+						"Alt Animation",
+						true
+					],
+					[
+						46500,
+						0,
+						0,
+						"Alt Animation",
 						true
 					]
 				],
@@ -2264,7 +2304,7 @@
 						46800,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -2292,7 +2332,7 @@
 						47400,
 						2,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -2310,13 +2350,13 @@
 				"sectionNotes": [
 					[
 						48000,
-						3,
+						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
-						48450,
+						48000,
 						3,
 						0,
 						"",
@@ -2326,11 +2366,11 @@
 						48450,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
-						48900,
+						48450,
 						3,
 						0,
 						"",
@@ -2339,6 +2379,13 @@
 					[
 						48900,
 						0,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
+						48900,
+						3,
 						0,
 						"",
 						true
@@ -2413,7 +2460,8 @@
 						50250,
 						5,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						50325,
@@ -2747,63 +2795,63 @@
 						55200,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						55350,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						55425,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						55500,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						55650,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						55800,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						55875,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						55950,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						56100,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -2920,77 +2968,77 @@
 						57600,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						57750,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						57825,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						57900,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						58050,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						58200,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						58275,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						58350,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						58500,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						58650,
-						3,
 						0,
-						"",
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						58725,
+						3,
 						0,
-						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -3455,56 +3503,70 @@
 						64800,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						64950,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						65025,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						65100,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						65250,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						65400,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						65400,
+						2,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						65550,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						65700,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						65850,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -3586,59 +3648,85 @@
 						67200,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						67350,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						67425,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						67500,
 						3,
 						0,
-						"",
+						"Alt Animation",
+						true
+					],
+					[
+						67650,
+						2,
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						67650,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						67800,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						67950,
+						3,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						67950,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						68100,
-						3,
+						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						68250,
-						3,
+						2,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						68250,
+						0,
+						0,
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -4062,7 +4150,8 @@
 						73200,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						73350,
@@ -4086,7 +4175,8 @@
 						73650,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						73725,
@@ -4098,7 +4188,8 @@
 						73800,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						73950,
@@ -4140,55 +4231,64 @@
 						74400,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						74550,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						74625,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						74700,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						74850,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						75000,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						75075,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						75150,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						75300,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						75450,
@@ -4290,67 +4390,78 @@
 						76800,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						76950,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						77025,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						77100,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						77250,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						77400,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						77475,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						77550,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						77700,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						77850,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						77925,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -4452,21 +4563,21 @@
 						79800,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						79950,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						80100,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -4554,28 +4665,21 @@
 					],
 					[
 						81600,
-						1,
+						5,
 						0,
-						"",
+						"Both Opponents Sing",
 						true
 					],
 					[
 						81600,
-						5,
+						1,
 						0,
-						"Both Opponents Sing",
+						"Alt Animation",
 						true
 					],
 					[
 						81750,
 						10,
-						0,
-						"",
-						true
-					],
-					[
-						81750,
-						2,
 						0,
 						"",
 						true
@@ -4588,15 +4692,15 @@
 						true
 					],
 					[
-						81900,
-						11,
+						81750,
+						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						81900,
-						3,
+						11,
 						0,
 						"",
 						true
@@ -4609,15 +4713,15 @@
 						true
 					],
 					[
-						82050,
-						9,
+						81900,
+						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						82050,
-						1,
+						9,
 						0,
 						"",
 						true
@@ -4630,15 +4734,15 @@
 						true
 					],
 					[
-						82200,
-						10,
+						82050,
+						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						82200,
-						2,
+						10,
 						0,
 						"",
 						true
@@ -4651,15 +4755,15 @@
 						true
 					],
 					[
-						82350,
-						11,
+						82200,
+						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						82350,
-						3,
+						11,
 						0,
 						"",
 						true
@@ -4672,15 +4776,15 @@
 						true
 					],
 					[
-						82500,
-						9,
+						82350,
+						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						82500,
-						1,
+						9,
 						0,
 						"",
 						true
@@ -4690,6 +4794,13 @@
 						5,
 						0,
 						"Both Opponents Sing",
+						true
+					],
+					[
+						82500,
+						1,
+						0,
+						"Alt Animation",
 						true
 					],
 					[
@@ -4701,16 +4812,16 @@
 					],
 					[
 						82650,
+						4,
 						0,
-						0,
-						"",
+						"Both Opponents Sing",
 						true
 					],
 					[
 						82650,
-						4,
 						0,
-						"Both Opponents Sing",
+						0,
+						"Alt Animation",
 						true
 					]
 				],
@@ -4923,28 +5034,21 @@
 					],
 					[
 						86400,
-						2,
-						0,
-						"",
-						true
-					],
-					[
-						86400,
 						6,
 						0,
 						"Both Opponents Sing",
 						true
 					],
 					[
-						86550,
-						9,
+						86400,
+						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						86550,
-						1,
+						9,
 						0,
 						"",
 						true
@@ -4957,15 +5061,15 @@
 						true
 					],
 					[
-						86700,
-						8,
+						86550,
+						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						86700,
-						0,
+						8,
 						0,
 						"",
 						true
@@ -4978,15 +5082,15 @@
 						true
 					],
 					[
-						86850,
-						11,
+						86700,
 						0,
-						"",
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						86850,
-						3,
+						11,
 						0,
 						"",
 						true
@@ -4996,6 +5100,13 @@
 						7,
 						0,
 						"Both Opponents Sing",
+						true
+					],
+					[
+						86850,
+						3,
+						0,
+						"Alt Animation",
 						true
 					],
 					[
@@ -5007,28 +5118,21 @@
 					],
 					[
 						87000,
-						2,
-						0,
-						"",
-						true
-					],
-					[
-						87000,
 						6,
 						0,
 						"Both Opponents Sing",
 						true
 					],
 					[
-						87150,
-						11,
+						87000,
+						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						87150,
-						3,
+						11,
 						0,
 						"",
 						true
@@ -5041,15 +5145,15 @@
 						true
 					],
 					[
-						87300,
-						8,
+						87150,
+						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						87300,
-						0,
+						8,
 						0,
 						"",
 						true
@@ -5059,6 +5163,13 @@
 						4,
 						0,
 						"Both Opponents Sing",
+						true
+					],
+					[
+						87300,
+						0,
+						0,
+						"Alt Animation",
 						true
 					],
 					[
@@ -5070,16 +5181,16 @@
 					],
 					[
 						87450,
-						1,
+						5,
 						0,
-						"",
+						"Both Opponents Sing",
 						true
 					],
 					[
 						87450,
-						5,
+						1,
 						0,
-						"Both Opponents Sing",
+						"",
 						true
 					]
 				],
@@ -5091,16 +5202,16 @@
 				"sectionNotes": [
 					[
 						87600,
-						2,
-						525,
-						"",
-						true
-					],
-					[
-						87600,
 						4,
 						0,
 						""
+					],
+					[
+						87600,
+						2,
+						600,
+						"",
+						true
 					],
 					[
 						87750,
@@ -5304,16 +5415,16 @@
 					],
 					[
 						92550,
-						3,
+						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						92700,
-						1,
+						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5361,7 +5472,7 @@
 						93750,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5375,7 +5486,7 @@
 						94050,
 						2,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5430,14 +5541,14 @@
 						95250,
 						1,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						95550,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5451,7 +5562,7 @@
 						95850,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -5471,7 +5582,7 @@
 						96150,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5499,7 +5610,7 @@
 						96900,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5519,7 +5630,7 @@
 						97200,
 						2,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5769,7 +5880,7 @@
 						102000,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5783,14 +5894,14 @@
 						102150,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						102300,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5804,21 +5915,21 @@
 						102600,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						102750,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						102900,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5846,21 +5957,21 @@
 						103200,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						103350,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						103500,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5874,21 +5985,21 @@
 						103800,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						103950,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						104100,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5902,7 +6013,7 @@
 						104325,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -5922,21 +6033,21 @@
 						104550,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						104700,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						104850,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5950,7 +6061,7 @@
 						105150,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5964,7 +6075,7 @@
 						105450,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -5984,7 +6095,7 @@
 						105600,
 						2,
 						525,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6011,7 +6122,7 @@
 						106950,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6032,7 +6143,7 @@
 						107700,
 						0,
 						225,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -6045,7 +6156,7 @@
 						108000,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6059,35 +6170,35 @@
 						108300,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						108450,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						108600,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						108750,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						108900,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6107,21 +6218,21 @@
 						109200,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						109350,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						109500,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6135,7 +6246,7 @@
 						110100,
 						3,
 						225,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -6148,7 +6259,7 @@
 						110400,
 						2,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6162,7 +6273,7 @@
 						110850,
 						0,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6176,7 +6287,7 @@
 						111300,
 						3,
 						225,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -6189,7 +6300,7 @@
 						111600,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6203,14 +6314,14 @@
 						111900,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						112050,
 						2,
 						375,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6230,56 +6341,56 @@
 						112800,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						112950,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						113100,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						113250,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						113400,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						113550,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						113700,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						113850,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -6299,14 +6410,14 @@
 						114150,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						114300,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6333,28 +6444,28 @@
 						115200,
 						3,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						115500,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						115650,
 						1,
 						225,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						115950,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6374,7 +6485,7 @@
 						116400,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6388,7 +6499,7 @@
 						116700,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -6420,7 +6531,8 @@
 						117750,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						117900,
@@ -6457,7 +6569,8 @@
 						118650,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -6469,19 +6582,22 @@
 						118800,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						118950,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						119100,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						119250,
@@ -6505,7 +6621,8 @@
 						120000,
 						2,
 						225,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						120300,
@@ -6517,7 +6634,8 @@
 						120450,
 						0,
 						225,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						120750,
@@ -6529,7 +6647,8 @@
 						120900,
 						3,
 						225,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -6541,7 +6660,8 @@
 						121200,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						121350,
@@ -6553,13 +6673,29 @@
 						121500,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						121650,
 						2,
 						375,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						121650,
+						0,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
+						122100,
+						3,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						122100,
@@ -6577,49 +6713,71 @@
 						122400,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						122550,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						122700,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						122850,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						122850,
+						3,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						123000,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						123150,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						123300,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						123450,
+						1,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						123450,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -6629,21 +6787,24 @@
 				"sectionNotes": [
 					[
 						123600,
-						1,
+						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						123750,
-						3,
+						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						123900,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						124050,
@@ -6667,31 +6828,35 @@
 						124800,
 						3,
 						225,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						125100,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						125250,
 						1,
 						225,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						125550,
-						2,
+						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						125700,
-						3,
+						2,
 						1425,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -6699,7 +6864,15 @@
 			},
 			{
 				"sectionBeats": 4,
-				"sectionNotes": [],
+				"sectionNotes": [
+					[
+						126150,
+						1,
+						975,
+						"",
+						true
+					]
+				],
 				"mustHitSection": true
 			},
 			{
@@ -6907,32 +7080,36 @@
 						133200,
 						0,
 						0,
-						""
-					],
-					[
-						133650,
-						1,
-						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						133650,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
-						134100,
-						2,
+						133650,
+						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						134100,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						134100,
+						2,
+						0,
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -6984,34 +7161,45 @@
 				"sectionNotes": [
 					[
 						135600,
+						2,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
+						135600,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						136050,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						136050,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						136500,
-						3,
+						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						136500,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -7408,67 +7596,78 @@
 						142800,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						142950,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						143025,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						143100,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						143250,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						143400,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						143475,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						143550,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						143700,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						143850,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						143925,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -7558,67 +7757,78 @@
 						145200,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						145350,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						145425,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						145500,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						145650,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						145800,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						145875,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						145950,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						146100,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						146250,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						146325,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -8067,7 +8277,7 @@
 						152400,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -8080,45 +8290,50 @@
 						152625,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						152700,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						152850,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						153000,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						153150,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						153300,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						153450,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -8130,7 +8345,8 @@
 						153600,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						153750,
@@ -8142,7 +8358,8 @@
 						153825,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						153900,
@@ -8178,7 +8395,8 @@
 						154500,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						154650,
@@ -8196,19 +8414,21 @@
 						154800,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						154950,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						155025,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -8222,14 +8442,15 @@
 						155250,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						155400,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						155550,
@@ -8241,13 +8462,14 @@
 						155700,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						155850,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -8672,7 +8894,8 @@
 						160800,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						160950,
@@ -8696,7 +8919,8 @@
 						161250,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						161325,
@@ -8760,19 +8984,22 @@
 						162150,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						162225,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						162300,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						162450,
@@ -8784,19 +9011,22 @@
 						162600,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						162675,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						162750,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						162900,
@@ -8808,13 +9038,15 @@
 						163050,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						163125,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -8826,14 +9058,14 @@
 						163200,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						163350,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -8858,13 +9090,14 @@
 						163725,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						163800,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -8884,7 +9117,8 @@
 						164100,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						164250,
@@ -8920,13 +9154,15 @@
 						164625,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						164700,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						164850,
@@ -8944,13 +9180,15 @@
 						165075,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						165150,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						165300,
@@ -8980,8 +9218,8 @@
 					[
 						165600,
 						0,
-						1061.68831168831,
-						"",
+						1000,
+						"Alt Animation",
 						true
 					],
 					[
@@ -9020,9 +9258,9 @@
 						true
 					]
 				],
+				"changeBPM": true,
 				"bpm": 210,
-				"mustHitSection": false,
-				"changeBPM": true
+				"mustHitSection": false
 			},
 			{
 				"sectionBeats": 4,
@@ -9112,9 +9350,9 @@
 						true
 					]
 				],
+				"changeBPM": true,
 				"bpm": 220,
-				"mustHitSection": false,
-				"changeBPM": true
+				"mustHitSection": false
 			},
 			{
 				"sectionBeats": 4,
@@ -9130,14 +9368,14 @@
 						167833.766233766,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						167970.12987013,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -9151,26 +9389,26 @@
 						168106.493506493,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						168242.857142857,
 						2,
 						0,
-						"",
-						true
-					],
-					[
-						168379.220779221,
-						7,
-						204.545454545455,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						168379.220779221,
 						0,
+						204.545454545455,
+						"Alt Animation",
+						true
+					],
+					[
+						168379.220779221,
+						7,
 						204.545454545455,
 						"",
 						true
@@ -9186,7 +9424,7 @@
 						168651.948051948,
 						1,
 						204.545454545455,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -9218,15 +9456,15 @@
 					],
 					[
 						169197.402597403,
-						6,
-						204.545454545455,
-						"",
+						3,
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						169197.402597403,
-						3,
-						0,
+						6,
+						204.545454545455,
 						"",
 						true
 					],
@@ -9234,7 +9472,14 @@
 						169333.766233766,
 						2,
 						0,
-						"",
+						"Alt Animation",
+						true
+					],
+					[
+						169470.12987013,
+						1,
+						0,
+						"Alt Animation",
 						true
 					],
 					[
@@ -9245,17 +9490,10 @@
 						true
 					],
 					[
-						169470.12987013,
-						1,
-						0,
-						"",
-						true
-					],
-					[
 						169606.493506493,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -9269,14 +9507,14 @@
 						169742.857142857,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						169879.220779221,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -9363,15 +9601,16 @@
 				"sectionNotes": [
 					[
 						171106.493506493,
+						7,
 						0,
-						204.545454545455,
 						""
 					],
 					[
 						171106.493506493,
-						7,
 						0,
-						""
+						204.545454545455,
+						"Alt Animation",
+						true
 					],
 					[
 						171242.857142857,
@@ -9383,7 +9622,8 @@
 						171379.220779221,
 						3,
 						204.545454545455,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						171379.220779221,
@@ -9399,15 +9639,16 @@
 					],
 					[
 						171651.948051948,
+						7,
 						0,
-						204.545454545455,
 						""
 					],
 					[
 						171651.948051948,
-						7,
 						0,
-						""
+						204.545454545455,
+						"Alt Animation",
+						true
 					],
 					[
 						171788.311688312,
@@ -9417,15 +9658,16 @@
 					],
 					[
 						171924.675324675,
-						1,
-						204.545454545455,
+						7,
+						0,
 						""
 					],
 					[
 						171924.675324675,
-						7,
-						0,
-						""
+						1,
+						204.545454545455,
+						"Alt Animation",
+						true
 					],
 					[
 						172061.038961039,
@@ -9443,7 +9685,8 @@
 						172197.402597403,
 						2,
 						204.545454545455,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						172197.402597403,
@@ -9477,15 +9720,16 @@
 					],
 					[
 						172742.857142857,
-						3,
+						4,
 						204.545454545455,
 						""
 					],
 					[
 						172742.857142857,
-						4,
+						3,
 						204.545454545455,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						173015.584415584,
@@ -9509,7 +9753,8 @@
 						173288.311688312,
 						0,
 						204.545454545455,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						173288.311688312,
@@ -9527,7 +9772,8 @@
 						173561.038961039,
 						2,
 						204.545454545455,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						173561.038961039,
@@ -9543,15 +9789,16 @@
 					],
 					[
 						173833.766233766,
+						5,
 						0,
-						204.545454545455,
 						""
 					],
 					[
 						173833.766233766,
-						5,
-						0,
-						""
+						3,
+						204.545454545455,
+						"Alt Animation",
+						true
 					],
 					[
 						173970.12987013,
@@ -9561,15 +9808,16 @@
 					],
 					[
 						174106.493506493,
-						3,
-						204.545454545455,
-						""
-					],
-					[
-						174106.493506493,
 						5,
 						0,
 						""
+					],
+					[
+						174106.493506494,
+						1,
+						204.545454545455,
+						"Alt Animation",
+						true
 					],
 					[
 						174242.857142857,
@@ -9585,9 +9833,10 @@
 				"sectionNotes": [
 					[
 						174379.220779221,
-						1,
+						3,
 						204.545454545455,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						174379.220779221,
@@ -9603,15 +9852,16 @@
 					],
 					[
 						174651.948051948,
-						3,
-						204.545454545455,
+						5,
+						0,
 						""
 					],
 					[
 						174651.948051948,
-						5,
 						0,
-						""
+						204.545454545455,
+						"Alt Animation",
+						true
 					],
 					[
 						174788.311688312,
@@ -9843,7 +10093,7 @@
 						177651.948051948,
 						2,
 						204.545454545455,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -9864,7 +10114,7 @@
 						177924.675324675,
 						0,
 						204.545454545455,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -9876,15 +10126,15 @@
 					],
 					[
 						178197.402597403,
-						4,
-						0,
-						"",
+						2,
+						204.545454545455,
+						"Alt Animation",
 						true
 					],
 					[
 						178197.402597403,
-						2,
-						204.545454545455,
+						4,
+						0,
 						"",
 						true
 					],
@@ -9897,15 +10147,15 @@
 					],
 					[
 						178470.12987013,
-						4,
-						0,
-						"",
+						3,
+						204.545454545455,
+						"Alt Animation",
 						true
 					],
 					[
 						178470.12987013,
-						3,
-						204.545454545455,
+						4,
+						0,
 						"",
 						true
 					],
@@ -9955,7 +10205,7 @@
 						179015.584415584,
 						3,
 						204.545454545455,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -9967,15 +10217,15 @@
 					],
 					[
 						179288.311688312,
-						6,
 						0,
-						"",
+						204.545454545455,
+						"Alt Animation",
 						true
 					],
 					[
 						179288.311688312,
+						6,
 						0,
-						204.545454545455,
 						"",
 						true
 					],
@@ -10034,15 +10284,16 @@
 					],
 					[
 						180106.493506493,
-						3,
-						0,
+						5,
+						204.545454545455,
 						""
 					],
 					[
 						180106.493506493,
-						5,
-						204.545454545455,
-						""
+						3,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						180242.857142857,
@@ -10084,7 +10335,8 @@
 						180788.311688312,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"altAnim": false,
@@ -10095,27 +10347,30 @@
 				"sectionNotes": [
 					[
 						180924.675324675,
-						2,
-						0,
-						""
-					],
-					[
-						180924.675324675,
 						5,
 						204.545454545455,
 						""
 					],
 					[
+						180924.675324675,
+						2,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
 						181061.038961039,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						181197.402597403,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						181197.402597403,
@@ -10127,7 +10382,8 @@
 						181333.766233766,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						181470.12987013,
@@ -10145,7 +10401,8 @@
 						181606.493506493,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						181742.857142857,
@@ -10163,7 +10420,8 @@
 						181879.220779221,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"altAnim": false,
@@ -10174,15 +10432,16 @@
 				"sectionNotes": [
 					[
 						182015.584415584,
-						0,
-						0,
+						6,
+						204.545454545455,
 						""
 					],
 					[
 						182015.584415584,
-						6,
-						204.545454545455,
-						""
+						0,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						182151.948051948,
@@ -10194,7 +10453,8 @@
 						182288.311688312,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						182288.311688312,
@@ -10212,7 +10472,8 @@
 						182561.038961039,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						182561.038961039,
@@ -10228,15 +10489,16 @@
 					],
 					[
 						182833.766233766,
-						0,
-						0,
+						7,
+						204.545454545455,
 						""
 					],
 					[
 						182833.766233766,
-						7,
-						204.545454545455,
-						""
+						0,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						182970.12987013,
@@ -10253,27 +10515,30 @@
 				"sectionNotes": [
 					[
 						183106.493506493,
-						2,
-						0,
-						""
-					],
-					[
-						183106.493506493,
 						5,
 						204.545454545455,
 						""
 					],
 					[
+						183106.493506493,
+						2,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
 						183242.857142857,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						183379.220779221,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						183379.220779221,
@@ -10289,21 +10554,23 @@
 					],
 					[
 						183651.948051948,
-						2,
-						0,
-						""
-					],
-					[
-						183651.948051948,
 						4,
 						204.545454545455,
 						""
 					],
 					[
+						183651.948051948,
+						2,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
 						183788.311688312,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						183924.675324675,
@@ -10323,7 +10590,7 @@
 						184061.038961039,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -10360,16 +10627,16 @@
 				"sectionNotes": [
 					[
 						186379.220779221,
-						6,
-						1023,
-						"Both Opponents Sing",
+						2,
+						1022.72727272727,
+						"Alt Animation",
 						true
 					],
 					[
 						186379.220779221,
-						2,
-						1022.72727272727,
-						"",
+						6,
+						1023,
+						"Both Opponents Sing",
 						true
 					]
 				],
@@ -10378,19 +10645,19 @@
 			{
 				"sectionBeats": 4,
 				"sectionNotes": [
+					[
+						187470.12987013,
+						0,
+						1022.72727272727,
+						"Alt Animation",
+						true
+					],
 					[
 						187470.12987013,
 						4,
 						1023,
 						"Both Opponents Sing",
 						true
-					],
-					[
-						187470.12987013,
-						0,
-						1022.72727272727,
-						"",
-						true
 					]
 				],
 				"mustHitSection": true
@@ -10400,16 +10667,16 @@
 				"sectionNotes": [
 					[
 						188561.038961039,
-						7,
-						1023,
-						"Both Opponents Sing",
+						3,
+						2113.63636363636,
+						"Alt Animation",
 						true
 					],
 					[
 						188561.038961039,
-						3,
-						2113.63636363636,
-						"",
+						7,
+						1023,
+						"Both Opponents Sing",
 						true
 					]
 				],
@@ -10445,17 +10712,17 @@
 				"sectionNotes": [
 					[
 						191833.766233766,
-						0,
-						1022.72727272727,
-						"",
-						true
-					],
-					[
-						191833.766233766,
 						4,
 						1023,
 						"Both Opponents Sing",
 						true
+					],
+					[
+						191833.766233766,
+						1,
+						1022.72727272727,
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": false
@@ -10567,15 +10834,16 @@
 				"sectionNotes": [
 					[
 						194015.584415584,
-						0,
+						4,
 						0,
 						""
 					],
 					[
 						194015.584415584,
-						4,
 						0,
-						""
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						194151.948051948,
@@ -10587,7 +10855,7 @@
 						194151.948051948,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -10612,14 +10880,15 @@
 						194424.675324675,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						194561.038961039,
 						0,
 						204.545454545455,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						194561.038961039,
@@ -10643,7 +10912,7 @@
 						194833.766233766,
 						3,
 						204.545454545455,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -10679,16 +10948,16 @@
 					],
 					[
 						195379.220779221,
-						4,
-						0,
-						""
+						1,
+						204.545454545455,
+						"Alt Animation",
+						true
 					],
 					[
 						195379.220779221,
-						1,
-						204.545454545455,
-						"",
-						true
+						4,
+						0,
+						""
 					],
 					[
 						195515.584415584,
@@ -10706,7 +10975,7 @@
 						195651.948051948,
 						3,
 						204.545454545455,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -10742,16 +11011,16 @@
 				"sectionNotes": [
 					[
 						196197.402597403,
-						7,
-						0,
-						""
+						2,
+						477.272727272727,
+						"Alt Animation",
+						true
 					],
 					[
 						196197.402597403,
-						2,
-						477.272727272727,
-						"",
-						true
+						7,
+						0,
+						""
 					],
 					[
 						196333.766233766,
@@ -10832,7 +11101,8 @@
 						197424.675324675,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						197561.038961039,
@@ -10845,6 +11115,13 @@
 						3,
 						0,
 						""
+					],
+					[
+						197697.402597403,
+						1,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						197697.402597403,
@@ -10853,12 +11130,6 @@
 						""
 					],
 					[
-						197697.402597403,
-						1,
-						0,
-						""
-					],
-					[
 						197833.766233766,
 						7,
 						0,
@@ -10869,6 +11140,13 @@
 						3,
 						0,
 						""
+					],
+					[
+						197970.12987013,
+						0,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						197970.12987013,
@@ -10877,12 +11155,6 @@
 						""
 					],
 					[
-						197970.12987013,
-						0,
-						0,
-						""
-					],
-					[
 						198106.493506493,
 						7,
 						0,
@@ -10904,7 +11176,8 @@
 						198242.857142857,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -10914,13 +11187,14 @@
 				"sectionNotes": [
 					[
 						198379.220779221,
-						4,
 						0,
-						""
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						198379.220779221,
-						0,
+						4,
 						0,
 						""
 					],
@@ -10946,13 +11220,15 @@
 						198651.948051948,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						198788.311688312,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						198788.311688312,
@@ -10970,7 +11246,8 @@
 						198924.675324675,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						199061.038961039,
@@ -10982,7 +11259,8 @@
 						199197.402597403,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						199197.402597403,
@@ -10994,7 +11272,8 @@
 						199333.766233766,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -11015,16 +11294,11 @@
 						""
 					],
 					[
-						199606.493506493,
+						199606.493506494,
 						1,
 						0,
-						""
-					],
-					[
-						199742.857142857,
-						0,
-						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						199742.857142857,
@@ -11033,14 +11307,15 @@
 						""
 					],
 					[
-						199879.220779221,
-						2,
+						199742.857142857,
 						0,
-						""
+						0,
+						"Alt Animation",
+						true
 					],
 					[
-						200015.584415584,
-						1,
+						199879.220779221,
+						2,
 						0,
 						""
 					],
@@ -11051,16 +11326,25 @@
 						""
 					],
 					[
+						200015.584415584,
+						1,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
 						200151.948051948,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						200288.311688312,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						200288.311688312,
@@ -11072,7 +11356,8 @@
 						200424.675324675,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -11117,31 +11402,31 @@
 						""
 					],
 					[
-						201106.493506493,
+						201106.493506494,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						201242.857142857,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						201379.220779221,
 						0,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						201515.584415584,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -11152,16 +11437,16 @@
 				"sectionNotes": [
 					[
 						201651.948051948,
-						2,
-						2113.63636363636,
+						7,
+						0,
 						"",
 						true
 					],
 					[
 						201651.948051948,
-						7,
 						0,
-						"",
+						2113.63636363636,
+						"Alt Animation",
 						true
 					],
 					[
@@ -11285,16 +11570,16 @@
 				"sectionNotes": [
 					[
 						203833.766233766,
-						3,
-						477.272727272727,
+						7,
+						0,
 						"",
 						true
 					],
 					[
 						203833.766233766,
-						7,
-						0,
-						"",
+						2,
+						477.272727272727,
+						"Alt Animation",
 						true
 					],
 					[
@@ -11418,16 +11703,16 @@
 				"sectionNotes": [
 					[
 						204924.675324675,
-						3,
-						477.272727272727,
+						6,
+						0,
 						"",
 						true
 					],
 					[
 						204924.675324675,
-						6,
 						0,
-						"",
+						477.272727272727,
+						"Alt Animation",
 						true
 					],
 					[
@@ -11481,9 +11766,9 @@
 					],
 					[
 						205470.12987013,
-						0,
+						3,
 						477.272727272727,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -11551,15 +11836,23 @@
 				"sectionNotes": [
 					[
 						206015.584415584,
-						3,
-						0,
-						""
-					],
-					[
-						206015.584415584,
 						6,
 						1022.72727272727,
 						"",
+						true
+					],
+					[
+						206015.584415584,
+						2,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
+						206015.584415584,
+						0,
+						0,
+						"Alt Animation",
 						true
 					],
 					[
@@ -11582,9 +11875,17 @@
 					],
 					[
 						206561.038961039,
-						3,
+						2,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						206561.038961039,
+						0,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						206697.402597402,
@@ -11618,6 +11919,13 @@
 						""
 					],
 					[
+						207106.493506494,
+						3,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
 						207242.857142857,
 						3,
 						0,
@@ -11640,6 +11948,13 @@
 						2,
 						0,
 						""
+					],
+					[
+						207651.948051948,
+						3,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						207788.311688312,
@@ -11682,7 +11997,8 @@
 						208265.584415584,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						208333.766233766,
@@ -11694,7 +12010,8 @@
 						208401.948051948,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						208470.12987013,
@@ -11706,7 +12023,8 @@
 						208538.311688312,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						208606.493506493,
@@ -11724,7 +12042,8 @@
 						208674.675324675,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						208742.857142857,
@@ -11736,7 +12055,8 @@
 						208811.038961039,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						208879.220779221,
@@ -11745,10 +12065,11 @@
 						""
 					],
 					[
-						208947.402597402,
+						208947.402597403,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						209015.584415584,
@@ -11760,7 +12081,8 @@
 						209083.766233766,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						209151.948051948,
@@ -11772,7 +12094,8 @@
 						209220.12987013,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"altAnim": false,
@@ -11783,27 +12106,30 @@
 				"sectionNotes": [
 					[
 						209288.311688312,
+						2,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
+						209288.311688312,
 						7,
 						477.272727272727,
 						""
 					],
 					[
-						209288.311688312,
-						2,
-						0,
-						""
-					],
-					[
-						209356.493506493,
+						209356.493506494,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						209424.675324675,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						209492.857142857,
@@ -11821,13 +12147,15 @@
 						209629.220779221,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
-						209697.402597402,
+						209697.402597403,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						209765.584415584,
@@ -11851,13 +12179,15 @@
 						209901.948051948,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						209970.12987013,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						210038.311688312,
@@ -11875,13 +12205,15 @@
 						210174.675324675,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						210242.857142857,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						210311.038961039,
@@ -11900,7 +12232,7 @@
 						210379.220779221,
 						2,
 						1022.72727272727,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -12179,13 +12511,29 @@
 						216379.220779221,
 						3,
 						204.545454545455,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						216379.220779221,
+						2,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						216651.948051948,
 						2,
 						204.545454545455,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						216651.948051948,
+						1,
+						0,
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -12197,32 +12545,43 @@
 						216924.675324675,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						217333.766233766,
+						0,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						217333.766233766,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
-						217333.766233766,
-						3,
+						217742.857142857,
 						0,
-						""
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						217742.857142857,
-						3,
+						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						217742.857142857,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -12257,14 +12616,30 @@
 					[
 						218561.038961039,
 						2,
+						68.1818181818182,
+						"Alt Animation",
+						true
+					],
+					[
+						218561.038961039,
+						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						218833.766233766,
 						1,
+						136.363636363636,
+						"Alt Animation",
+						true
+					],
+					[
+						218833.766233766,
 						0,
-						""
+						0,
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -12273,35 +12648,46 @@
 				"sectionBeats": 4,
 				"sectionNotes": [
 					[
-						219106.493506493,
+						219106.493506494,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						219515.584415584,
+						3,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						219515.584415584,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
-						219515.584415584,
-						1,
+						219924.675324675,
+						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						219924.675324675,
+						1,
 						0,
-						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						219924.675324675,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -12832,61 +13218,71 @@
 						225788.311688312,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						225856.493506493,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						225924.675324675,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						226061.038961039,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
-						226197.402597402,
+						226197.402597403,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						226265.584415584,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						226333.766233766,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						226470.12987013,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						226606.493506493,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						226674.675324675,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -12898,45 +13294,49 @@
 						226742.857142857,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						226879.220779221,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
-						226947.402597402,
+						226947.402597403,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						227015.584415584,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						227151.948051948,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						227220.12987013,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						227288.311688312,
 						3,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
@@ -12980,25 +13380,29 @@
 						227833.766233766,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						227970.12987013,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						228038.311688312,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						228106.493506493,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						228242.857142857,
@@ -13028,19 +13432,22 @@
 						228651.948051948,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						228788.311688312,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						228856.493506493,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -13549,9 +13956,17 @@
 				"sectionNotes": [
 					[
 						234379.220779221,
+						2,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
+						234379.220779221,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						234515.584415584,
@@ -13575,13 +13990,22 @@
 						234788.311688312,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						234924.675324675,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						235061.038961039,
+						2,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						235061.038961039,
@@ -13590,16 +14014,31 @@
 						""
 					],
 					[
-						235197.402597402,
+						235197.402597403,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						235197.402597403,
+						2,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						235333.766233766,
 						1,
 						0,
 						""
+					],
+					[
+						235333.766233766,
+						0,
+						0,
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -13677,34 +14116,50 @@
 						236561.038961039,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
-						236697.402597402,
+						236561.038961039,
+						1,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
+						236697.402597403,
 						2,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						236765.584415584,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
 						236833.766233766,
 						0,
 						0,
-						"",
+						"Alt Animation",
+						true
+					],
+					[
+						236970.12987013,
+						3,
+						0,
+						"Alt Animation",
 						true
 					],
 					[
 						236970.12987013,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						237106.493506493,
@@ -13719,6 +14174,13 @@
 						""
 					],
 					[
+						237242.857142857,
+						1,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
 						237379.220779221,
 						3,
 						0,
@@ -13729,6 +14191,13 @@
 						1,
 						0,
 						"",
+						true
+					],
+					[
+						237515.584415584,
+						0,
+						0,
+						"Alt Animation",
 						true
 					]
 				],
@@ -14367,50 +14836,71 @@
 						242015.584415584,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						242015.584415584,
+						2,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						242151.948051948,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						242220.12987013,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						242288.311688312,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						242424.675324675,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						242492.857142857,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						242561.038961039,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					],
 					[
-						242697.402597402,
+						242697.402597403,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						242697.402597403,
+						1,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						242765.584415584,
@@ -14435,9 +14925,10 @@
 					],
 					[
 						243038.311688312,
-						2,
+						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					]
 				],
 				"mustHitSection": true
@@ -14446,58 +14937,95 @@
 				"sectionBeats": 4,
 				"sectionNotes": [
 					[
-						243106.493506493,
+						243106.493506494,
+						2,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
+						243106.493506494,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						243242.857142857,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						243242.857142857,
+						1,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						243311.038961039,
-						1,
+						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						243379.220779221,
-						2,
+						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						243515.584415584,
-						3,
+						2,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						243515.584415584,
+						1,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						243651.948051948,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						243720.12987013,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						243788.311688312,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						243788.311688312,
+						3,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						243924.675324675,
-						3,
+						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						244061.038961039,
@@ -14604,69 +15132,100 @@
 				"sectionNotes": [
 					[
 						245288.311688312,
+						3,
+						0,
+						"Alt Animation",
+						true
+					],
+					[
+						245288.311688312,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						245424.675324675,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						245492.857142857,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						245561.038961039,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
-						245697.402597402,
+						245561.038961039,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						245697.402597403,
+						2,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						245833.766233766,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						245901.948051948,
 						1,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						245970.12987013,
 						0,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
-						246106.493506493,
+						245970.12987013,
 						2,
 						0,
-						""
+						"Alt Animation",
+						true
+					],
+					[
+						246106.493506494,
+						2,
+						0,
+						"Alt Animation",
+						true
 					],
 					[
 						246242.857142857,
 						3,
 						0,
-						""
+						"Alt Animation",
+						true
 					],
 					[
 						246311.038961039,
 						1,
 						0,
-						"",
+						"Alt Animation",
 						true
 					]
 				],
@@ -14679,7 +15238,14 @@
 						246379.220779221,
 						0,
 						1022.72727272727,
-						"",
+						"Alt Animation",
+						true
+					],
+					[
+						246856.493506494,
+						1,
+						545.454545454545,
+						"Alt Animation",
 						true
 					]
 				],
@@ -15923,13 +16489,20 @@
 					],
 					[
 						280742.857142857,
-						7,
+						3,
 						204.545454545455,
 						""
 					],
 					[
 						280742.857142857,
-						3,
+						7,
+						204.545454545455,
+						"",
+						true
+					],
+					[
+						281015.584415584,
+						0,
 						204.545454545455,
 						""
 					],
@@ -15937,13 +16510,8 @@
 						281015.584415584,
 						4,
 						204.545454545455,
-						""
-					],
-					[
-						281015.584415584,
-						0,
-						204.545454545455,
-						""
+						"",
+						true
 					]
 				],
 				"altAnim": false,
@@ -15955,18 +16523,13 @@
 					[
 						281288.311688312,
 						6,
-						204.545454545455,
-						""
+						0,
+						"",
+						true
 					],
 					[
 						281288.311688312,
 						2,
-						204.545454545455,
-						""
-					],
-					[
-						281561.038961039,
-						7,
 						204.545454545455,
 						""
 					],
@@ -15977,10 +16540,11 @@
 						""
 					],
 					[
-						281833.766233766,
-						4,
-						204.545454545455,
-						""
+						281561.038961039,
+						5,
+						0,
+						"",
+						true
 					],
 					[
 						281833.766233766,
@@ -15989,10 +16553,18 @@
 						""
 					],
 					[
+						281833.766233766,
+						4,
+						0,
+						"",
+						true
+					],
+					[
 						282106.493506494,
 						5,
-						204.545454545455,
-						""
+						0,
+						"",
+						true
 					],
 					[
 						282106.493506494,
@@ -19378,6 +19950,141 @@
 				"bpm": 200
 			},
 			{
+				"sectionNotes": [],
+				"sectionBeats": 4,
+				"gfSection": false,
+				"altAnim": false,
+				"bpm": 200,
+				"changeBPM": false,
+				"mustHitSection": true
+			},
+			{
+				"sectionNotes": [],
+				"sectionBeats": 4,
+				"gfSection": false,
+				"altAnim": false,
+				"bpm": 200,
+				"changeBPM": false,
+				"mustHitSection": true
+			},
+			{
+				"sectionBeats": 4,
+				"sectionNotes": [],
+				"gfSection": false,
+				"altAnim": false,
+				"mustHitSection": true,
+				"changeBPM": false,
+				"bpm": 200
+			},
+			{
+				"sectionBeats": 4,
+				"sectionNotes": [],
+				"gfSection": false,
+				"altAnim": false,
+				"mustHitSection": true,
+				"changeBPM": false,
+				"bpm": 200
+			},
+			{
+				"sectionBeats": 4,
+				"sectionNotes": [],
+				"gfSection": false,
+				"altAnim": false,
+				"mustHitSection": true,
+				"changeBPM": false,
+				"bpm": 200
+			},
+			{
+				"sectionNotes": [],
+				"sectionBeats": 4,
+				"gfSection": false,
+				"altAnim": false,
+				"bpm": 200,
+				"changeBPM": false,
+				"mustHitSection": true
+			},
+			{
+				"sectionNotes": [],
+				"sectionBeats": 4,
+				"gfSection": false,
+				"altAnim": false,
+				"bpm": 200,
+				"changeBPM": false,
+				"mustHitSection": true
+			},
+			{
+				"sectionNotes": [],
+				"sectionBeats": 4,
+				"gfSection": false,
+				"altAnim": false,
+				"bpm": 200,
+				"changeBPM": false,
+				"mustHitSection": true
+			},
+			{
+				"sectionNotes": [],
+				"sectionBeats": 4,
+				"gfSection": false,
+				"altAnim": false,
+				"bpm": 200,
+				"changeBPM": false,
+				"mustHitSection": true
+			},
+			{
+				"sectionNotes": [],
+				"sectionBeats": 4,
+				"gfSection": false,
+				"altAnim": false,
+				"bpm": 200,
+				"changeBPM": false,
+				"mustHitSection": true
+			},
+			{
+				"sectionBeats": 4,
+				"sectionNotes": [],
+				"gfSection": false,
+				"altAnim": false,
+				"mustHitSection": true,
+				"changeBPM": false,
+				"bpm": 200
+			},
+			{
+				"gfSection": false,
+				"altAnim": false,
+				"sectionNotes": [],
+				"bpm": 200,
+				"sectionBeats": 4,
+				"changeBPM": false,
+				"mustHitSection": true
+			},
+			{
+				"gfSection": false,
+				"altAnim": false,
+				"sectionNotes": [],
+				"bpm": 200,
+				"sectionBeats": 4,
+				"changeBPM": false,
+				"mustHitSection": true
+			},
+			{
+				"gfSection": false,
+				"altAnim": false,
+				"sectionNotes": [],
+				"bpm": 200,
+				"sectionBeats": 4,
+				"changeBPM": false,
+				"mustHitSection": true
+			},
+			{
+				"gfSection": false,
+				"altAnim": false,
+				"sectionNotes": [],
+				"bpm": 200,
+				"sectionBeats": 4,
+				"changeBPM": false,
+				"mustHitSection": true
+			},
+			{
 				"gfSection": false,
 				"altAnim": false,
 				"sectionNotes": [],
@@ -19404,7 +20111,1011 @@
 		"format": "nmv2",
 		"lanes": 3,
 		"speed": 3.2,
-		"events": [],
+		"events": [
+			[
+				1200,
+				[
+					[
+						"flash",
+						"",
+						""
+					]
+				]
+			],
+			[
+				10790,
+				[
+					[
+						"Opponent Two",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				10800,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					]
+				]
+			],
+			[
+				15600,
+				[
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				20390,
+				[
+					[
+						"Opponent Two",
+						"0",
+						""
+					],
+					[
+						"Reactor Beep",
+						"",
+						""
+					]
+				]
+			],
+			[
+				22800,
+				[
+					[
+						"Reactor Beep",
+						"",
+						""
+					]
+				]
+			],
+			[
+				25190,
+				[
+					[
+						"Opponent Two",
+						"1",
+						""
+					],
+					[
+						"Reactor Beep",
+						"",
+						""
+					]
+				]
+			],
+			[
+				25200,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					]
+				]
+			],
+			[
+				27600,
+				[
+					[
+						"Reactor Beep",
+						"",
+						""
+					]
+				]
+			],
+			[
+				30000,
+				[
+					[
+						"Reactor Beep",
+						"",
+						""
+					],
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				32400,
+				[
+					[
+						"Reactor Beep",
+						"",
+						""
+					]
+				]
+			],
+			[
+				34800,
+				[
+					[
+						"Reactor Beep",
+						"",
+						""
+					]
+				]
+			],
+			[
+				37200,
+				[
+					[
+						"Reactor Beep",
+						"",
+						""
+					]
+				]
+			],
+			[
+				39590,
+				[
+					[
+						"Opponent Two",
+						"0",
+						""
+					]
+				]
+			],
+			[
+				49190,
+				[
+					[
+						"Opponent Two",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				49200,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					]
+				]
+			],
+			[
+				54000,
+				[
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				58800,
+				[
+					[
+						"Both Opponents",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				77990,
+				[
+					[
+						"Reactor Beep",
+						"",
+						""
+					],
+					[
+						"Opponent Two",
+						"0",
+						""
+					],
+					[
+						"Both Opponents",
+						"0",
+						""
+					]
+				],
+				null,
+				""
+			],
+			[
+				79190,
+				[
+					[
+						"Opponent Two",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				80390,
+				[
+					[
+						"Opponent Two",
+						"0",
+						""
+					],
+					[
+						"Reactor Beep",
+						"",
+						""
+					]
+				]
+			],
+			[
+				81590,
+				[
+					[
+						"Both Opponents",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				81600,
+				[
+					[
+						"Legacy",
+						"wmc",
+						""
+					]
+				]
+			],
+			[
+				82725,
+				[
+					[
+						"Both Opponents",
+						"0",
+						""
+					]
+				]
+			],
+			[
+				82800,
+				[
+					[
+						"Legacy",
+						"nc",
+						""
+					]
+				]
+			],
+			[
+				83990,
+				[
+					[
+						"Opponent Two",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				84000,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					]
+				]
+			],
+			[
+				85190,
+				[
+					[
+						"Opponent Two",
+						"0",
+						""
+					],
+					[
+						"Reactor Beep",
+						"",
+						""
+					]
+				]
+			],
+			[
+				85200,
+				[
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				86390,
+				[
+					[
+						"Both Opponents",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				86400,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					],
+					[
+						"Legacy",
+						"wmc",
+						""
+					]
+				]
+			],
+			[
+				87590.625,
+				[
+					[
+						"Both Opponents",
+						"0",
+						""
+					]
+				]
+			],
+			[
+				87600,
+				[
+					[
+						"Legacy",
+						"nc",
+						""
+					],
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				97190,
+				[
+					[
+						"Opponent Two",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				97200,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					]
+				]
+			],
+			[
+				102000,
+				[
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				106800,
+				[
+					[
+						"Legacy",
+						"darken",
+						""
+					],
+					[
+						"Legacy",
+						"356",
+						""
+					]
+				]
+			],
+			[
+				116400,
+				[
+					[
+						"Legacy",
+						"airship",
+						""
+					]
+				]
+			],
+			[
+				126000,
+				[
+					[
+						"Legacy",
+						"brighten",
+						""
+					],
+					[
+						"Legacy",
+						"420",
+						""
+					]
+				]
+			],
+			[
+				126009.375,
+				[
+					[
+						"Add Camera Zoom",
+						"0.1",
+						"0.3"
+					]
+				]
+			],
+			[
+				127190,
+				[
+					[
+						"Opponent Two",
+						"0",
+						""
+					]
+				]
+			],
+			[
+				136790,
+				[
+					[
+						"Opponent Two",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				136800,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					]
+				]
+			],
+			[
+				141600,
+				[
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				146400,
+				[
+					[
+						"Both Opponents",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				165590,
+				[
+					[
+						"Opponent Two",
+						"0",
+						""
+					],
+					[
+						"Both Opponents",
+						"0",
+						""
+					]
+				]
+			],
+			[
+				165600,
+				[
+					[
+						"Legacy",
+						"552",
+						""
+					],
+					[
+						"Camera Follow Pos",
+						"1600",
+						"1177"
+					]
+				]
+			],
+			[
+				166742.857142857,
+				[
+					[
+						"Legacy",
+						"556",
+						""
+					],
+					[
+						"Camera Follow Pos",
+						"",
+						""
+					]
+				]
+			],
+			[
+				175460.12987013,
+				[
+					[
+						"Opponent Two",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				175470.12987013,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					]
+				]
+			],
+			[
+				179833.766233766,
+				[
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				184187.402597403,
+				[
+					[
+						"Both Opponents",
+						"1",
+						""
+					]
+				],
+				null,
+				""
+			],
+			[
+				184197.402597403,
+				[
+					[
+						"Set Cams",
+						"2150,925,2150,925",
+						""
+					],
+					[
+						"Extra Cam Zoom",
+						"-0.12",
+						""
+					]
+				],
+				null,
+				""
+			],
+			[
+				186379.220779221,
+				[
+					[
+						"Extra Cam Zoom",
+						"-0.07",
+						""
+					]
+				]
+			],
+			[
+				187470.12987013,
+				[
+					[
+						"Extra Cam Zoom",
+						"-0.05",
+						""
+					]
+				]
+			],
+			[
+				188561.038961039,
+				[
+					[
+						"Extra Cam Zoom",
+						"-0.12",
+						""
+					]
+				],
+				null,
+				""
+			],
+			[
+				190742.857142857,
+				[
+					[
+						"Extra Cam Zoom",
+						"-0.07",
+						""
+					]
+				],
+				null,
+				""
+			],
+			[
+				191833.766233766,
+				[
+					[
+						"Extra Cam Zoom",
+						"-0.05",
+						""
+					]
+				]
+			],
+			[
+				192914.675324675,
+				[
+					[
+						"Opponent Two",
+						"0",
+						""
+					],
+					[
+						"Both Opponents",
+						"0",
+						""
+					]
+				],
+				null,
+				""
+			],
+			[
+				192924.675324675,
+				[
+					[
+						"Legacy",
+						"not black",
+						""
+					],
+					[
+						"Legacy",
+						"ncy",
+						""
+					],
+					[
+						"Extra Cam Zoom",
+						"0",
+						""
+					]
+				],
+				null,
+				""
+			],
+			[
+				201641.948051948,
+				[
+					[
+						"Opponent Two",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				201651.948051948,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					]
+				]
+			],
+			[
+				206015.584415584,
+				[
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				211470.12987013,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					]
+				]
+			],
+			[
+				211472.970779221,
+				[
+					[
+						"Reactor Beep",
+						"",
+						""
+					],
+					[
+						"flash",
+						"",
+						""
+					]
+				]
+			],
+			[
+				211475.811688312,
+				[
+					[
+						"Change Scroll Speed",
+						"1.08",
+						"0"
+					]
+				]
+			],
+			[
+				212561.038961039,
+				[
+					[
+						"Both Opponents",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				213651.948051948,
+				[
+					[
+						"Both Opponents",
+						"",
+						""
+					]
+				]
+			],
+			[
+				214742.857142857,
+				[
+					[
+						"Both Opponents",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				215833.766233766,
+				[
+					[
+						"Both Opponents",
+						"0",
+						""
+					]
+				]
+			],
+			[
+				215833.766233766,
+				[
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				220197.402597403,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					]
+				]
+			],
+			[
+				221288.311688312,
+				[
+					[
+						"Both Opponents",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				222379.220779221,
+				[
+					[
+						"Both Opponents",
+						"0",
+						""
+					]
+				]
+			],
+			[
+				223470.12987013,
+				[
+					[
+						"Both Opponents",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				224561.038961039,
+				[
+					[
+						"Both Opponents",
+						"",
+						""
+					],
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				228924.675324675,
+				[
+					[
+						"Both Opponents",
+						"1",
+						""
+					]
+				]
+			],
+			[
+				228927.516233766,
+				[
+					[
+						"Change Scroll Speed",
+						"1.05",
+						"0"
+					],
+					[
+						"flash",
+						"",
+						""
+					]
+				]
+			],
+			[
+				246106.493506494,
+				[
+					[
+						"Change Scroll Speed",
+						"0.9",
+						"1"
+					]
+				]
+			],
+			[
+				246379.220779221,
+				[
+					[
+						"Legacy",
+						"gonnakill",
+						""
+					]
+				]
+			],
+			[
+				247460.12987013,
+				[
+					[
+						"Legacy",
+						"readykill",
+						""
+					],
+					[
+						"Opponent Two",
+						"1",
+						""
+					]
+				],
+				null,
+				""
+			],
+			[
+				247470.12987013,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					]
+				],
+				null,
+				""
+			],
+			[
+				247472.970779221,
+				[
+					[
+						"Reactor Beep",
+						"",
+						""
+					]
+				]
+			],
+			[
+				256197.402597402,
+				[
+					[
+						"Legacy",
+						"not black",
+						""
+					]
+				]
+			],
+			[
+				264924.675324675,
+				[
+					[
+						"Legacy",
+						"black",
+						""
+					],
+					[
+						"Legacy",
+						"ending",
+						""
+					]
+				]
+			],
+			[
+				273651.948051948,
+				[
+					[
+						"Legacy",
+						"endingcam",
+						""
+					]
+				]
+			],
+			[
+				282379.220779221,
+				[
+					[
+						"Legacy",
+						"kill",
+						""
+					]
+				]
+			]
+		],
 		"gfVersion": "gf",
 		"arrowSkins": [
 			"default",

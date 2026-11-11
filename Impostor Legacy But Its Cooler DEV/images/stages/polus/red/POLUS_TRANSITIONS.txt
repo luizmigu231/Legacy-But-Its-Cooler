@@ -1,0 +1,67 @@
+POLUS — TRANSIÇÕES DE VARIANTE
+
+Variantes:
+- Normal: polussm
+- Night: poluss
+- Midnight: polusm
+
+CARREGAMENTO EM PARES NO MESMO HScript
+
+Cada elemento é criado em par no próprio HScript do stage. Para cada asset, o sprite da variante atual é adicionado e, logo em seguida, o sprite da próxima variante é adicionado no mesmo local, com o mesmo scrollFactor e escala.
+
+A ordem visual é controlada pelo zIndex de cada par (o Legacy ordena em zIndex crescente):
+- Sky: objetivo -600, atual -599
+- Rocks: objetivo -590, atual -589
+- Hills: objetivo -580, atual -579
+- Laboratory: objetivo -570, atual -569
+- Camera-off overlay: objetivo -560, atual -559
+- Floor: objetivo -550, atual -549
+- Speaker: objetivo -90, atual -89
+
+Assim, cada versão objetivo fica imediatamente atrás da sua própria versão atual. O par seguinte permanece acima do par anterior, preservando a composição do cenário. Não é criado um segundo objeto Stage nem um segundo carregamento de StageData.
+
+COMO A TRANSIÇÃO FUNCIONA
+
+1) Normal -> Night
+Quando a música começa no stage polussm, Normal e Night já estão carregados. Ambos começam visíveis com alpha 1 (a câmera desligada mantém seu alpha funcional de 0.001 até o evento toggle cams). A transição dura 183 segundos (3.05 * 60) e reduz somente o alpha de cada sprite Normal de 1 para 0. Os sprites Night permanecem em alpha 1, atrás dos seus pares.
+
+2) Night -> Midnight
+No fim da primeira transição, os sprites Normal são removidos. Night é promovido para o zIndex de variante atual e os assets Midnight são carregados em pares logo abaixo de cada sprite Night. Use um evento no chart:
+- Event name: Polus Stage Transition
+- Value 1: midnight (ou next)
+- Value 2: duração em segundos (exemplo: 12)
+
+Se Midnight for solicitado enquanto Normal -> Night ainda está em andamento, o pedido fica na fila e começa depois que Night for promovido. Se Value 1 = midnight for solicitado ainda em Normal, o sistema passa primeiro por Night.
+
+Ao concluir qualquer transição, a variante objetivo é promovida para a posição superior do seu par; a próxima variante é criada abaixo dela. Somente os sprites da variante atual perdem alpha. Os sprites objetivo permanecem em alpha 1.
+
+O QUE É INTERPOLADO
+
+- Matrix dos personagens entre Normal, Night e Midnight.
+- Matriz de cor da Layer EDSS e sua força.
+- Direção, distância e thresholds da EDSS permanecem iguais entre as variantes.
+- Speaker Lonely segue o mesmo pareamento e preserva a visibilidade funcional (por exemplo, GF fantasma).
+- Boppers e BF Dead continuam exclusivos de Midnight.
+- A neve permanece branca, sem tint ou colorTransform aplicado aos sprites de partículas.
+- As imagens de cenário não usam tween de colorTransform nem tint por .color.
+
+OBSERVAÇÃO SOBRE O LEGACY
+
+A transição troca as artes e os estados EDSS dentro do Stage já carregado. Ela não substitui internamente o objeto Stage nem recarrega StageData/SONG.stage em tempo real. As posições e os scrollFactors das variantes são mantidos iguais, então a troca visual usa as mesmas coordenadas e o mesmo parallax.
+
+O evento para Midnight não é inserido automaticamente em um chart porque o ponto musical desejado não foi especificado.
+
+DESEMPENHO
+
+Durante a transição, as duas versões de cada elemento ficam carregadas simultaneamente. O objetivo permanece atrás do sprite atual e em alpha 1; o atual é o único que perde opacidade. Ao concluir, o antigo é removido e destruído. Isso evita que os elementos de um stage inteiro fiquem empilhados globalmente atrás de todos os elementos do outro.
+
+A shading do Speaker Night é pré-renderizada no PNG e não cria custo de shader em runtime. O sistema noteBW continua removido de polusm.hx.
+
+NOTAS
+- A transição P&B do HUD/personagens permanece em polusm.hx.
+- Boppers e BF Dead continuam exclusivos de Midnight.
+- Esta atualização ainda precisa de teste dentro do Impostor Legacy Mobile.
+
+
+AUTOMAÇÃO DA SEGUNDA TRANSIÇÃO
+Em poluss.hx, onSongStart() chama beginPolusStageTransition("midnight", 3.05 * 60). Assim, o par Night/Midnight já criado no onLoad é usado sem recarregar o stage. O evento Polus Stage Transition continua disponível para transições manuais.

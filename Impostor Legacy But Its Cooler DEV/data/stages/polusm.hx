@@ -8,14 +8,12 @@ import funkin.states.substates.PauseSubState;
 public var speaker:FlxSprite;
 public var bfdead:FlxSprite;
 var flashSprite:FlxSprite;
-var speakerRim:ExtraDropShadowShader;
-var bfdeadRim:ExtraDropShadowShader;
-var crowdRim:ExtraDropShadowShader;
-var crowdRim2:ExtraDropShadowShader;
 var bfRim:ExtraDropShadowShader;
 var petRim:ExtraDropShadowShader;
 var gfRim:ExtraDropShadowShader;
 var dadRim:ExtraDropShadowShader;
+var midnightRimsSuspended:Bool = false;
+var midnightCharacterChangeHooksBound:Bool = false;
 var snowAlpha = 1;
 var snowEmitter:SnowEmitter;
 var crowd:FlxSprite;
@@ -24,311 +22,153 @@ var outroVid:PsychVideoSprite;
 var ext = 'stages/polus/red/';
 var colorShader = newShader('pureColor');
 var camOff:FlxSprite;
+var moonGlow:FlxSprite;
+var polusVignette:FlxSprite;
+var polusVignetteFitWidth:Int = -1;
+var polusVignetteFitHeight:Int = -1;
 
 var whiteBg:FlxSprite;
 
-var noteBWActive:Bool = false;
 
-function createRim(angleX:Float, angleY:Float):ExtraDropShadowShader
+var darkMatrix:Array<Float> = [
+	0.53, 0, 0, 0, 0,
+	0, 0.62, 0, 0, 0,
+	0, 0, 0.75, 0, 0,
+	0, 0, 0, 1, 0
+];
+
+var layerColorMatrix:Array<Float> = [
+	0.94, 0, 0, 0, 4,
+	0, 0.94, 0, 0, 3,
+	0, 0, 0.94, 0, 6,
+	0, 0, 0, 1, 0
+];
+
+function multiplyPolusColorMatrices(a:Array<Float>, b:Array<Float>):Array<Float>
+{
+	var result:Array<Float> = [];
+	for (i in 0...4)
+	{
+		for (j in 0...5)
+		{
+			result[i * 5 + j] = a[i * 5] * b[j]
+				+ a[i * 5 + 1] * b[j + 5]
+				+ a[i * 5 + 2] * b[j + 10]
+				+ a[i * 5 + 3] * b[j + 15]
+				+ (j == 4 ? a[i * 5 + 4] : 0);
+		}
+	}
+	return result;
+}
+
+function createRim(angleX:Float, distance:Float):ExtraDropShadowShader
 {
 	var rim = new ExtraDropShadowShader();
-
 	rim.threshold = .045;
-	rim.strength = .82;
-	rim.roughness = .012;
+	rim.strength = 1;
+	rim.roughness = .35;
+	rim.antialiasStages = 0;
+	rim.setAdjustColor(-5, -9, 5, -13);
+	var adjustMatrix:Array<Float> = rim.colorMatrix;
+	for (i in 0...4) adjustMatrix[i * 5 + 4] *= 255;
+	rim.setColorMatrix(multiplyPolusColorMatrices(adjustMatrix, darkMatrix));
+	rim.addLayer(layerColorMatrix, angleX + 92, distance, .018, .95, .25);
+	return rim;
+}
 
-	rim.addLayer([
-		1,0,0,0,170,
-		0,1,0,0,100,
-		0,0,1,0,255,
-		0,0,0,1,0
-	], angleX + 92, angleY + 0, .018, .70);
+
+function rebindMidnightCharacterRim(rim:ExtraDropShadowShader, oldChar:FlxSprite, newChar:FlxSprite, angleX:Float):ExtraDropShadowShader
+{
+	if (!ClientPrefs.shaders || newChar == null || midnightRimsSuspended) return rim;
+
+	if (rim == null)
+	{
+		newChar.useRenderTexture = true;
+		rim = createRim(angleX, -15);
+		rim.attachedSprite = newChar;
+	}
+	else
+	{
+		var previousSprite = rim.attachedSprite;
+		newChar.useRenderTexture = true;
+		rim.attachedSprite = newChar;
+		if (previousSprite != null && previousSprite != newChar && previousSprite.shader == null)
+			previousSprite.useRenderTexture = false;
+		if (rim.layers != null && rim.layers.length > 0)
+			rim.layers[0].angle = angleX + 92;
+	}
 
 	return rim;
 }
 
-function applyRim(sprite:FlxSprite)
+function bindMidnightCharacterChangeHooks():Void
 {
-	if (!ClientPrefs.shaders || sprite == null)
-		return;
+	if (midnightCharacterChangeHooksBound) return;
+	midnightCharacterChangeHooksBound = true;
 
-	var rim = createRim(0, 0);
-	rim.attachedSprite = sprite;
-	sprite.useRenderTexture = true;
-	sprite.shader = rim;
-}
-
-function updateBWMaskData(shader:FlxRuntimeShader)
-{
-	if (shader == null)
-		return;
-
-	if (boyfriend != null && boyfriend.framePixels != null)
-	{
-		var bfPos = boyfriend.getScreenPosition(camGame);
-
-		var bfWidth:Float = boyfriend.framePixels.width * boyfriend.scale.x;
-		var bfHeight:Float = boyfriend.framePixels.height * boyfriend.scale.y;
-
-		shader.setBitmapData(
-			'u_bfMask',
-			boyfriend.framePixels
-		);
-
-		shader.setFloatArray('u_bfPos', [
-			bfPos.x,
-			bfPos.y
-		]);
-
-		shader.setFloatArray('u_bfSize', [
-			bfWidth,
-			bfHeight
-		]);
-
-		shader.setFloat(
-			'u_bfFlip',
-			boyfriend.flipX ? 1.0 : 0.0
-		);
-	}
-
-	if (dad != null && dad.framePixels != null)
-	{
-		var dadPos = dad.getScreenPosition(camGame);
-
-		var dadWidth:Float = dad.framePixels.width * dad.scale.x;
-		var dadHeight:Float = dad.framePixels.height * dad.scale.y;
-
-		shader.setBitmapData(
-			'u_dadMask',
-			dad.framePixels
-		);
-
-		shader.setFloatArray('u_dadPos', [
-			dadPos.x,
-			dadPos.y
-		]);
-
-		shader.setFloatArray('u_dadSize', [
-			dadWidth,
-			dadHeight
-		]);
-
-		shader.setFloat(
-			'u_dadFlip',
-			dad.flipX ? 1.0 : 0.0
-		);
-	}
-}
-
-function setupBWNote(note)
-{
-	if (note == null)
-		return;
-
-	if (!note.mustPress)
-	{
-		note.visible = false;
-		note.shader = null;
-		note.rgbEnabled = false;
-		note.rgbShader.enabled = false;
-		return;
-	}
-
-	if (!note.extraData.exists('noteBWOriginalColor'))
-		note.extraData['noteBWOriginalColor'] = note.color;
-
-	if (!note.extraData.exists('noteBWOriginalVisible'))
-		note.extraData['noteBWOriginalVisible'] = note.visible;
-
-	if (!note.extraData.exists('noteBWOriginalRGB'))
-		note.extraData['noteBWOriginalRGB'] = note.rgbEnabled;
-
-	var shader:FlxRuntimeShader = note.extraData['noteBWShader'];
-
-	if (shader == null)
-	{
-		shader = newShader('noteBWMask');
-
-		if (shader == null)
-		{
-			note.color = FlxColor.BLACK;
-			note.rgbEnabled = false;
-			note.rgbShader.enabled = false;
-			return;
-		}
-
-		note.extraData['noteBWShader'] = shader;
-	}
-
-	note.rgbEnabled = false;
-	note.rgbShader.enabled = false;
-
-	note.shader = shader;
-	note.visible = true;
-}
-
-function updateBWNote(note)
-{
-	if (note == null || !note.mustPress)
-		return;
-
-	var shader:FlxRuntimeShader = note.extraData['noteBWShader'];
-
-	if (shader == null)
-	{
-		setupBWNote(note);
-		shader = note.extraData['noteBWShader'];
-	}
-
-	if (shader == null)
-	{
-		note.rgbEnabled = false;
-		note.rgbShader.enabled = false;
-		note.color = FlxColor.BLACK;
-		return;
-	}
-
-	var notePos = note.getScreenPosition(camHUD);
-
-	var noteWidth:Float = note.width * note.scale.x;
-	var noteHeight:Float = note.height * note.scale.y;
-
-	if (noteWidth <= 0 || noteHeight <= 0)
-		return;
-
-	shader.setFloatArray('u_targetPos', [
-		notePos.x,
-		notePos.y
-	]);
-
-	shader.setFloatArray('u_targetSize', [
-		noteWidth,
-		noteHeight
-	]);
-
-	updateBWMaskData(shader);
-
-	note.rgbEnabled = false;
-	note.rgbShader.enabled = false;
-	note.shader = shader;
-	note.visible = true;
-}
-
-function enableNoteBW()
-{
-	noteBWActive = true;
-
-	if (game.notes == null)
-		return;
-
-	game.notes.forEachAlive(function(note)
-	{
-		if (note == null)
-			return;
-
-		if (!note.extraData.exists('noteBWOriginalColor'))
-			note.extraData['noteBWOriginalColor'] = note.color;
-
-		if (!note.extraData.exists('noteBWOriginalVisible'))
-			note.extraData['noteBWOriginalVisible'] = note.visible;
-
-		if (!note.extraData.exists('noteBWOriginalRGB'))
-			note.extraData['noteBWOriginalRGB'] = note.rgbEnabled;
-
-		if (!note.mustPress)
-		{
-			note.visible = false;
-			note.shader = null;
-			note.rgbEnabled = false;
-			note.rgbShader.enabled = false;
-			return;
-		}
-
-		setupBWNote(note);
-	});
-}
-
-function disableNoteBW()
-{
-	noteBWActive = false;
-
-	if (game.notes == null)
-		return;
-
-	game.notes.forEachAlive(function(note)
-	{
-		if (note == null)
-			return;
-
-		note.shader = null;
-
-		if (note.extraData.exists('noteBWOriginalColor'))
-		{
-			note.color = note.extraData['noteBWOriginalColor'];
-			note.extraData.remove('noteBWOriginalColor');
-		}
-
-		if (note.extraData.exists('noteBWOriginalVisible'))
-		{
-			note.visible = note.extraData['noteBWOriginalVisible'];
-			note.extraData.remove('noteBWOriginalVisible');
-		}
-
-		if (note.extraData.exists('noteBWOriginalRGB'))
-		{
-			note.rgbEnabled = note.extraData['noteBWOriginalRGB'];
-			note.extraData.remove('noteBWOriginalRGB');
-		}
-		else
-		{
-			note.rgbEnabled = true;
-		}
-
-		note.rgbShader.enabled = note.rgbEnabled;
-
-		if (note.extraData.exists('noteBWShader'))
-			note.extraData.remove('noteBWShader');
-	});
+	if (boyfriendGroup != null)
+		boyfriendGroup.onChange.add(function(newChar, oldChar) {
+			if (newChar != null) bfRim = rebindMidnightCharacterRim(bfRim, oldChar, newChar, newChar.flipX ? 140 : 220);
+		});
+	if (gfGroup != null)
+		gfGroup.onChange.add(function(newChar, oldChar) {
+			if (newChar != null) gfRim = rebindMidnightCharacterRim(gfRim, oldChar, newChar, 220);
+		});
+	if (dadGroup != null)
+		dadGroup.onChange.add(function(newChar, oldChar) {
+			if (newChar != null) dadRim = rebindMidnightCharacterRim(dadRim, oldChar, newChar, 220);
+		});
+	if (pet != null)
+		pet.onChange.add(function(changedPet) {
+			if (changedPet != null) petRim = rebindMidnightCharacterRim(petRim, changedPet, changedPet, 220);
+		});
 }
 
 function onLoad()
 {
-	var sky:FlxSprite = new FlxSprite(-400, -400).loadGraphic(Paths.image(ext + 'polus_custom_sky'));
+	var sky:FlxSprite = new FlxSprite(-400, -400).loadGraphic(Paths.image(ext + 'polus_custom_sky_midnight'));
 	sky.scrollFactor.set(0.5, 0.5);
 	sky.setGraphicSize(Std.int(sky.width * 1.4));
-	sky.setColorTransform(0.88, 0.92, 1.12);
 	add(sky);
 
 	var rocks:FlxSprite = new FlxSprite(-700, -300).loadGraphic(Paths.image(ext + 'polusrocks_midnight'));
 	rocks.scrollFactor.set(0.6, 0.6);
-	rocks.setColorTransform(0.88, 0.92, 1.12);
 	add(rocks);
 
 	var hills:FlxSprite = new FlxSprite(-1050, -180.55).loadGraphic(Paths.image(ext + 'polusHills_midnight'));
 	hills.scrollFactor.set(0.9, 0.9);
-	hills.setColorTransform(0.88, 0.92, 1.12);
 	add(hills);
 
 	var warehouse:FlxSprite = new FlxSprite(50, -400).loadGraphic(Paths.image(ext + 'polus_custom_lab_midnight'));
-	warehouse.setColorTransform(0.88, 0.92, 1.12);
 	add(warehouse);
 	
-	camOff = new FlxSprite(50 + 1123, -400 + 452).loadGraphic(Paths.image(ext + 'cam_off_lab'));
-	camOff.setColorTransform(0.88, 0.92, 1.12);
+	camOff = new FlxSprite(50 + 1123, -400 + 452).loadGraphic(Paths.image(ext + 'cam_off_lab_midnight'));
 	camOff.alpha = 0.001;
 	add(camOff);
 
-	var ground:FlxSprite = new FlxSprite(-1350, 80).loadGraphic(Paths.image(ext + 'polus_custom_floor'));
-	ground.setColorTransform(0.88, 0.92, 1.12);
+	var ground:FlxSprite = new FlxSprite(-1350, 80).loadGraphic(Paths.image(ext + 'polus_custom_floor_midnight'));
 	add(ground);
+
+	moonGlow = new FlxSprite(-130, -430).loadGraphic(Paths.image(ext + 'polus_moon_glow'));
+	moonGlow.setGraphicSize(960, 960);
+	moonGlow.updateHitbox();
+	moonGlow.scrollFactor.set(.5, .5);
+	moonGlow.blend = BlendMode.ADD;
+	moonGlow.color = 0xFF647BCB;
+	moonGlow.alpha = .38;
+	moonGlow.antialiasing = true;
+	moonGlow.active = false;
+	add(moonGlow);
+
+
 
 	whiteBg = new FlxSprite(0, 0).makeGraphic(100, 100, 0xFFFFFFFF);
 	whiteBg.scale.set(10000, 10000);
 	whiteBg.alpha = 0;
 	add(whiteBg);
 
-	snowEmitter = new SnowEmitter(-600, -600, 2700);
-	snowEmitter.start(false, ClientPrefs.lowQuality ? 0.1 : 0.04);
+	snowEmitter = new SnowEmitter(-600, -600, 200);
+	snowEmitter.start(false, ClientPrefs.lowQuality ? 0.16 : 0.08);
 	snowEmitter.scrollFactor.x.set(1, 1.5);
 	snowEmitter.scrollFactor.y.set(1, 1.5);
 	add(snowEmitter);
@@ -342,26 +182,48 @@ function onLoad()
 		else
 			particle.alpha = snowAlpha;
 
-		particle.color = 0xFFDCE6FF;
 	});
 
 	snowEmitter.zIndex = 13;
 	snowEmitter.lifespan.set(5);
 
 	speaker = new FlxSprite(300, 185);
-	speaker.frames = Paths.getSparrowAtlas(ext + 'speakerlonely');
+	speaker.frames = Paths.getSparrowAtlas(ext + 'speakerlonely_midnight');
 	speaker.animation.addByPrefix('bop', 'speakers lonely', 24, false);
 	speaker.animation.play('bop');
 	speaker.alpha = 0;
-	speaker.color = 0xFF89A0D0;
 	add(speaker);
 
 	bfdead = new FlxSprite(600, 525).loadGraphic(Paths.image(ext + 'bfdead_midnight'));
 	bfdead.setGraphicSize(Std.int(bfdead.width * 0.8));
 	bfdead.updateHitbox();
 	bfdead.alpha = 0;
-	bfdead.color = 0xFF89A0D0;
 	add(bfdead);
+}
+
+function fitPolusVignette():Void
+{
+	if (polusVignette == null || camGame == null) return;
+
+	var fitZoom:Float = camGame.zoom > 0 ? camGame.zoom : 1;
+	var targetWidth:Int = Std.int(Math.ceil(FlxG.width / fitZoom));
+	var targetHeight:Int = Std.int(Math.ceil(FlxG.height / fitZoom));
+	if (targetWidth < 1 || targetHeight < 1) return;
+
+	if (targetWidth != polusVignetteFitWidth || targetHeight != polusVignetteFitHeight)
+	{
+		polusVignette.setGraphicSize(targetWidth, targetHeight);
+		polusVignette.updateHitbox();
+		polusVignetteFitWidth = targetWidth;
+		polusVignetteFitHeight = targetHeight;
+	}
+
+	polusVignette.setPosition(camGame.viewMarginX, camGame.viewMarginY);
+}
+
+function onUpdatePost(elapsed:Float):Void
+{
+	fitPolusVignette();
 }
 
 function onCreatePost()
@@ -391,118 +253,91 @@ function onCreatePost()
 
 	camSpecialThing([470, 250], [820, 250]);
 
-	boyfriend.color = 0xFF89A0D0;
-	gf.color = 0xFF89A0D0;
-	dad.color = 0xFF89A0D0;
-	pet.color = 0xFF89A0D0;
+	polusVignette = new FlxSprite(0, 0).loadGraphic(Paths.image(ext + 'polus_vignette'));
+	polusVignette.scrollFactor.set(0, 0);
+	polusVignette.blend = BlendMode.NORMAL;
+	polusVignette.alpha = .72;
+	polusVignette.camera = camGame;
+	polusVignette.zIndex = 999999;
+	polusVignette.active = false;
+	polusVignette.antialiasing = true;
+	polusVignetteFitWidth = -1;
+	polusVignetteFitHeight = -1;
+	fitPolusVignette();
+	add(polusVignette);
+	refreshZ(stage);
 
 	if (gf.curCharacter == 'gf-ghost' && curSong.toLowerCase() != 'top 10')
 	{
 		speaker.alpha = 1;
 		gf.y -= 240;
-		speaker.color = 0xFF89A0D0;
-	}
+		}
 
 	if (boyfriend.curCharacter == 'bf-ghost')
 	{
 		bfdead.alpha = 1;
-		bfdead.color = 0xFF89A0D0;
-	}
+		}
 
 	crowdfirst = new FlxSprite(-900, 300);
-	crowdfirst.frames = Paths.getSparrowAtlas(ext + 'boppers_meltdown_first');
+	crowdfirst.frames = Paths.getSparrowAtlas(ext + 'boppers_meltdown_first_midnight');
 	crowdfirst.animation.addByPrefix('bop', 'BoppersMeltdown', 24, false);
 	crowdfirst.animation.play('bop');
 	crowdfirst.scale.set(0.9, 0.9);
 	crowdfirst.scrollFactor.set(1.5, 1.5);
 	crowdfirst.antialiasing = true;
-	crowdfirst.setColorTransform(0.88, 0.92, 1.12);
 	crowdfirst.alpha = 0;
 
 	crowd = new FlxSprite(-900, 150);
-	crowd.frames = Paths.getSparrowAtlas(ext + 'boppers_meltdown');
+	crowd.frames = Paths.getSparrowAtlas(ext + 'boppers_meltdown_midnight');
 	crowd.animation.addByPrefix('bop', 'BoppersMeltdown', 24, false);
 	crowd.animation.play('bop');
 	crowd.scale.set(0.9, 0.9);
 	crowd.scrollFactor.set(1.5, 1.5);
 	crowd.antialiasing = true;
-	crowd.setColorTransform(0.88, 0.92, 1.12);
 	crowd.alpha = 0;
 
 	if (PlayState.SONG.song.toLowerCase() == 'meltdown')
 	{
 		add(crowd);
 		add(crowdfirst);
+	}
 
-		if (ClientPrefs.shaders)
+	if (ClientPrefs.shaders)
+	{
+		boyfriend.useRenderTexture = true;
+
+		if (boyfriend.flipX)
+			bfRim = createRim(140, -15);
+		else
+			bfRim = createRim(220, -15);
+
+		bfRim.attachedSprite = boyfriend;
+		boyfriend.shader = bfRim;
+
+		if (hasPet && pet != null)
 		{
-			boyfriend.useRenderTexture = true;
+			pet.useRenderTexture = true;
+			petRim = createRim(220, -15);
+			petRim.attachedSprite = pet;
+			pet.shader = petRim;
+		}
 
-			if (boyfriend.flipX)
-				bfRim = createRim(140, -15);
-			else
-				bfRim = createRim(220, -15);
-
-			bfRim.attachedSprite = boyfriend;
-			boyfriend.shader = bfRim;
-
-			if (hasPet && pet != null)
-			{
-				pet.useRenderTexture = true;
-				petRim = createRim(220, -15);
-				petRim.attachedSprite = pet;
-				pet.shader = petRim;
-			}
-
+		if (gf != null)
+		{
 			gf.useRenderTexture = true;
 			gfRim = createRim(220, -15);
 			gfRim.attachedSprite = gf;
 			gf.shader = gfRim;
-
-			dad.useRenderTexture = true;
-			dadRim = createRim(220, -15);
-			dadRim.attachedSprite = dad;
-			dad.shader = dadRim;
-
-			crowdRim = createRim(220, -15);
-			crowdRim.attachedSprite = crowd;
-			crowd.shader = crowdRim;
-
-			crowdRim2 = createRim(220, -15);
-			crowdRim2.attachedSprite = crowdfirst;
-			crowdfirst.shader = crowdRim2;
-
-			speakerRim = createRim(220, -15);
-			speakerRim.attachedSprite = speaker;
-			speaker.shader = speakerRim;
 		}
+
+		dad.useRenderTexture = true;
+		dadRim = createRim(220, -15);
+		dadRim.attachedSprite = dad;
+		dad.shader = dadRim;
 	}
-}
 
-function onUpdatePost(elapsed:Float)
-{
-	if (!noteBWActive)
-		return;
-
-	if (game.notes == null)
-		return;
-
-	game.notes.forEachAlive(function(note)
-	{
-		if (note == null)
-			return;
-
-		if (!note.mustPress)
-		{
-			note.visible = false;
-			note.shader = null;
-			note.rgbEnabled = false;
-			note.rgbShader.enabled = false;
-			return;
-		}
-
-		updateBWNote(note);
-	});
+	bindMidnightCharacterChangeHooks();
+	refreshZ(stage);
 }
 
 function onSongStart()
@@ -546,17 +381,28 @@ function onBeatHit()
 			dad.useRenderTexture = true;
 			dad.shader = dadRim;
 		}
-
-		dad.color = 0xFF89A0D0;
 	}
 
 	if (curBeat == 128)
 	{
+		midnightRimsSuspended = true;
 		dad.shader = null;
 		boyfriend.shader = null;
 
 		dad.useRenderTexture = false;
 		boyfriend.useRenderTexture = false;
+
+		if (gfRim != null)
+		{
+			gf.shader = null;
+			gf.useRenderTexture = false;
+		}
+
+		if (petRim != null && pet != null)
+		{
+			pet.shader = null;
+			pet.useRenderTexture = false;
+		}
 
 		dad.color = FlxColor.BLACK;
 		boyfriend.color = FlxColor.BLACK;
@@ -565,6 +411,8 @@ function onBeatHit()
 		speaker.alpha = 0;
 		gf.alpha = 0;
 		whiteBg.alpha = 1;
+		if (moonGlow != null) moonGlow.visible = false;
+		if (polusVignette != null) polusVignette.visible = false;
 
 		healthBar.rightBar.color = healthBar.leftBar.color = FlxColor.BLACK;
 		iconP1.color = FlxColor.BLACK;
@@ -598,30 +446,25 @@ function onBeatHit()
 			pet.alpha = 0;
 
 		bfdead.alpha = 0;
-
-		enableNoteBW();
 	}
 
 	if (curBeat == 160)
 	{
-		disableNoteBW();
 
+		midnightRimsSuspended = false;
 		if (ClientPrefs.shaders)
 		{
-			if (bfRim != null)
-			{
-				boyfriend.useRenderTexture = true;
-				boyfriend.shader = bfRim;
-			}
-
-			if (dadRim != null)
-			{
-				dad.useRenderTexture = true;
-				dad.shader = dadRim;
-			}
+			bfRim = rebindMidnightCharacterRim(bfRim, bfRim != null ? bfRim.attachedSprite : null, boyfriend, boyfriend.flipX ? 140 : 220);
+			dadRim = rebindMidnightCharacterRim(dadRim, dadRim != null ? dadRim.attachedSprite : null, dad, 220);
+			if (gf != null)
+				gfRim = rebindMidnightCharacterRim(gfRim, gfRim != null ? gfRim.attachedSprite : null, gf, 220);
+			if (hasPet && pet != null)
+				petRim = rebindMidnightCharacterRim(petRim, petRim != null ? petRim.attachedSprite : null, pet, 220);
 		}
 
-		boyfriend.color = 0xFF89A0D0;
+	
+		boyfriend.color = FlxColor.WHITE;
+		dad.color = FlxColor.WHITE;
 
 		for (obj in [playHUD.healthBar, playHUD.iconP1, playHUD.iconP2, playHUD.scoreTxt, playHUD.timeBar, playHUD.timeTxt])
 			obj.visible = true;
@@ -633,6 +476,8 @@ function onBeatHit()
 
 		gf.alpha = 1;
 		whiteBg.alpha = 0;
+		if (moonGlow != null) moonGlow.visible = true;
+		if (polusVignette != null) polusVignette.visible = true;
 
 		iconP1.color = FlxColor.WHITE;
 		iconP2.color = FlxColor.WHITE;

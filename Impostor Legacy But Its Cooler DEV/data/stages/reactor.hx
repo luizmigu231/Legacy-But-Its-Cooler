@@ -18,9 +18,10 @@ var coreClaw:FunkinSprite;
 var coreGlow:FunkinSprite;
 var coreRing:FunkinSprite;
 
-var coreGlowRim:ExtraDropShadowShader;
-var coreRingRim:ExtraDropShadowShader;
-var coreClawRim:ExtraDropShadowShader;
+var reactorBfRim:ExtraDropShadowShader;
+var reactorGfRim:ExtraDropShadowShader;
+var reactorDadRim:ExtraDropShadowShader;
+var reactorPetRim:ExtraDropShadowShader;
 
 function makeAdjustColor():FunkinRuntimeShader
 {
@@ -34,7 +35,7 @@ function makeAdjustColor():FunkinRuntimeShader
 	return shader;
 }
 
-function colorize(sprite:FlxSprite, hue:Float, saturation:Float, brightness:Float, contrast:Float)
+function colorize(sprite:FlxSprite, hue:Float, saturation:Float, brightness:Float, contrast:Float):Void
 {
 	if (sprite == null) return;
 
@@ -48,94 +49,99 @@ function colorize(sprite:FlxSprite, hue:Float, saturation:Float, brightness:Floa
 	sprite.shader = shader;
 }
 
-function makeCoreGlowRim():ExtraDropShadowShader
+function makeCharacterRim():ExtraDropShadowShader
 {
 	var shader:ExtraDropShadowShader = new ExtraDropShadowShader();
 
-	shader.threshold = .018;
+	shader.threshold = .02;
+	shader.strength = 1;
+	shader.roughness = .9;
+	shader.operation = 'stack';
 
-	shader.setColorMatrix([
-		1.00, .18, .38, 0, 18,
-		.02, .30, .10, 0, -10,
-		.24, .00, 1.02, 0, 28,
-		0, 0, 0, 1, 0
-	]);
+	shader.setAdjustColor(-24, -9, 34, -42);
 
 	shader.addLayer([
-		1.00, .12, .30, 0, 42,
-		.02, .22, .08, 0, -2,
-		.18, .01, .98, 0, 22,
+		1.00, .025, .10, 0, 88,
+		.01, .90, .025, 0, 2,
+		.10, .02, 1.02, 0, 58,
 		0, 0, 0, 1, 0
-	], 90, 22, .055);
+	], 90, 20, .018, .82, .82);
 
 	shader.addLayer([
-		1.00, .03, .18, 0, 58,
-		0, .11, .06, 0, 2,
-		.22, 0, .90, 0, 38,
+		.96, .015, .13, 0, 38,
+		.012, .87, .035, 0, 1,
+		.13, .025, 1.06, 0, 92,
 		0, 0, 0, 1, 0
-	], 270, 42, .035);
+	], 90, 32, .035, .50, .85);
+
+	shader.addLayer([
+		1.02, .02, .075, 0, 52,
+		.012, .94, .02, 0, 1,
+		.075, .015, 1.0, 0, 36,
+		0, 0, 0, 1, 0
+	], 90, 11, .05, .30, .8);
 
 	return shader;
 }
 
-function makeCoreRingRim():ExtraDropShadowShader
+function updateCharacterRimDirection(shader:ExtraDropShadowShader, character:FlxSprite):Void
 {
-	var shader:ExtraDropShadowShader = new ExtraDropShadowShader();
+	if (shader == null || character == null || coreGlow == null)
+		return;
 
-	shader.threshold = .018;
+	var cameraX:Float = FlxG.camera.scroll.x;
+	var cameraY:Float = FlxG.camera.scroll.y;
 
-	shader.setColorMatrix([
-		1.00, .20, .42, 0, 22,
-		.02, .36, .12, 0, -8,
-		.26, .00, 1.05, 0, 34,
-		0, 0, 0, 1, 0
-	]);
+	var sourceX:Float = coreGlow.x + coreGlow.width * .5
+		- cameraX * coreGlow.scrollFactor.x;
 
-	shader.addLayer([
-		1.00, .12, .32, 0, 36,
-		.01, .27, .09, 0, 0,
-		.20, .01, 1.00, 0, 24,
-		0, 0, 0, 1, 0
-	], 90, 20, .06);
+	var sourceY:Float = coreGlow.y + coreGlow.height * .5
+		- cameraY * coreGlow.scrollFactor.y;
 
-	shader.addLayer([
-		1.00, .03, .20, 0, 56,
-		0, .13, .06, 0, 2,
-		.23, 0, .92, 0, 36,
-		0, 0, 0, 1, 0
-	], 270, 38, .035);
+	var characterX:Float = character.x + character.width * .5
+		- cameraX * character.scrollFactor.x;
 
-	return shader;
+	var characterY:Float = character.y + character.height * .5
+		- cameraY * character.scrollFactor.y;
+
+	var dx:Float = sourceX - characterX;
+	var dy:Float = sourceY - characterY;
+
+	var angle:Float = Math.atan2(-dy, dx) * 180 / Math.PI;
+
+	if (angle < 0)
+		angle += 360;
+
+	shader.layers[0].angle = angle;
+	shader.layers[1].angle = angle - 13;
+	shader.layers[2].angle = angle + 13;
 }
 
-function makeCoreClawRim():ExtraDropShadowShader
+function keepCharacterRim(shader:ExtraDropShadowShader, character:FlxSprite):Void
 {
-	var shader:ExtraDropShadowShader = new ExtraDropShadowShader();
+	if (shader == null || character == null) return;
 
-	shader.threshold = .04;
+	updateCharacterRimDirection(shader, character);
 
-	shader.setColorMatrix([
-		.78, .08, .20, 0, -4,
-		.03, .62, .13, 0, 8,
-		.15, .04, .86, 0, 8,
-		0, 0, 0, 1, 0
-	]);
+	if (shader.attachedSprite != character)
+		shader.attachedSprite = character;
 
-	shader.addLayer([
-		.92, .12, .24, 0, 28,
-		.02, .66, .10, 0, 8,
-		.10, .03, .80, 0, 4,
-		0, 0, 0, 1, 0
-	], 120, 20, .05);
+	character.useRenderTexture = true;
 
-	shader.addLayer([
-		.72, .05, .30, 0, 20,
-		.01, .44, .08, 0, 2,
-		.16, .01, .76, 0, 14,
-		0, 0, 0, 1, 0
-	], 300, 28, .035);
+	if (character.shader != shader)
+		character.shader = shader;
+}
 
-	return shader;
+function applyCharacterRims():Void
+{
+	if (!ClientPrefs.shaders) return;
+
+	keepCharacterRim(reactorBfRim, boyfriend);
+	keepCharacterRim(reactorGfRim, gf);
+	keepCharacterRim(reactorDadRim, dad);
+
+	if (hasPet)
+		keepCharacterRim(reactorPetRim, pet);
 }
 
 function onLoad()
@@ -214,103 +220,53 @@ function onCreatePost()
 	mainoverlay.blend = BlendMode.ADD;
 	add(mainoverlay);
 
-	colorize(bg0, -8, -42, -24, 34);
-	colorize(bg, -11, -50, -28, 38);
 	colorize(toogusorange, 6, -12, -12, 26);
-	colorize(bg2, -5, -40, -22, 36);
 	colorize(toogusblue, -16, -34, -20, 31);
-	colorize(bg3, -9, -52, -31, 40);
-
-	colorize(lightoverlay, -4, -62, -34, 28);
-	colorize(mainoverlay, 8, 26, 6, 15);
 
 	if (ClientPrefs.shaders)
 	{
-		coreGlowRim = makeCoreGlowRim();
-		coreGlow.shader = coreGlowRim;
-		coreGlow.useRenderTexture = true;
+		var rimlightBase:ExtraDropShadowShader = makeCharacterRim();
 
-		coreRingRim = makeCoreRingRim();
-		coreRing.shader = coreRingRim;
-		coreRing.useRenderTexture = true;
+		reactorBfRim = new ExtraDropShadowShader().copyFrom(rimlightBase);
+		bfRim = reactorBfRim;
 
-		coreClawRim = makeCoreClawRim();
-		coreClaw.shader = coreClawRim;
-		coreClaw.useRenderTexture = true;
+		reactorGfRim = new ExtraDropShadowShader().copyFrom(rimlightBase);
+		gfRim = reactorGfRim;
 
-		var rimlightBase:ExtraDropShadowShader = new ExtraDropShadowShader();
+		reactorDadRim = new ExtraDropShadowShader().copyFrom(rimlightBase);
 
-		rimlightBase.threshold = .03;
+		reactorDadRim.setAdjustColor(-20, -8, 30, -28);
 
-		rimlightBase.setColorMatrix([
-			.88, .10, .25, 0, -16,
-			.02, .58, .11, 0, 4,
-			.11, .04, .84, 0, -2,
-			0, 0, 0, 1, 0
-		]);
+		reactorDadRim.layers[0].distance = 24;
+		reactorDadRim.layers[0].threshold = .02;
+		reactorDadRim.layers[0].strength = .72;
+		reactorDadRim.layers[0].roughness = .85;
 
-		rimlightBase.addLayer([
-			1.00, .17, .36, 0, 102,
-			.04, .72, .13, 0, 18,
-			.22, .04, 1.00, 0, 42,
-			0, 0, 0, 1, 0
-		], 120, 22, .03);
+		reactorDadRim.layers[1].distance = 34;
+		reactorDadRim.layers[1].threshold = .035;
+		reactorDadRim.layers[1].strength = .46;
+		reactorDadRim.layers[1].roughness = .85;
 
-		rimlightBase.addLayer(
-			rimlightBase.addLayer([
-				.96, .13, .30, 0, 32,
-				-.02, .63, .14, 0, 8,
-				-.02, .20, .94, 0, -8,
-				0, 0, 0, 1, 0
-			], 95, 38, .035)
-		.colorMatrix, 140, 32, .03);
+		reactorDadRim.layers[2].distance = 12;
+		reactorDadRim.layers[2].threshold = .05;
+		reactorDadRim.layers[2].strength = .28;
+		reactorDadRim.layers[2].roughness = .8;
 
-		if (hasBfSkin)
-		{
-			bfRim = rimlightBase;
-			bfRim.attachedSprite = boyfriend;
-			boyfriend.useRenderTexture = true;
-		}
-
-		if (hasGfSkin)
-		{
-			gfRim = new ExtraDropShadowShader().copyFrom(rimlightBase);
-
-			gfRim.layers[0].angle = 90;
-			gfRim.layers[1].angle = 90;
-			gfRim.layers[2].angle = 90;
-
-			gfRim.attachedSprite = gf;
-			gf.useRenderTexture = true;
-		}
+		dadRim = reactorDadRim;
 
 		if (hasPet)
 		{
-			petRim = new ExtraDropShadowShader().copyFrom(rimlightBase);
-
-			petRim.layers[0].angle = 105;
-			petRim.layers[1].angle = 100;
-			petRim.layers[2].angle = 115;
-
-			petRim.attachedSprite = pet;
-			pet.useRenderTexture = true;
+			reactorPetRim = new ExtraDropShadowShader().copyFrom(rimlightBase);
+			petRim = reactorPetRim;
 		}
 
-		var dadRim:ExtraDropShadowShader = new ExtraDropShadowShader().copyFrom(rimlightBase);
-
-		dadRim.layers[0].angle = 60;
-		dadRim.layers[1].angle = 85;
-		dadRim.layers[2].angle = 40;
-
-		dadRim.attachedSprite = dad;
-		dad.useRenderTexture = true;
+		applyCharacterRims();
 	}
 	else
 	{
-		if (hasBfSkin)
-			boyfriend.color = 0xffe080a6;
+		boyfriend.color = 0xffe080a6;
 
-		if (hasGfSkin)
+		if (gf != null)
 			gf.color = 0xffe080a6;
 
 		if (hasPet)
@@ -318,6 +274,11 @@ function onCreatePost()
 
 		dad.color = 0xffd48aa8;
 	}
+}
+
+function onUpdatePost(elapsed:Float):Void
+{
+	applyCharacterRims();
 }
 
 function onBeatHit():Void

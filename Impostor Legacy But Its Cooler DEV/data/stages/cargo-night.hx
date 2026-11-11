@@ -1,3 +1,4 @@
+import flixel.math.FlxMath;
 import funkin.game.shaders.ExtraDropShadowShader;
 import animate.FlxAnimateFrames;
 
@@ -7,6 +8,7 @@ public var cargoDark:FlxSprite;
 public var lightoverlayDK:FlxSprite;
 public var mainoverlayDK:FlxSprite;
 var cargoAirship:FlxSprite;
+var blackanim:FlxSprite;
 var ext = 'stages/airship/double-kill/';
 public var yellow:Character;
 public var isBfGhost:Bool = false;
@@ -17,6 +19,22 @@ var petRim:ExtraDropShadowShader;
 var blackRim:ExtraDropShadowShader;
 var gfRim:ExtraDropShadowShader;
 var dadRim:ExtraDropShadowShader;
+
+var dadForegroundRim:ExtraDropShadowShader = null;
+var whiteDkExcludedParts:Array<String> = ['halo', '_bta_asi_36', '_bta_asi_37', 'halo__00__sprite_38', 'halo__01__sprite_39'];
+var whiteDkHaloOverlay:FunkinSprite = null;
+var whiteDkGlowWideOverlay:FunkinSprite = null;
+var whiteDkGlowMidOverlay:FunkinSprite = null;
+var whiteDkGlowOverlay:FunkinSprite = null;
+var whiteDkBodyBackOverlay:FunkinSprite = null;
+var whiteDkBodyFrontOverlay:FunkinSprite = null;
+var whiteDkPartsLayer:FlxSpriteGroup = null;
+var whiteDkOverlayCharacter:String = '';
+var whiteDkSource:Dynamic = null;
+var whiteDkSourceCharacter:String = '';
+var whiteDkHidden:Bool = false;
+var whiteDkOriginalVisible:Bool = true;
+
 var blackDkEyeOverlay:FunkinSprite;
 var blackDkEyeAnim:String = '';
 var blackDkEyeHidden:Bool = false;
@@ -72,11 +90,12 @@ function onBeatHit()
     switch(curBeat)
     {
         case 32:
+            blackanim.setPosition(black.x, black.y - 1400);
+            blackanim.animation.play('intro');
+            blackanim.alpha = 1;
+        case 36:
+            blackanim.visible = false;
             black.alpha = 1;
-	    black.canDance = false;
-            black.playAnim('fall');
-	case 36:
-	    black.canDance = true;
         case 196, 228, 272, 288, 488, 520, 756, 764, 784, 816:
             extraStrums(true);
         case 212, 244, 276, 292, 504, 536, 760, 768, 800, 832:
@@ -93,7 +112,12 @@ function onCreatePost()
     black = new Character(1550, 600, "blackdk");
     startCharacterPos(black);
     stage.insert(stage.members.indexOf(dadGroup), black);
-    black.playAnim('fall');
+
+    blackanim = new FunkinSprite(0,0);
+    blackanim.frames = Paths.getSparrowAtlas('characters/story/black/black_anim');
+    blackanim.animation.addByPrefix('intro', 'black anim', 24, false);
+    blackanim.alpha = 0.001;
+    stage.insert(stage.members.indexOf(black) + 1, blackanim);
 
     createBlackDkEyeOverlay();
 
@@ -154,10 +178,12 @@ function onCreatePost()
     applyBLACKEffect();
     applyGFEffect();
     applyDadEffect();
+    wdkRefreshParts();
 }
 
 function onUpdatePost(elapsed:Float)
 {
+    wdkRefreshParts();
     syncBlackDkEyeOverlay();
 }
 
@@ -190,7 +216,7 @@ function createBlackDkEyeOverlay():Void
 
     var char = black;
     var atlasPath:String = Paths.getPath(
-        'images/characters/story/black/blackdk',
+        'images/${char.imageFile}',
         null,
         PathsTestMode.LOOSE
     );
@@ -280,7 +306,7 @@ function createBlackDkEyeOverlay():Void
         'Capa 2'
     ]);
 
-    stage.insert(stage.members.indexOf(black) + 1, overlay);
+    stage.insert(stage.members.indexOf(blackanim), overlay);
     blackDkEyeOverlay = overlay;
 
     hideOriginalBlackDkEye();
@@ -456,7 +482,7 @@ function syncBlackDkEyeOverlay():Void
     overlay.blend = black.blend;
     overlay.scrollFactor.set(black.scrollFactor.x, black.scrollFactor.y);
     overlay.antialiasing = black.antialiasing;
-    overlay.zIndex = black.zIndex + 1;
+    overlay.zIndex = black.zIndex + 0.01;
     overlay.shader = null;
     overlay.useRenderTexture = false;
     overlay.cameras = [camGame];
@@ -474,21 +500,596 @@ function syncBlackDkEyeOverlay():Void
     overlay.visible = true;
 }
 
-function applyDarkLightEffect(target:FlxSprite, angle:Float, distance:Float):ExtraDropShadowShader
+function createDarkLightShader(angle:Float, distance:Float):ExtraDropShadowShader
 {
-    if (!ClientPrefs.shaders || target == null) return null;
-
+    if (!ClientPrefs.shaders) return null;
     var effect = new ExtraDropShadowShader();
     effect.threshold = 0;
     effect.strength = 1;
     effect.roughness = 1;
     effect.setColorMatrix(darkMatrix);
     effect.addLayer(originalColorMatrix, angle, distance, 0.01, 0.9, 1);
+    return effect;
+}
 
+function applyDarkLightEffect(target:FlxSprite, angle:Float, distance:Float):ExtraDropShadowShader
+{
+    if (target == null) return null;
+    var effect = createDarkLightShader(angle, distance);
+    if (effect == null) return null;
     target.useRenderTexture = true;
     effect.attachedSprite = target;
     target.shader = effect;
     return effect;
+}
+
+function wdkGetLibrary(sprite:Dynamic):Dynamic
+{
+    if (sprite == null) return null;
+    var library:Dynamic = sprite.library;
+    if (library == null) return null;
+    return library;
+}
+
+function wdkGetElementName(element:Dynamic):String
+{
+    if (element == null) return '';
+    var kind:String = '' + element.elementType;
+    if (kind != 'graphic' && kind != 'movieclip' && kind != 'button') return '';
+    var child:Dynamic = element.libraryItem;
+    if (child == null || child.name == null) return '';
+    var result:String = '' + child.name;
+    if (result == '' || result == 'null' || result == 'undefined') return '';
+    return result;
+}
+
+function wdkCheckItem(item:Dynamic, cacheTrue:Array<String>, cacheFalse:Array<String>, stack:Array<String>):Bool
+{
+    if (item == null || item.name == null) return false;
+    var name:String = '' + item.name;
+    if (whiteDkExcludedParts.indexOf(name) != -1) return true;
+    if (cacheTrue.indexOf(name) != -1) return true;
+    if (cacheFalse.indexOf(name) != -1 || stack.indexOf(name) != -1) return false;
+    var timeline:Dynamic = item.timeline;
+    if (timeline == null || timeline.layers == null)
+    {
+        if (cacheFalse.indexOf(name) == -1) cacheFalse.push(name);
+        return false;
+    }
+    stack.push(name);
+    var found:Bool = false;
+    for (layer in timeline.layers)
+    {
+        if (layer == null) continue;
+        layer.forEachFrame(function(frame)
+        {
+            if (found || frame == null || frame.elements == null) return;
+            for (element in frame.elements)
+            {
+                var childName:String = wdkGetElementName(element);
+                if (childName == '') continue;
+                if (whiteDkExcludedParts.indexOf(childName) != -1 || wdkCheckItem(element.libraryItem, cacheTrue, cacheFalse, stack))
+                {
+                    found = true;
+                    break;
+                }
+            }
+        });
+        if (found) break;
+    }
+    stack.pop();
+    if (found)
+    {
+        if (cacheTrue.indexOf(name) == -1) cacheTrue.push(name);
+    }
+    else if (cacheFalse.indexOf(name) == -1) cacheFalse.push(name);
+    return found;
+}
+
+function wdkSetupSymbol(item:Dynamic, mode:String, glowScale:Float):Void
+{
+    if (item == null || item.timeline == null) return;
+    var symbolName:String = '' + item.name;
+    var cacheTrue:Array<String> = [];
+    var cacheFalse:Array<String> = [];
+    if (mode == 'excluded' && whiteDkExcludedParts.indexOf(symbolName) != -1)
+        return;
+    for (layer in item.timeline.layers)
+    {
+        if (layer == null) continue;
+        layer.forEachFrame(function(frame)
+        {
+            if (frame == null || frame.elements == null) return;
+            for (element in frame.elements)
+            {
+                if (element == null) continue;
+                var childName:String = wdkGetElementName(element);
+                if (mode != 'excluded')
+                {
+                    if (childName != '' && whiteDkExcludedParts.indexOf(childName) != -1)
+                        element.visible = false;
+                    continue;
+                }
+                if (childName == '')
+                {
+                    element.visible = false;
+                    continue;
+                }
+                var isExcluded:Bool = whiteDkExcludedParts.indexOf(childName) != -1;
+                var childItem:Dynamic = element.libraryItem;
+                var hasExcluded:Bool = isExcluded || wdkCheckItem(childItem, cacheTrue, cacheFalse, []);
+                element.visible = hasExcluded;
+                if (glowScale > 1 && childName == 'halo' && isExcluded && symbolName != 'halo' && element.matrix != null && childItem != null && childItem.timeline != null)
+                {
+                    var localBounds:Dynamic = childItem.timeline.getWholeBounds(false, null, null, true);
+                    if (localBounds != null && localBounds.width > 0 && localBounds.height > 0)
+                        wdkScaleAround(element, glowScale, localBounds.x + localBounds.width * 0.5, localBounds.y + localBounds.height * 0.5);
+                }
+            }
+        });
+    }
+}
+
+function wdkHasParts(sprite:Dynamic):Bool
+{
+    var library:Dynamic = wdkGetLibrary(sprite);
+    if (library == null) return false;
+    for (part in ['halo', '_bta_asi_36', '_bta_asi_37'])
+    {
+        var item = library.getSymbol(part);
+        if (item == null || item.timeline == null) return false;
+    }
+    var halo = library.getSymbol('halo');
+    return halo.timeline.layers != null && halo.timeline.layers.length >= 2;
+}
+
+function wdkCheckSymbol(sprite:Dynamic, symbolName:String, cacheTrue:Array<String>, cacheFalse:Array<String>, stack:Array<String>):Bool
+{
+    if (symbolName == null || symbolName == '') return false;
+    if (whiteDkExcludedParts.indexOf(symbolName) != -1) return true;
+    if (cacheTrue.indexOf(symbolName) != -1) return true;
+    if (cacheFalse.indexOf(symbolName) != -1) return false;
+    if (stack.indexOf(symbolName) != -1) return false;
+    var library:Dynamic = wdkGetLibrary(sprite);
+    if (library == null) return false;
+    var symbol = library.getSymbol(symbolName);
+    if (symbol == null || symbol.timeline == null)
+    {
+        if (cacheFalse.indexOf(symbolName) == -1) cacheFalse.push(symbolName);
+        return false;
+    }
+    stack.push(symbolName);
+    var found:Bool = false;
+    for (layer in symbol.timeline.layers)
+    {
+        if (layer == null) continue;
+        layer.forEachFrame(function(frame)
+        {
+            if (found || frame == null || frame.elements == null) return;
+            for (element in frame.elements)
+            {
+                var childName:String = wdkGetElementName(element);
+                if (childName == '') continue;
+                if (wdkCheckSymbol(sprite, childName, cacheTrue, cacheFalse, stack))
+                {
+                    found = true;
+                    break;
+                }
+            }
+        });
+        if (found) break;
+    }
+    stack.pop();
+    if (found)
+    {
+        if (cacheTrue.indexOf(symbolName) == -1) cacheTrue.push(symbolName);
+    }
+    else if (cacheFalse.indexOf(symbolName) == -1) cacheFalse.push(symbolName);
+    return found;
+}
+
+function wdkGetDepthSymbol(symbolName:String):String
+{
+    if (symbolName == null || symbolName == '') return symbolName;
+    return symbolName;
+}
+
+function wdkFindLayer(sprite:Dynamic, symbolName:String, cacheTrue:Array<String>, cacheFalse:Array<String>):Int
+{
+    symbolName = wdkGetDepthSymbol(symbolName);
+    var library:Dynamic = wdkGetLibrary(sprite);
+    if (library == null) return -1;
+    var symbol = library.getSymbol(symbolName);
+    if (symbol == null || symbol.timeline == null) return -1;
+    var targetLayer:Int = -1;
+    for (layerOrder in 0...symbol.timeline.layers.length)
+    {
+        var layerIndex:Int = symbol.timeline.layers.length - 1 - layerOrder;
+        var layer = symbol.timeline.layers[layerIndex];
+        if (layer == null) continue;
+        layer.forEachFrame(function(frame)
+        {
+            if (targetLayer >= 0 || frame == null || frame.elements == null) return;
+            for (element in frame.elements)
+            {
+                var childName:String = wdkGetElementName(element);
+                if (childName != '' && wdkCheckSymbol(sprite, childName, cacheTrue, cacheFalse, []))
+                {
+                    targetLayer = layerIndex;
+                    break;
+                }
+            }
+        });
+        if (targetLayer >= 0) break;
+    }
+    return targetLayer;
+}
+
+function wdkFindElement(sprite:Dynamic, symbolName:String, targetLayer:Int, cacheTrue:Array<String>, cacheFalse:Array<String>):Int
+{
+    symbolName = wdkGetDepthSymbol(symbolName);
+    var library:Dynamic = wdkGetLibrary(sprite);
+    if (library == null || targetLayer < 0) return -1;
+    var symbol = library.getSymbol(symbolName);
+    if (symbol == null || symbol.timeline == null || targetLayer >= symbol.timeline.layers.length) return -1;
+    var targetElement:Int = -1;
+    var layer = symbol.timeline.layers[targetLayer];
+    if (layer == null) return -1;
+    layer.forEachFrame(function(frame)
+    {
+        if (targetElement >= 0 || frame == null || frame.elements == null) return;
+        for (i in 0...frame.elements.length)
+        {
+            var childName:String = wdkGetElementName(frame.elements[i]);
+            if (childName != '' && wdkCheckSymbol(sprite, childName, cacheTrue, cacheFalse, []))
+            {
+                targetElement = i;
+                break;
+            }
+        }
+    });
+    return targetElement;
+}
+
+function wdkSetLayerOrder(sprite:Dynamic, rootSymbols:Array<String>, showForeground:Bool):Void
+{
+    for (symbolName in rootSymbols)
+    {
+        var depthSymbolName:String = wdkGetDepthSymbol(symbolName);
+        var library:Dynamic = wdkGetLibrary(sprite);
+        if (library == null) return;
+        var symbol = library.getSymbol(depthSymbolName);
+        if (symbol == null || symbol.timeline == null) continue;
+        var cacheTrue:Array<String> = [];
+        var cacheFalse:Array<String> = [];
+        var targetLayer:Int = wdkFindLayer(sprite, depthSymbolName, cacheTrue, cacheFalse);
+        if (targetLayer < 0)
+        {
+            if (showForeground)
+            {
+                for (layer in symbol.timeline.layers)
+                {
+                    if (layer == null) continue;
+                    layer.forEachFrame(function(frame)
+                    {
+                        if (frame == null || frame.elements == null) return;
+                        for (element in frame.elements)
+                            if (element != null) element.visible = false;
+                    });
+                }
+            }
+            continue;
+        }
+        var targetElement:Int = wdkFindElement(sprite, depthSymbolName, targetLayer, cacheTrue, cacheFalse);
+        if (targetElement < 0) continue;
+        for (layerIndex in 0...symbol.timeline.layers.length)
+        {
+            var layer = symbol.timeline.layers[layerIndex];
+            if (layer == null) continue;
+            layer.forEachFrame(function(frame)
+            {
+                if (frame == null || frame.elements == null) return;
+                var frameTargetElement:Int = -1;
+                if (layerIndex == targetLayer)
+                {
+                    for (i in 0...frame.elements.length)
+                    {
+                        var targetChild:String = wdkGetElementName(frame.elements[i]);
+                        if (targetChild != '' && wdkCheckSymbol(sprite, targetChild, cacheTrue, cacheFalse, []))
+                        {
+                            frameTargetElement = i;
+                            break;
+                        }
+                    }
+                }
+                if (frameTargetElement < 0) frameTargetElement = targetElement;
+                for (i in 0...frame.elements.length)
+                {
+                    var element = frame.elements[i];
+                    if (element == null) continue;
+                    var childName:String = wdkGetElementName(element);
+                    if (childName != '' && whiteDkExcludedParts.indexOf(childName) != -1)
+                    {
+                        element.visible = false;
+                        continue;
+                    }
+                    if (showForeground)
+                        element.visible = layerIndex < targetLayer || (layerIndex == targetLayer && i > frameTargetElement);
+                    else
+                        element.visible = layerIndex > targetLayer || (layerIndex == targetLayer && i < frameTargetElement);
+                }
+            });
+        }
+    }
+}
+
+function wdkDisposePart(sprite:FunkinSprite):Void
+{
+    if (sprite == null) return;
+    if (whiteDkPartsLayer != null) whiteDkPartsLayer.remove(sprite, true);
+    sprite.destroy();
+}
+
+function wdkDisposeLayers():Void
+{
+    if (dadRim != null && whiteDkBodyBackOverlay != null && dadRim.attachedSprite == whiteDkBodyBackOverlay)
+        dadRim.attachedSprite = null;
+    if (dadForegroundRim != null && whiteDkBodyFrontOverlay != null && dadForegroundRim.attachedSprite == whiteDkBodyFrontOverlay)
+        dadForegroundRim.attachedSprite = null;
+    wdkDisposePart(whiteDkBodyBackOverlay);
+    wdkDisposePart(whiteDkGlowWideOverlay);
+    wdkDisposePart(whiteDkGlowMidOverlay);
+    wdkDisposePart(whiteDkGlowOverlay);
+    wdkDisposePart(whiteDkHaloOverlay);
+    wdkDisposePart(whiteDkBodyFrontOverlay);
+    if (whiteDkPartsLayer != null)
+    {
+        if (game != null && game.dadGroup != null) game.dadGroup.remove(whiteDkPartsLayer, true);
+        whiteDkPartsLayer.destroy();
+        whiteDkPartsLayer = null;
+    }
+    whiteDkBodyBackOverlay = null;
+    whiteDkGlowWideOverlay = null;
+    whiteDkGlowMidOverlay = null;
+    whiteDkGlowOverlay = null;
+    whiteDkHaloOverlay = null;
+    whiteDkBodyFrontOverlay = null;
+    whiteDkOverlayCharacter = '';
+}
+
+function wdkScaleAround(element:Dynamic, factor:Float, centerX:Float, centerY:Float):Void
+{
+    if (element == null || element.matrix == null) return;
+    var a:Float = element.matrix.a;
+    var b:Float = element.matrix.b;
+    var c:Float = element.matrix.c;
+    var d:Float = element.matrix.d;
+    element.matrix.tx = element.matrix.tx + (1 - factor) * (a * centerX + c * centerY);
+    element.matrix.ty = element.matrix.ty + (1 - factor) * (b * centerX + d * centerY);
+    element.matrix.a = a * factor;
+    element.matrix.b = b * factor;
+    element.matrix.c = c * factor;
+    element.matrix.d = d * factor;
+}
+
+function wdkBuildPart(mode:String, suffix:String, glowScale:Float = 1):FunkinSprite
+{
+    var atlasPath:String = Paths.getPath('images/${dad.imageFile}', null, PathsTestMode.LOOSE);
+    var settings:Dynamic = {
+        cacheOnLoad: mode != 'excluded',
+        onSymbolCreate: function(item:Dynamic) wdkSetupSymbol(item, mode, glowScale)
+    };
+    var frames:FlxAnimateFrames = FlxAnimateFrames.fromAnimate(atlasPath, null, null, 'shaderParts_${suffix}_${dad.curCharacter}', true, settings);
+    if (frames == null) return null;
+    var sprite:FunkinSprite = new FunkinSprite(0, 0);
+    sprite.frames = frames;
+    var addedAnimations:Int = 0;
+    var rootSymbols:Array<String> = [];
+    for (anim in dad.animations)
+    {
+        if (anim == null) continue;
+        var animName:String = '' + anim.anim;
+        var symbolName:String = '' + anim.name;
+        if (animName == '' || symbolName == '') continue;
+        if (anim.indices != null && anim.indices.length > 0)
+            sprite.addAnimByIndices(animName, symbolName, anim.indices, anim.fps, anim.loop, anim.flipX, anim.flipY);
+        else
+            sprite.addAnimByPrefix(animName, symbolName, anim.fps, anim.loop, anim.flipX, anim.flipY);
+        if (dad.animSuffix != null && dad.animSuffix != '')
+        {
+            var suffixedName:String = animName + dad.animSuffix;
+            if (!sprite.hasAnim(suffixedName))
+            {
+                if (anim.indices != null && anim.indices.length > 0)
+                    sprite.addAnimByIndices(suffixedName, symbolName, anim.indices, anim.fps, anim.loop, anim.flipX, anim.flipY);
+                else
+                    sprite.addAnimByPrefix(suffixedName, symbolName, anim.fps, anim.loop, anim.flipX, anim.flipY);
+            }
+        }
+        if (rootSymbols.indexOf(symbolName) == -1) rootSymbols.push(symbolName);
+        addedAnimations++;
+    }
+    if (addedAnimations == 0)
+    {
+        sprite.destroy();
+        return null;
+    }
+    if (mode != 'excluded') wdkSetLayerOrder(sprite, rootSymbols, mode == 'foreground');
+    sprite.shader = null;
+    sprite.useRenderTexture = false;
+    sprite.cameras = [camGame];
+    sprite.scrollFactor.set(dad.scrollFactor.x, dad.scrollFactor.y);
+    sprite.active = false;
+    sprite.visible = false;
+    if (whiteDkPartsLayer == null) return sprite;
+    whiteDkPartsLayer.add(sprite);
+    return sprite;
+}
+
+function wdkSetupParts():Bool
+{
+    if (!wdkHasParts(dad) || dadRim == null || dadForegroundRim == null || game == null || game.dadGroup == null) return false;
+    if (whiteDkPartsLayer != null && whiteDkHaloOverlay != null && whiteDkGlowOverlay != null && whiteDkGlowMidOverlay != null && whiteDkGlowWideOverlay != null && whiteDkBodyBackOverlay != null && whiteDkBodyFrontOverlay != null && whiteDkOverlayCharacter == dad.curCharacter) return true;
+    wdkDisposeLayers();
+    whiteDkPartsLayer = new FlxSpriteGroup(0, 0);
+    whiteDkPartsLayer.zIndex = dad.zIndex;
+    whiteDkPartsLayer.visible = false;
+    game.dadGroup.add(whiteDkPartsLayer);
+    whiteDkBodyBackOverlay = wdkBuildPart('background', 'body_back', 1);
+    whiteDkGlowWideOverlay = wdkBuildPart('excluded', 'excluded_glow_wide', 1.34);
+    whiteDkGlowMidOverlay = wdkBuildPart('excluded', 'excluded_glow_mid', 1.20);
+    whiteDkGlowOverlay = wdkBuildPart('excluded', 'excluded_glow_near', 1.075);
+    whiteDkHaloOverlay = wdkBuildPart('excluded', 'excluded', 1);
+    whiteDkBodyFrontOverlay = wdkBuildPart('foreground', 'body_front', 1);
+    if (whiteDkBodyBackOverlay == null || whiteDkGlowWideOverlay == null || whiteDkGlowMidOverlay == null || whiteDkGlowOverlay == null || whiteDkHaloOverlay == null || whiteDkBodyFrontOverlay == null)
+    {
+        wdkDisposeLayers();
+        return false;
+    }
+    whiteDkBodyBackOverlay.zIndex = 0;
+    whiteDkGlowWideOverlay.zIndex = 1;
+    whiteDkGlowMidOverlay.zIndex = 2;
+    whiteDkGlowOverlay.zIndex = 3;
+    whiteDkHaloOverlay.zIndex = 4;
+    whiteDkBodyFrontOverlay.zIndex = 5;
+    whiteDkOverlayCharacter = dad.curCharacter;
+    refreshZ(whiteDkPartsLayer);
+    refreshZ(game.dadGroup);
+    return true;
+}
+
+function wdkSyncPart(sprite:FunkinSprite, shouldShow:Bool):Void
+{
+    if (sprite == null || dad == null) return;
+    if (!whiteDkOriginalVisible || !dad.exists || dad.alpha <= 0)
+    {
+        sprite.visible = false;
+        return;
+    }
+    var animName:String = dad.getAnimName();
+    if (animName != null && animName != '' && sprite.hasAnim(animName) && sprite.getAnimName() != animName)
+    {
+        sprite.playAnim(animName, true, false);
+        if (sprite.animation.curAnim != null) sprite.animation.curAnim.pause();
+    }
+    if (sprite.animation.curAnim == null)
+    {
+        sprite.visible = false;
+        return;
+    }
+    if (dad.animation.curAnim != null && sprite.animation.curAnim != null)
+    {
+        var sourceFrames:Int = dad.animation.curAnim.numFrames;
+        var overlayFrames:Int = sprite.animation.curAnim.numFrames;
+        if (sourceFrames > 0 && overlayFrames > 0)
+        {
+            var sourceFrame:Int = Std.int(FlxMath.bound(dad.animation.curAnim.curFrame, 0, sourceFrames - 1));
+            var overlayFrame:Int = sourceFrames == overlayFrames ? sourceFrame : Math.round((sourceFrames <= 1 ? 0 : sourceFrame / (sourceFrames - 1)) * (overlayFrames - 1));
+            overlayFrame = Std.int(FlxMath.bound(overlayFrame, 0, overlayFrames - 1));
+            if (sprite.animation.curAnim.curFrame != overlayFrame)
+                sprite.animation.curAnim.curFrame = overlayFrame;
+        }
+    }
+    sprite.x = dad.x;
+    sprite.y = dad.y;
+    sprite.scale.set(dad.scale.x, dad.scale.y);
+    sprite.baseScale.set(dad.baseScale.x, dad.baseScale.y);
+    sprite.baseFlipX = dad.baseFlipX;
+    sprite.baseFlipY = dad.baseFlipY;
+    sprite.scalableOffsets = dad.scalableOffsets;
+    sprite.rotatableOffsets = dad.rotatableOffsets;
+    sprite.skewableOffsets = dad.skewableOffsets;
+    sprite.angle = dad.angle;
+    sprite.skew.set(dad.skew.x, dad.skew.y);
+    sprite.flipX = dad.flipX;
+    sprite.flipY = dad.flipY;
+    sprite.alpha = dad.alpha;
+    sprite.color = dad.color;
+    sprite.blend = dad.blend;
+    sprite.offset.set(dad.offset.x, dad.offset.y);
+    sprite.origin.set(dad.origin.x, dad.origin.y);
+    sprite.spriteOffset.set(dad.spriteOffset.x, dad.spriteOffset.y);
+    sprite.animOffset.set(dad.animOffset.x, dad.animOffset.y);
+    sprite.scrollFactor.set(dad.scrollFactor.x, dad.scrollFactor.y);
+    sprite.cameras = dad.cameras;
+    sprite.antialiasing = dad.antialiasing;
+    sprite.active = false;
+    sprite.visible = shouldShow;
+}
+
+function wdkRefreshParts():Void
+{
+    if (dad == null) return;
+    if (whiteDkSource != dad || whiteDkSourceCharacter != dad.curCharacter)
+    {
+        if (whiteDkHidden && whiteDkSource != null) whiteDkSource.visible = whiteDkOriginalVisible;
+        whiteDkHidden = false;
+        wdkDisposeLayers();
+        whiteDkSource = dad;
+        whiteDkSourceCharacter = dad.curCharacter;
+    }
+    var hasHaloParts:Bool = wdkHasParts(dad);
+    var shouldSplit:Bool = ClientPrefs.shaders && hasHaloParts && dadRim != null && dadForegroundRim != null && game != null && game.dadGroup != null;
+    if (shouldSplit && !wdkSetupParts()) shouldSplit = false;
+    if (!shouldSplit)
+    {
+        if (whiteDkHidden && whiteDkSource != null) whiteDkSource.visible = whiteDkOriginalVisible;
+        whiteDkHidden = false;
+        if (whiteDkPartsLayer != null) whiteDkPartsLayer.visible = false;
+        for (sprite in [whiteDkHaloOverlay, whiteDkGlowWideOverlay, whiteDkGlowMidOverlay, whiteDkGlowOverlay, whiteDkBodyBackOverlay, whiteDkBodyFrontOverlay])
+            if (sprite != null) sprite.visible = false;
+        if (dadRim != null && whiteDkBodyBackOverlay != null && dadRim.attachedSprite == whiteDkBodyBackOverlay) dadRim.attachedSprite = null;
+        if (dadForegroundRim != null && whiteDkBodyFrontOverlay != null && dadForegroundRim.attachedSprite == whiteDkBodyFrontOverlay) dadForegroundRim.attachedSprite = null;
+        if (ClientPrefs.shaders && dadRim != null)
+        {
+            dad.useRenderTexture = true;
+            if (dadRim.attachedSprite != dad) dadRim.attachedSprite = dad;
+            dad.shader = dadRim;
+        }
+        else
+        {
+            dad.shader = null;
+            dad.useRenderTexture = false;
+        }
+        return;
+    }
+    if (!whiteDkHidden)
+    {
+        whiteDkOriginalVisible = dad.visible;
+        dad.shader = null;
+        dad.visible = false;
+        whiteDkHidden = true;
+    }
+    else
+    {
+        dad.shader = null;
+        dad.visible = false;
+    }
+    if (whiteDkPartsLayer.zIndex != dad.zIndex)
+    {
+        whiteDkPartsLayer.zIndex = dad.zIndex;
+        refreshZ(game.dadGroup);
+    }
+    wdkSyncPart(whiteDkBodyBackOverlay, whiteDkOriginalVisible);
+    wdkSyncPart(whiteDkGlowWideOverlay, whiteDkOriginalVisible);
+    wdkSyncPart(whiteDkGlowMidOverlay, whiteDkOriginalVisible);
+    wdkSyncPart(whiteDkGlowOverlay, whiteDkOriginalVisible);
+    wdkSyncPart(whiteDkHaloOverlay, whiteDkOriginalVisible);
+    wdkSyncPart(whiteDkBodyFrontOverlay, whiteDkOriginalVisible);
+    whiteDkGlowWideOverlay.color = 0xFFFFD34A;
+    whiteDkGlowWideOverlay.alpha = dad.alpha * 0.10;
+    whiteDkGlowWideOverlay.blend = BlendMode.ADD;
+    whiteDkGlowMidOverlay.color = 0xFFFFC83A;
+    whiteDkGlowMidOverlay.alpha = dad.alpha * 0.16;
+    whiteDkGlowMidOverlay.blend = BlendMode.ADD;
+    whiteDkGlowOverlay.color = 0xFFFFD84A;
+    whiteDkGlowOverlay.alpha = dad.alpha * 0.24;
+    whiteDkGlowOverlay.blend = BlendMode.ADD;
+    whiteDkPartsLayer.visible = whiteDkOriginalVisible && dad.exists && dad.alpha > 0;
+    if (!whiteDkBodyBackOverlay.useRenderTexture) whiteDkBodyBackOverlay.useRenderTexture = true;
+    if (!whiteDkBodyFrontOverlay.useRenderTexture) whiteDkBodyFrontOverlay.useRenderTexture = true;
+    if (dadRim.attachedSprite != whiteDkBodyBackOverlay) dadRim.attachedSprite = whiteDkBodyBackOverlay;
+    if (dadForegroundRim.attachedSprite != whiteDkBodyFrontOverlay) dadForegroundRim.attachedSprite = whiteDkBodyFrontOverlay;
 }
 
 function applyBFEffect()
@@ -505,6 +1106,7 @@ function applyBLACKEffect()
 {
     if (black == null) return;
     blackRim = applyDarkLightEffect(black, -85, -25);
+    applyDarkLightEffect(blackanim, -85, -25);
 }
 
 function applyGFEffect()
@@ -517,6 +1119,7 @@ function applyDadEffect()
 {
     if (dad == null) return;
     dadRim = applyDarkLightEffect(dad, -85, -35);
+    dadForegroundRim = createDarkLightShader(-85, -35);
 }
 
 function onEvent(eventName, value1, value2)
@@ -537,12 +1140,12 @@ function onEvent(eventName, value1, value2)
         case 'Both Opponents':
             bothSing = Std.int(value1) == 1;
             playHUD.iconP2.changeIcon(bothSing ? 'double-kill' : (twoSing ? 'black' : 'white'));
-	    if (bothSing)
-	    {
-		playHUD.healthBar.setColors(black.healthColour, boyfriend.healthColour);
-		if (hasColor) playHUD.scoreTxt.color = black.healthColour;
-	    }
-	    else refreshDoubleKillIcon();
+            if (bothSing)
+            {
+                playHUD.healthBar.setColors(black.healthColour, boyfriend.healthColour);
+                if (hasColor) playHUD.scoreTxt.color = black.healthColour;
+            }
+            else refreshDoubleKillIcon();
     }
 }
 
@@ -558,19 +1161,16 @@ function opponentNoteHitPre(note)
     if (note.noteType == 'Opponent 2 Sing')
     {
         note.owner = black;
-	health -= 0.01;
     }
     else if (note.noteType == 'Both Opponents Sing')
     {
         characterSing(dad, note);
         characterSing(black, note);
         note.noAnimation = true;
-	health -= 0.015;
     }
     else if (twoSing)
     {
         note.owner = black;
-	health -= 0.01;
     }
     if (note.noteType == 'Opponent 1 Sing')
     {
@@ -592,6 +1192,9 @@ function extraStrums(happyChristmas:Bool)
 
 function onDestroy()
 {
+    if (whiteDkHidden && whiteDkSource != null) whiteDkSource.visible = whiteDkOriginalVisible;
+    whiteDkHidden = false;
+    wdkDisposeLayers();
     restoreOriginalBlackDkEye();
 
     if (blackDkEyeOverlay != null)
