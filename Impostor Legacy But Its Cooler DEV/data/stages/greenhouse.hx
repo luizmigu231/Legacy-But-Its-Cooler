@@ -747,7 +747,7 @@ function onSongStart()
 			tweenShadowLayer(boyfriend.shader.layers[0], [getBaseMatrix()], dur, FlxEase.linear);
 			tweenShadowLayer(boyfriend.shader.layers[1], [getBaseMatrix()], dur, FlxEase.linear);
 		}
-		if (pet != null)
+		if (hasPet)
 		{
 			FlxTween.color(pet, dur, pet.color, 0xFF192141, {ease: FlxEase.linear});
 			FlxTween.tween(pet.shader, {threshold: .01, strength: 1}, dur, {ease: FlxEase.linear});
@@ -917,7 +917,7 @@ function onSongStart()
 			tweenShadowLayer(boyfriend.shader.layers[0], [layerMatrix], dur, FlxEase.linear);
 			tweenShadowLayer(boyfriend.shader.layers[1], [layerMatrix], dur, FlxEase.linear);
 		}
-		if (pet != null)
+		if (hasPet)
 		{
 			FlxTween.color(pet, dur, pet.color, 0xFFFF6B70, {ease: FlxEase.linear});
 			FlxTween.tween(pet.shader, {threshold: .01, strength: 1}, dur, {ease: FlxEase.linear});

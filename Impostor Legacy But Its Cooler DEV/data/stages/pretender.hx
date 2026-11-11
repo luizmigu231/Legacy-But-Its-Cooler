@@ -576,7 +576,7 @@ function onSongStart()
 				0, 0, 0, 1, 0
 			], 90, 12, .025], dur, FlxEase.linear);
 		}
-		if (pet != null)
+		if (hasPet)
 		{
 			FlxTween.color(pet, dur, pet.color, 0xFF8A3943, {ease: FlxEase.linear});
 			FlxTween.tween(pet.shader, {threshold: .035, strength: .55}, dur, {ease: FlxEase.linear});
