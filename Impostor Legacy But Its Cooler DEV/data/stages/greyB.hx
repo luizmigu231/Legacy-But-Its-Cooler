@@ -3,6 +3,7 @@ import funkin.game.shaders.DropShadowShader;
 import openfl.filters.ShaderFilter;
 import animate.FlxAnimateFrames;
 var gfGhost:Character;
+var noob69Exe:FlxSprite;
 var bg:FlxSprite;
 var thebackground:FlxSprite;
 var grayfg:FlxSprite;
@@ -321,9 +322,11 @@ function onBeatHit()
 		);
 	}
 	gfGhost.onBeatHit();
-	if (curBeat % 2 == 0) for (ghost in [brown, red, yellow, blue]) ghost.animation.play('idle', true);
+	if (curBeat % 2 == 0) for (ghost in [brown, red, yellow, blue, noob69Exe]) ghost.animation.play('idle', true);
 	if (curBeat % 4 == 0)
 		crowd.animation.play('bop', true);
+	if (curBeat == 136) camGame.alpha = 0;
+	if (curBeat == 140) camGame.alpha = 1;
 	if (curBeat == 260)
 		defeatPurple.alpha = .35;
 	if (curBeat == 328)
@@ -361,6 +364,7 @@ function onBeatHit()
 		tweenGhost(red);
 	if (curBeat == 404)
 		tweenGhost(yellow);
+
 	if (curBeat == 428)
 	{
 		dark.alpha = 0;
@@ -369,6 +373,7 @@ function onBeatHit()
 		gfGhost.alpha = 1;
 		gfGhost.playAnim('scared', true);
 		gfGhost.stunned = true;
+		noob69Exe.alpha = 0.8;
 	}
 	if (curBeat == 430)
 		gfGhost.stunned = false;
@@ -380,6 +385,7 @@ function onLoad()
 	gfGhost.alpha = 0.001;
 	gfGhost.zIndex = 1;
 	add(gfGhost);
+
 	bg = new FlxSprite(0, 0).loadGraphic(
 		Paths.image(ext + 'graybg')
 	);
@@ -388,6 +394,7 @@ function onLoad()
 	thebackground.frames = Paths.getSparrowAtlas(
 		ext + 'grayglowy'
 	);
+
 	thebackground.animation.addByPrefix(
 		'bop',
 		'jar??',
@@ -419,6 +426,16 @@ function onLoad()
 	brown.frames = Paths.getSparrowAtlas(
 		ext + 'graybrown'
 	);
+
+	noob69Exe = new FunkinSprite(500, 500);
+	noob69Exe.frames = Paths.getSparrowAtlas(ext + 'ghost49');
+	noob69Exe.addAnimByPrefix('idle', '49', 24, false);
+	noob69Exe.scale.set(1.2, 1.2);
+	noob69Exe.updateHitbox();
+	noob69Exe.zIndex = 2;
+	noob69Exe.alpha = 0;
+	add(noob69Exe);
+
 	brown.animation.addByPrefix(
 		'idle',
 		'ghosts idle',

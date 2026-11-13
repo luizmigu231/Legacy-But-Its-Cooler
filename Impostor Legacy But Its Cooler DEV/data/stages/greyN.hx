@@ -670,8 +670,8 @@ function onLoad()
 	gfGhost.zIndex = 1;
 	add(gfGhost);
 
-	noob69Exe = new FunkinSprite(500, 550);
-	noob69Exe.frames = Paths.getSparrowAtlas(ext + 'noob49Exe');
+	noob69Exe = new FunkinSprite(500, 500);
+	noob69Exe.frames = Paths.getSparrowAtlas(ext + 'ghost49');
 	noob69Exe.addAnimByPrefix('idle', '49', 24, false);
 	noob69Exe.scale.set(1.2, 1.2);
 	noob69Exe.updateHitbox();
