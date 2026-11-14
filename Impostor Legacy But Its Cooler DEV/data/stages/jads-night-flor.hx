@@ -114,8 +114,6 @@ function onStepHit()
 {
 	modchart(curStep);
 
-	// Tenta aplicar aos ghosts caso eles sejam criados
-	// depois do onCreatePost.
 	applyDoubleGhostEffects();
 
 	if (curStep == 63)
@@ -236,9 +234,6 @@ function applyDoubleGhostEffects()
 	if (!ClientPrefs.shaders)
 		return;
 
-	// =========================================
-	// BOYFRIEND DOUBLE GHOSTS
-	// =========================================
 
 	if (boyfriend != null && boyfriend.doubleGhosts != null)
 	{
@@ -247,7 +242,6 @@ function applyDoubleGhostEffects()
 			if (ghost == null)
 				continue;
 
-			// Evita aplicar outro shader no mesmo ghost.
 			var alreadyExists:Bool = false;
 
 			for (rim in bfGhostRims)
@@ -271,9 +265,6 @@ function applyDoubleGhostEffects()
 		}
 	}
 
-	// =========================================
-	// DAD DOUBLE GHOSTS
-	// =========================================
 
 	if (dad != null && dad.doubleGhosts != null)
 	{
@@ -282,7 +273,6 @@ function applyDoubleGhostEffects()
 			if (ghost == null)
 				continue;
 
-			// Evita aplicar outro shader no mesmo ghost.
 			var alreadyExists:Bool = false;
 
 			for (rim in dadGhostRims)

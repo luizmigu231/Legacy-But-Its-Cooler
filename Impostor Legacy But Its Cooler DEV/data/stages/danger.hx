@@ -307,8 +307,6 @@ function beginDangerUnscreamTransition():Void
 		cloudlight.visible = true;
 	}
 
-	// Five quick on/off cycles. The character rim base layers blink with the ship,
-	// while the separate thunder/lightning layers are left untouched.
 	dangerUnscreamTween = FlxTween.num(
 		0,
 		10,
@@ -325,8 +323,6 @@ function beginDangerUnscreamTransition():Void
 					airshipDark.visible = true;
 				}
 
-				// Cross-fade to the dark replacement while the original ship, lights,
-				// and createRim layers fade out together.
 				dangerUnscreamTween = FlxTween.num(
 					0,
 					1,

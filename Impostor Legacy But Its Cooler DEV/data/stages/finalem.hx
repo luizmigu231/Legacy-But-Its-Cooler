@@ -15,21 +15,23 @@ var finaleMode:Bool = false;
 var bars:FlxSpriteGroup;
 var rimNormalStrength:Float = .85;
 var finaleDropRimApplied:Bool = false;
+var finalemDestroying:Bool = false;
 
-var dadEyeBlack:FunkinSprite = null;
-var dadEyeOverlay:FunkinSprite = null;
-var dadEyeAnim:String = '';
 
 var dadEyeBlackP:FunkinSprite = null;
 var dadEyeBlackPInitFailed:Bool = false;
 var dadEyeBlackPAnim:String = '';
 var dadEyeBlackPHiddenOwner:Dynamic = null;
 var dadEyeBlackPVisibilityBackup:Array<Dynamic> = [];
-var dadEyeBlackPDirtyFrames:Array<Dynamic> = [];
+var finaleEyeDebug:FlxText = null;
+var finaleEyeDebugStatus:String = 'waiting for blackparasite';
+var finaleEyeDebugMaskCount:Int = 0;
+var finaleEyeDebugHiddenCount:Int = 0;
+var finaleEyeDebugError:String = '';
 
 function onLoad()
 {
-	var bars:FlxSpriteGroup = new FlxSpriteGroup();
+	bars = new FlxSpriteGroup();
 	bars.cameras = [camHUD];
 	add(bars);
 	
@@ -156,16 +158,8 @@ function onCreatePost()
 	opponentStrums.visible = false;
 	modManager.setValue("alpha", 1, 1);
 	refreshZ();
-	
-	// Build and mask the BlackP eye before attaching a sprite-wide shader.
-	// If it cannot be isolated, the BF must remain unshaded rather than leak rimlight onto the eye.
-	var blackPEyeSeparatedAtCreate:Bool = true;
-	if (isBlackParasiteTarget(boyfriend))
-	{
-		ensureBlackParasiteEyeOverlay();
-		blackPEyeSeparatedAtCreate = hideOriginalBlackParasiteEye() && dadEyeBlackP != null;
-	}
 
+	
 	if (ClientPrefs.shaders)
 	{
 		var blackRimlightBase:ExtraDropShadowShader =
@@ -200,22 +194,11 @@ function onCreatePost()
 			96,24,.01,.4
 		);
 
-		if (
-			hasBfSkin &&
-			boyfriend.getFlag('backlit') != true &&
-			blackPEyeSeparatedAtCreate
-		)
+		if (hasBfSkin && boyfriend.getFlag('backlit') != true)
 		{
 			bfRim = blackRimlightBase;
 			bfRim.attachedSprite = boyfriend;
 			boyfriend.useRenderTexture = true;
-			if (isBlackParasiteTarget(boyfriend))
-				invalidateAnimateSpriteFrame(boyfriend);
-		}
-		else if (isBlackParasiteTarget(boyfriend))
-		{
-			boyfriend.shader = null;
-			boyfriend.useRenderTexture = false;
 		}
 
 		if (hasPet)
@@ -233,6 +216,7 @@ function onCreatePost()
 			.copyFrom(blackRimlightBase);
 
 		dadRim.attachedSprite = dad;
+		dad.shader = dadRim;
 		dad.useRenderTexture = true;
 
 		dadRim.layers[0].angle = 170;
@@ -240,8 +224,7 @@ function onCreatePost()
 
 	}
 	PauseSubState.songName = 'blackPause';
-	ensureBlackEyeOverlay();
-	ensureBlackParasiteEyeOverlay();
+	createFinaleEyeDebug();
 }
 
 
@@ -281,26 +264,11 @@ function applyInitialRimlightCopies()
 
 	var initialRimCopy:ExtraDropShadowShader = createInitialRimlightCopy();
 
-	var bfCanUseRimlight:Bool = true;
-	if (isBlackParasiteTarget(boyfriend))
-	{
-		ensureBlackParasiteEyeOverlay();
-		bfCanUseRimlight = hideOriginalBlackParasiteEye() && dadEyeBlackP != null;
-	}
-
-	if (hasBfSkin && boyfriend.getFlag('backlit') != true && bfCanUseRimlight)
+	if (hasBfSkin && boyfriend.getFlag('backlit') != true)
 	{
 		bfRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(initialRimCopy);
 		bfRim.attachedSprite = boyfriend;
 		boyfriend.useRenderTexture = true;
-		if (isBlackParasiteTarget(boyfriend))
-			invalidateAnimateSpriteFrame(boyfriend);
-	}
-	else if (isBlackParasiteTarget(boyfriend))
-	{
-		if (bfRim != null && boyfriend.shader == bfRim)
-			boyfriend.shader = null;
-		boyfriend.useRenderTexture = false;
 	}
 
 	if (hasPet)
@@ -312,71 +280,22 @@ function applyInitialRimlightCopies()
 
 	dadRim = new funkin.game.shaders.ExtraDropShadowShader().copyFrom(initialRimCopy);
 	dadRim.attachedSprite = dad;
+	dad.shader = dadRim;
 	dad.useRenderTexture = true;
 	dadRim.layers[0].angle = 170;
 	dadRim.layers[1].angle = 88;
 }
 
 
-function ensureBlackEyeOverlay():Void
+function isBlackParasiteTarget(sprite:FunkinSprite):Bool
 {
-	// Disabled: do not create or modify a second Animate library for normal Black.
-}
-
-function copyExactAnimationsToOverlay(source:FunkinSprite, target:FunkinSprite):Bool
-{
-	if (source == null || target == null || source.library == null || target.library == null)
+	if (sprite == null)
 		return false;
-
 	try
 	{
-		// Use Legacy's own animation controller copy so prefixes, indices, FPS,
-		// looping and special animation definitions match the source character exactly.
-		target.copyAnimController(source.animation);
-
-		var sourceAnimations:Dynamic = Reflect.field(source.animation, '_animations');
-		var targetAnimations:Dynamic = Reflect.field(target.animation, '_animations');
-		if (sourceAnimations == null || targetAnimations == null)
+		if (!sprite.exists || !sprite.alive)
 			return false;
-
-		var keysMethod:Dynamic = Reflect.field(sourceAnimations, 'keys');
-		var getSourceMethod:Dynamic = Reflect.field(sourceAnimations, 'get');
-		var getTargetMethod:Dynamic = Reflect.field(targetAnimations, 'get');
-		if (keysMethod == null || getSourceMethod == null || getTargetMethod == null)
-			return false;
-
-		var keys:Dynamic = Reflect.callMethod(sourceAnimations, keysMethod, []);
-		while (keys.hasNext())
-		{
-			var animationName:String = Std.string(keys.next());
-			var sourceAnim:Dynamic = Reflect.callMethod(sourceAnimations, getSourceMethod, [animationName]);
-			var targetAnim:Dynamic = Reflect.callMethod(targetAnimations, getTargetMethod, [animationName]);
-			if (sourceAnim == null || targetAnim == null)
-				continue;
-
-			var sourceTimeline:Dynamic = Reflect.field(sourceAnim, 'timeline');
-			if (sourceTimeline == null)
-				continue;
-
-			var mappedTimeline:Dynamic = null;
-			if (sourceTimeline == source.library.timeline)
-				mappedTimeline = target.library.timeline;
-			else
-			{
-				var timelineName:Dynamic = Reflect.field(sourceTimeline, 'name');
-				if (timelineName != null)
-				{
-					var symbol:Dynamic = target.library.getSymbol(Std.string(timelineName));
-					if (symbol != null)
-						mappedTimeline = symbol.timeline;
-				}
-			}
-
-			if (mappedTimeline == null)
-				return false;
-			Reflect.setField(targetAnim, 'timeline', mappedTimeline);
-		}
-		return true;
+		return Std.string(sprite.curCharacter).toLowerCase() == 'blackparasite';
 	}
 	catch (e:Dynamic)
 	{
@@ -384,479 +303,380 @@ function copyExactAnimationsToOverlay(source:FunkinSprite, target:FunkinSprite):
 	}
 }
 
-function invalidateAnimateSpriteFrame(sprite:FunkinSprite):Void
+function getBlackParasiteCharacter():FunkinSprite
 {
-	if (sprite == null || sprite.isAnimNull())
-		return;
-	try
-	{
-		var currentFrame:Int = sprite.animation.frameIndex;
-		sprite.animation.frameIndex = currentFrame;
-	}
-	catch (e:Dynamic) {}
+	return isBlackParasiteTarget(dad) ? dad : null;
 }
 
-function isBlackParasiteEyePart(symbolName:String):Bool
+function maskBlackParasiteEyeRoot(overlay:FunkinSprite, symbolName:String, eyeLayerIndices:Array<Int>):Int
 {
-	if (symbolName == null || symbolName == '')
-		return false;
-
-	var lowerName:String = StringTools.trim(symbolName).toLowerCase();
-	return lowerName == 'símbolo 25 copia'
-		|| lowerName == 'símbolo 25 copia copy'
-		|| lowerName == 'simbolo 25 copia'
-		|| lowerName == 'simbolo 25 copia copy'
-		|| lowerName == '_bta_asi_4'
-		|| lowerName == '_bta_asi_5'
-		|| lowerName == '_bta_asi_6'
-		|| lowerName == '_bta_asi_7'
-		|| lowerName == '_bta_asi_18'
-		|| lowerName == '_bta_asi_19'
-		|| lowerName == '_bta_asi_20'
-		|| lowerName == '_bta_asi_21'
-		|| lowerName == '_bta_asi_22'
-		|| lowerName == '_bta_asi_23'
-		|| lowerName == '_bta_asi_24'
-		|| lowerName == '_bta_asi_38'
-		|| lowerName == '_bta_asi_39'
-		|| lowerName == '_bta_asi_40'
-		|| lowerName == '_bta_asi_41'
-		|| lowerName == '_bta_asi_51'
-		|| lowerName == '_bta_asi_52'
-		|| lowerName == '_bta_asi_53'
-		|| lowerName == '_bta_asi_54';
-}
-
-function getBlackParasiteElementSymbolName(element:Dynamic):String
-{
-	if (element == null)
-		return '';
-
-	var value:Dynamic = null;
-	try { value = element.symbolName; } catch (e:Dynamic) {}
-	if (value != null && Std.string(value) != '')
-		return Std.string(value);
-
-	try { value = Reflect.field(element, 'symbolName'); } catch (e:Dynamic) {}
-	if (value != null && Std.string(value) != '')
-		return Std.string(value);
-
-	var libraryItem:Dynamic = null;
-	try { libraryItem = element.libraryItem; } catch (e:Dynamic) {}
-	if (libraryItem == null)
-		try { libraryItem = Reflect.field(element, 'libraryItem'); } catch (e:Dynamic) {}
-	if (libraryItem != null)
-	{
-		var itemName:Dynamic = null;
-		try { itemName = libraryItem.name; } catch (e:Dynamic) {}
-		if (itemName == null)
-			try { itemName = Reflect.field(libraryItem, 'name'); } catch (e:Dynamic) {}
-		if (itemName != null && Std.string(itemName) != '')
-			return Std.string(itemName);
-	}
-
-	var atlasFrame:Dynamic = null;
-	try { atlasFrame = element.frame; } catch (e:Dynamic) {}
-	if (atlasFrame == null)
-		try { atlasFrame = Reflect.field(element, 'frame'); } catch (e:Dynamic) {}
-	if (atlasFrame != null)
-	{
-		var frameName:Dynamic = null;
-		try { frameName = atlasFrame.name; } catch (e:Dynamic) {}
-		if (frameName == null)
-			try { frameName = Reflect.field(atlasFrame, 'name'); } catch (e:Dynamic) {}
-		if (frameName != null && Std.string(frameName) != '')
-			return Std.string(frameName);
-	}
-
-	var bitmapName:Dynamic = null;
-	try { bitmapName = element.bitmap; } catch (e:Dynamic) {}
-	if (bitmapName == null)
-		try { bitmapName = Reflect.field(element, 'bitmap'); } catch (e:Dynamic) {}
-	if (bitmapName != null && Std.string(bitmapName) != '')
-		return Std.string(bitmapName);
-
-	return '';
-}
-
-function filterBlackParasiteEyeSymbol(overlay:FunkinSprite, symbolName:String, trail:Array<String>):Bool
-{
-	if (isBlackParasiteEyePart(symbolName))
-		return true;
-	if (overlay == null || overlay.library == null || symbolName == null || symbolName == '')
-		return false;
-	if (trail.indexOf(symbolName) >= 0)
-		return false;
-
+	if (overlay == null || overlay.library == null)
+		return 0;
 	var symbol = overlay.library.getSymbol(symbolName);
 	if (symbol == null || symbol.timeline == null)
-		return false;
-
-	trail.push(symbolName);
-	var hasEyePart:Bool = false;
-	for (layer in symbol.timeline.layers)
+		return 0;
+	var matched:Int = 0;
+	for (layerIndex in 0...symbol.timeline.layers.length)
 	{
+		var layer = symbol.timeline.layers[layerIndex];
+		var keepLayer:Bool = eyeLayerIndices.indexOf(layerIndex) >= 0;
+		if (keepLayer)
+			matched++;
 		layer.forEachFrame(function(frame)
 		{
 			if (frame == null || frame.elements == null)
 				return;
-
-			var frameChanged:Bool = false;
+			var changed:Bool = false;
 			for (element in frame.elements)
 			{
-				var childName:String = getBlackParasiteElementSymbolName(element);
-				var keep:Bool = isBlackParasiteEyePart(childName);
-				if (!keep && childName != '')
-					keep = filterBlackParasiteEyeSymbol(overlay, childName, trail);
-
-				if (element.visible != keep)
-					frameChanged = true;
-				element.visible = keep;
-				if (keep)
-					hasEyePart = true;
+				if (element.visible != keepLayer)
+					changed = true;
+				element.visible = keepLayer;
 			}
-			if (frameChanged)
-				frame.setDirty();
+			if (changed)
+				try { frame.setDirty(); } catch (e:Dynamic) {}
 		});
 	}
-	trail.pop();
-	return hasEyePart;
-}
-
-function isBlackParasiteTarget(sprite:FunkinSprite):Bool
-{
-	if (sprite == null)
-		return false;
-
-	var imagePath:String = '';
-	var characterName:String = '';
-	try { imagePath = Std.string(sprite.imageFile).toLowerCase(); } catch (e:Dynamic) {}
-	try { characterName = Std.string(sprite.curCharacter).toLowerCase(); } catch (e:Dynamic) {}
-
-	return imagePath.indexOf('mini_black') >= 0
-		|| imagePath.indexOf('blackparasite') >= 0
-		|| characterName == 'blackp'
-		|| characterName == 'blackparasite';
-}
-
-function getBlackParasiteCharacter():FunkinSprite
-{
-	return isBlackParasiteTarget(boyfriend) ? boyfriend : null;
+	return matched;
 }
 
 function ensureBlackParasiteEyeOverlay():Void
 {
-	if (dadEyeBlackP != null || dadEyeBlackPInitFailed)
+	if (finalemDestroying || (dadEyeBlackP != null && dadEyeBlackP.exists))
 		return;
-
-	var blackPCharacter:FunkinSprite = getBlackParasiteCharacter();
-	if (blackPCharacter == null || blackPCharacter.library == null)
+	if (dadEyeBlackP != null && !dadEyeBlackP.exists)
+		dadEyeBlackP = null;
+	if (dadEyeBlackPInitFailed || !isBlackParasiteTarget(dad))
 		return;
+	if (dadGroup == null || dadGroup.map == null)
+	{
+		finaleEyeDebugStatus = 'dadGroup/map unavailable';
+		return;
+	}
 
-	var atlasPath:String = Paths.getPath(
-		'images/${ext}blackp_eye_overlay',
-		null,
-		PathsTestMode.LOOSE
-	);
-	var eyeFrames:FlxAnimateFrames = FlxAnimateFrames.fromAnimate(
-		atlasPath,
-		null,
-		null,
-		'dadEyeUnique_blackp_private_finales',
-		true,
-		{cacheOnLoad:false}
-	);
-	if (eyeFrames == null)
+	var blackPTemplate:FunkinSprite = null;
+	try { blackPTemplate = dadGroup.map.get('blackparasite'); } catch (e:Dynamic) {}
+	if (blackPTemplate == null || blackPTemplate.library == null || blackPTemplate.animations == null)
+	{
+		finaleEyeDebugStatus = 'blackparasite template missing';
+		return;
+	}
+
+	var overlay:FunkinSprite = null;
+	try
+	{
+		var atlasPath:String = Paths.getPath(
+			'images/${ext}blackp_eye_overlay',
+			null,
+			PathsTestMode.LOOSE
+		);
+		if (atlasPath == null || atlasPath == '')
+			throw 'overlay atlas path is empty';
+
+		var eyeFrames:FlxAnimateFrames = FlxAnimateFrames.fromAnimate(
+			atlasPath,
+			null,
+			null,
+			'dadEyeUnique_blackparasite_finalem_debug',
+			true,
+			{cacheOnLoad:false}
+		);
+		if (eyeFrames == null)
+			throw 'FlxAnimateFrames.fromAnimate returned null';
+
+		overlay = new FunkinSprite(0, 0);
+		overlay.frames = eyeFrames;
+		var animationCount:Int = 0;
+		for (anim in blackPTemplate.animations)
+		{
+			if (anim == null)
+				continue;
+			var animName:String = '' + anim.anim;
+			var sourceName:String = '' + anim.name;
+			var fps:Int = anim.fps;
+			var looping:Bool = !!anim.loop;
+			var indices:Array<Int> = anim.indices ?? [];
+			var flipX:Bool = anim.flipX ?? false;
+			var flipY:Bool = anim.flipY ?? false;
+			if (indices.length > 0)
+				overlay.addAnimByIndices(animName, sourceName, indices, fps, looping, flipX, flipY);
+			else
+				overlay.addAnimByPrefix(animName, sourceName, fps, looping, flipX, flipY);
+			animationCount++;
+		}
+		if (animationCount == 0)
+			throw 'blackparasite template has no animations';
+
+		var matched:Int = 0;
+		matched += maskBlackParasiteEyeRoot(overlay, 'abomination black idle', [4]);
+		matched += maskBlackParasiteEyeRoot(overlay, 'BLACK UP', [2, 3]);
+		matched += maskBlackParasiteEyeRoot(overlay, 'black down', [0]);
+		matched += maskBlackParasiteEyeRoot(overlay, 'right ske', [3, 4]);
+		matched += maskBlackParasiteEyeRoot(overlay, 'left ', [2, 12]);
+		finaleEyeDebugMaskCount = matched;
+		if (matched != 8)
+			throw 'unexpected eye layer count: ' + matched + ' (expected 8)';
+
+		overlay.scalableOffsets = blackPTemplate.scalableOffsets;
+		overlay.rotatableOffsets = blackPTemplate.rotatableOffsets;
+		overlay.skewableOffsets = blackPTemplate.skewableOffsets;
+		overlay.baseFlipX = blackPTemplate.baseFlipX;
+		overlay.baseFlipY = blackPTemplate.baseFlipY;
+		overlay.antialiasing = blackPTemplate.antialiasing;
+		overlay.shader = null;
+		overlay.useRenderTexture = false;
+		overlay.cameras = [camGame];
+		overlay.scrollFactor.set(blackPTemplate.scrollFactor.x, blackPTemplate.scrollFactor.y);
+		overlay.zIndex = dad.zIndex + 0.01;
+		overlay.active = false;
+		overlay.visible = false;
+
+		dadGroup.add(overlay);
+		refreshZ();
+		dadEyeBlackP = overlay;
+		dadEyeBlackPInitFailed = false;
+		finaleEyeDebugStatus = 'overlay created';
+		finaleEyeDebugError = '';
+	}
+	catch (e:Dynamic)
 	{
 		dadEyeBlackPInitFailed = true;
-		return;
+		finaleEyeDebugStatus = 'overlay creation failed';
+		finaleEyeDebugError = Std.string(e);
+		if (overlay != null)
+		{
+			try { overlay.visible = false; overlay.active = false; } catch (ignored:Dynamic) {}
+			try { overlay.destroy(); } catch (ignored:Dynamic) {}
+		}
 	}
-
-	var overlay:FunkinSprite = new FunkinSprite(0, 0);
-	overlay.frames = eyeFrames;
-
-	if (!copyExactAnimationsToOverlay(blackPCharacter, overlay))
-	{
-		overlay.destroy();
-		dadEyeBlackPInitFailed = true;
-		return;
-	}
-
-	overlay.scalableOffsets = blackPCharacter.scalableOffsets;
-	overlay.rotatableOffsets = blackPCharacter.rotatableOffsets;
-	overlay.skewableOffsets = blackPCharacter.skewableOffsets;
-	overlay.baseFlipX = blackPCharacter.baseFlipX;
-	overlay.baseFlipY = blackPCharacter.baseFlipY;
-	overlay.antialiasing = blackPCharacter.antialiasing;
-	overlay.shader = null;
-	overlay.useRenderTexture = false;
-	overlay.cameras = [camGame];
-	overlay.scrollFactor.set(blackPCharacter.scrollFactor.x, blackPCharacter.scrollFactor.y);
-	overlay.zIndex = finaleDarkFG == null ? 6 : finaleDarkFG.zIndex + 1;
-	overlay.active = false;
-	overlay.visible = false;
-
-	var roots:Array<String> = [
-		'abomination black idle',
-		'BLACK UP',
-		'black down',
-		'right ske',
-		'left '
-	];
-	var matched:Int = 0;
-	for (rootName in roots)
-	{
-		if (filterBlackParasiteEyeSymbol(overlay, rootName, []))
-			matched++;
-	}
-	if (matched == 0)
-	{
-		overlay.destroy();
-		dadEyeBlackPInitFailed = true;
-		return;
-	}
-
-	add(overlay);
-	refreshZ();
-	dadEyeBlackP = overlay;
 }
 
-function saveBlackParasiteEyeVisibility(element:Dynamic):Void
+function saveBlackParasiteEyeVisibility(element:Dynamic, frame:Dynamic):Void
 {
 	for (entry in dadEyeBlackPVisibilityBackup)
 	{
 		if (entry != null && entry.element == element)
 			return;
 	}
-	var parentFrame:Dynamic = null;
-	try { parentFrame = element.parentFrame; } catch (e:Dynamic) {}
-	dadEyeBlackPVisibilityBackup.push({element:element, visible:element.visible, frame:parentFrame});
+	dadEyeBlackPVisibilityBackup.push({element:element, visible:element.visible, frame:frame});
 }
 
-function markBlackParasiteEyeFrameDirty(frame:Dynamic):Void
+function hideBlackParasiteEyeRoot(source:FunkinSprite, symbolName:String, eyeLayerIndices:Array<Int>):Int
 {
-	if (frame == null)
-		return;
-	if (dadEyeBlackPDirtyFrames.indexOf(frame) < 0)
-		dadEyeBlackPDirtyFrames.push(frame);
-	try { frame.setDirty(); } catch (e:Dynamic) {}
-}
-
-function hideBlackParasiteEyePartsInSymbol(source:FunkinSprite, symbolName:String, trail:Array<String>):Int
-{
-	if (source == null || source.library == null || symbolName == null || symbolName == '')
+	if (source == null || source.library == null)
 		return 0;
-	if (trail.indexOf(symbolName) >= 0)
-		return 0;
-
 	var symbol = source.library.getSymbol(symbolName);
 	if (symbol == null || symbol.timeline == null)
 		return 0;
-
-	var matchedCount:Int = 0;
-	trail.push(symbolName);
-	for (layer in symbol.timeline.layers)
+	var matched:Int = 0;
+	for (layerIndex in 0...symbol.timeline.layers.length)
 	{
+		if (eyeLayerIndices.indexOf(layerIndex) < 0)
+			continue;
+		var layer = symbol.timeline.layers[layerIndex];
 		layer.forEachFrame(function(frame)
 		{
 			if (frame == null || frame.elements == null)
 				return;
-
-			var frameChanged:Bool = false;
+			var changed:Bool = false;
 			for (element in frame.elements)
 			{
-				var childName:String = getBlackParasiteElementSymbolName(element);
-				if (isBlackParasiteEyePart(childName))
+				saveBlackParasiteEyeVisibility(element, frame);
+				matched++;
+				if (element.visible)
 				{
-					saveBlackParasiteEyeVisibility(element);
-					matchedCount++;
-					frameChanged = true;
 					element.visible = false;
-				}
-				else if (childName != '')
-				{
-					var nestedMatches:Int = hideBlackParasiteEyePartsInSymbol(source, childName, trail);
-					if (nestedMatches > 0)
-					{
-						matchedCount += nestedMatches;
-						frameChanged = true;
-					}
+					changed = true;
 				}
 			}
-
-			// A parent's baked frame contains its nested child's rendered pixels too.
-			// Mark every frame on the path dirty, not only the leaf that owns _bta_asi.
-			if (frameChanged)
-				markBlackParasiteEyeFrameDirty(frame);
+			if (changed)
+				try { frame.setDirty(); } catch (e:Dynamic) {}
 		});
 	}
-	trail.pop();
-	return matchedCount;
+	return matched;
+}
+
+function disableBlackParasiteRimlight(source:FunkinSprite):Void
+{
+	if (source == null)
+		return;
+	try
+	{
+		if (dadRim != null && dadRim.attachedSprite == source)
+			dadRim.attachedSprite = null;
+	}
+	catch (e:Dynamic) {}
+	try
+	{
+		if (dadRim != null && source.shader == dadRim)
+			source.shader = null;
+	}
+	catch (e:Dynamic) {}
+	try { source.useRenderTexture = false; } catch (e:Dynamic) {}
+}
+
+function syncBlackParasiteRimlight(source:FunkinSprite):Void
+{
+	if (source == null || dadRim == null)
+		return;
+	var previous:FunkinSprite = null;
+	try { previous = dadRim.attachedSprite; } catch (e:Dynamic) {}
+	if (previous != null && previous != source)
+	{
+		try { if (previous.shader == dadRim) previous.shader = null; } catch (e:Dynamic) {}
+		try { previous.useRenderTexture = false; } catch (e:Dynamic) {}
+	}
+	if (finaleMode && ClientPrefs.shaders)
+	{
+		try
+		{
+			dadRim.attachedSprite = source;
+			source.shader = dadRim;
+			source.useRenderTexture = true;
+		}
+		catch (e:Dynamic) {}
+	}
+	else if (dadRim.attachedSprite == source)
+	{
+		disableBlackParasiteRimlight(source);
+	}
 }
 
 function hideOriginalBlackParasiteEye():Bool
 {
 	var source:FunkinSprite = getBlackParasiteCharacter();
-	if (source == null || source.library == null)
+	if (source == null)
 	{
+		finaleEyeDebugStatus = 'Black Parasite source unavailable';
 		if (dadEyeBlackPHiddenOwner != null)
 			restoreOriginalBlackParasiteEye();
 		return false;
 	}
+	if (source.library == null)
+	{
+		finaleEyeDebugStatus = 'Black Parasite Animate library unavailable';
+		return false;
+	}
 	if (dadEyeBlackPHiddenOwner == source)
 		return dadEyeBlackPVisibilityBackup.length > 0;
-
 	if (dadEyeBlackPHiddenOwner != null)
 		restoreOriginalBlackParasiteEye();
 
-	var roots:Array<String> = [];
-	function addEyeRoot(value:Dynamic):Void
-	{
-		if (value == null) return;
-		var name:String = Std.string(value);
-		if (name == '' || name == 'null' || roots.indexOf(name) >= 0) return;
-		roots.push(name);
-	}
-
-	// Walk the complete Animate document root first. Some eye instances live
-	// in symbols outside the five common pose symbols below.
-	try { addEyeRoot(source.library.timeline.name); } catch (e:Dynamic) {}
-	try
-	{
-		for (anim in source.animations)
-		{
-			if (anim == null) continue;
-			addEyeRoot(anim.name);
-			addEyeRoot(anim.anim);
-		}
-	}
-	catch (e:Dynamic) {}
-
-	for (rootName in [
-		'abomination black idle',
-		'BLACK UP',
-		'black down',
-		'right ske',
-		'left '
-	])
-		addEyeRoot(rootName);
-
 	var hiddenCount:Int = 0;
-	for (rootName in roots)
-		hiddenCount += hideBlackParasiteEyePartsInSymbol(source, rootName, []);
-
+	hiddenCount += hideBlackParasiteEyeRoot(source, 'abomination black idle', [4]);
+	hiddenCount += hideBlackParasiteEyeRoot(source, 'BLACK UP', [2, 3]);
+	hiddenCount += hideBlackParasiteEyeRoot(source, 'black down', [0]);
+	hiddenCount += hideBlackParasiteEyeRoot(source, 'right ske', [3, 4]);
+	hiddenCount += hideBlackParasiteEyeRoot(source, 'left ', [2, 12]);
+	finaleEyeDebugHiddenCount = hiddenCount;
 	if (hiddenCount > 0 || dadEyeBlackPVisibilityBackup.length > 0)
 	{
 		dadEyeBlackPHiddenOwner = source;
 		invalidateAnimateSpriteFrame(source);
 		return true;
 	}
-
-	// Never mark the source as masked when no eye elements were actually found.
-	// Keep trying on the next update instead of silently leaving the shaded eye visible.
 	dadEyeBlackPHiddenOwner = null;
 	return false;
 }
 
 function restoreOriginalBlackParasiteEye():Void
 {
+	var source:FunkinSprite = dadEyeBlackPHiddenOwner;
 	for (entry in dadEyeBlackPVisibilityBackup)
 	{
-		if (entry != null && entry.element != null)
-			entry.element.visible = entry.visible;
+		if (entry == null || entry.element == null)
+			continue;
+		try { entry.element.visible = entry.visible; } catch (e:Dynamic) {}
+		if (entry.frame != null)
+			try { entry.frame.setDirty(); } catch (e:Dynamic) {}
 	}
-
-	// Restore the baked parent frames as well as leaf frames; otherwise stale
-	// cached pixels can survive after the source visibility has been restored.
-	for (frame in dadEyeBlackPDirtyFrames)
-		try { frame.setDirty(); } catch (e:Dynamic) {}
-
-	dadEyeBlackPDirtyFrames = [];
 	dadEyeBlackPVisibilityBackup = [];
 	dadEyeBlackPHiddenOwner = null;
-	invalidateAnimateSpriteFrame(getBlackParasiteCharacter());
+	invalidateAnimateSpriteFrame(source);
 }
 
-function syncOverlayAnimationClock(source:FunkinSprite, target:FunkinSprite):Void
+function syncOverlayAnimationClock(source:FunkinSprite, overlay:FunkinSprite):Void
 {
-	if (source == null || target == null || source.isAnimNull() || target.isAnimNull())
+	if (source == null || overlay == null)
 		return;
-
-	target.animCurFrame = source.animCurFrame;
-
-	var sourceAnim:Dynamic = source.animation.curAnim;
-	var targetAnim:Dynamic = target.animation.curAnim;
-	if (sourceAnim != null && targetAnim != null)
+	try
 	{
-		for (field in ['frameTimer', 'finished', 'reversed'])
-		{
-			try
-			{
-				var value:Dynamic = Reflect.field(sourceAnim, field);
-				if (value != null)
-					Reflect.setField(targetAnim, field, value);
-			}
-			catch (e:Dynamic) {}
-		}
-		// Setting curFrame alone only changes the controller's counter; FlxAnimate
-		// draws from its timeline frameIndex. Copy the displayed frame as well.
-		try
-		{
-			var displayedFrame:Int = source.animation.frameIndex;
-			if (target.animation.frameIndex != displayedFrame)
-				target.animation.frameIndex = displayedFrame;
-		}
-		catch (e:Dynamic) {}
+		if (source.isAnimNull() || overlay.isAnimNull())
+			return;
+		var frameCount:Int = overlay.getAnimNumFrames();
+		if (frameCount <= 0)
+			return;
+		var frame:Int = source.animCurFrame;
+		if (frame < 0) frame = 0;
+		if (frame >= frameCount) frame = frameCount - 1;
+		overlay.animCurFrame = frame;
+		try { overlay.animation.frameIndex = source.animation.frameIndex; } catch (e:Dynamic) {}
 	}
+	catch (e:Dynamic) {}
 }
 
 function syncBlackParasiteEyeOverlay():Void
 {
+	if (finalemDestroying)
+		return;
+	if (dadEyeBlackP != null && !dadEyeBlackP.exists)
+	{
+		dadEyeBlackP = null;
+		dadEyeBlackPAnim = '';
+		dadEyeBlackPInitFailed = false;
+	}
 	var source:FunkinSprite = getBlackParasiteCharacter();
 	if (source == null)
 	{
-		if (dadEyeBlackP != null) { dadEyeBlackP.visible = false; dadEyeBlackP.active = false; }
-		if (dadEyeBlackPHiddenOwner != null) restoreOriginalBlackParasiteEye();
+		finaleEyeDebugStatus = 'waiting for dad.curCharacter == blackparasite';
+		if (dadEyeBlackP != null && dadEyeBlackP.exists)
+		{
+			dadEyeBlackP.visible = false;
+			dadEyeBlackP.active = false;
+		}
+		var oldOwner:FunkinSprite = dadEyeBlackPHiddenOwner;
+		if (oldOwner != null)
+			restoreOriginalBlackParasiteEye();
+		if (oldOwner != null && oldOwner != dad)
+			disableBlackParasiteRimlight(oldOwner);
+		if (dad != null && finaleMode)
+			syncBlackParasiteRimlight(dad);
+		else if (oldOwner != null)
+			disableBlackParasiteRimlight(oldOwner);
 		dadEyeBlackPAnim = '';
 		return;
 	}
 
+	syncBlackParasiteRimlight(source);
 	ensureBlackParasiteEyeOverlay();
-	if (dadEyeBlackP == null)
+	if (dadEyeBlackP == null || !dadEyeBlackP.exists)
 	{
-		if (dadEyeBlackPHiddenOwner != null) restoreOriginalBlackParasiteEye();
-		if (bfRim != null && source.shader == bfRim) source.shader = null;
-		source.useRenderTexture = false;
+		if (dadEyeBlackPHiddenOwner != null)
+			restoreOriginalBlackParasiteEye();
 		return;
 	}
-
 	if (!hideOriginalBlackParasiteEye())
 	{
+		finaleEyeDebugStatus = 'could not hide source eye layers';
 		dadEyeBlackP.visible = false;
 		dadEyeBlackP.active = false;
-		if (bfRim != null && source.shader == bfRim) source.shader = null;
-		source.useRenderTexture = false;
 		return;
 	}
-
 	if (!source.exists || !source.visible || source.alpha <= 0 || source.isAnimNull())
 	{
 		dadEyeBlackP.visible = false;
 		dadEyeBlackP.active = false;
 		return;
 	}
-
 	var currentAnim:String = source.getAnimName();
 	if (currentAnim == '' || !dadEyeBlackP.hasAnim(currentAnim))
 	{
+		finaleEyeDebugStatus = 'overlay animation not found: ' + currentAnim;
 		dadEyeBlackP.visible = false;
 		dadEyeBlackP.active = false;
 		restoreOriginalBlackParasiteEye();
-		if (bfRim != null && source.shader == bfRim) source.shader = null;
-		source.useRenderTexture = false;
 		return;
 	}
-
 	if (dadEyeBlackPAnim != currentAnim || dadEyeBlackP.isAnimNull())
 	{
 		var sourceReversed:Bool = false;
@@ -864,8 +684,15 @@ function syncBlackParasiteEyeOverlay():Void
 		dadEyeBlackP.playAnim(currentAnim, true, sourceReversed, source.animCurFrame);
 		dadEyeBlackPAnim = currentAnim;
 	}
-
-	syncOverlayAnimationClock(source, dadEyeBlackP);
+	var frameCount:Int = dadEyeBlackP.getAnimNumFrames();
+	if (frameCount > 0)
+	{
+		var frame:Int = source.animCurFrame;
+		if (frame < 0) frame = 0;
+		if (frame >= frameCount) frame = frameCount - 1;
+		dadEyeBlackP.animCurFrame = frame;
+		try { dadEyeBlackP.animation.frameIndex = source.animation.frameIndex; } catch (e:Dynamic) {}
+	}
 	dadEyeBlackP.x = source.x;
 	dadEyeBlackP.y = source.y;
 	dadEyeBlackP.scale.set(source.scale.x, source.scale.y);
@@ -883,8 +710,12 @@ function syncBlackParasiteEyeOverlay():Void
 	dadEyeBlackP.blend = source.blend;
 	dadEyeBlackP.scrollFactor.set(source.scrollFactor.x, source.scrollFactor.y);
 	dadEyeBlackP.antialiasing = source.antialiasing;
-	var eyeZ:Float = finaleDarkFG == null ? 6 : finaleDarkFG.zIndex + 1;
-	if (dadEyeBlackP.zIndex != eyeZ) { dadEyeBlackP.zIndex = eyeZ; refreshZ(); }
+	var eyeZ:Float = source.zIndex + 0.01;
+	if (dadEyeBlackP.zIndex != eyeZ)
+	{
+		dadEyeBlackP.zIndex = eyeZ;
+		refreshZ();
+	}
 	dadEyeBlackP.shader = null;
 	dadEyeBlackP.useRenderTexture = false;
 	dadEyeBlackP.cameras = [camGame];
@@ -898,48 +729,87 @@ function syncBlackParasiteEyeOverlay():Void
 	dadEyeBlackP.colorTransform.alphaOffset = source.colorTransform.alphaOffset;
 	dadEyeBlackP.active = false;
 	dadEyeBlackP.visible = true;
+	finaleEyeDebugStatus = 'separation active';
 }
 
-function syncBlackEyeOverlay():Void
+function createFinaleEyeDebug():Void
 {
-	// Disabled: leave normal Black and its Animate spritemap untouched.
+	if (finaleEyeDebug != null)
+		return;
+	finaleEyeDebug = new FlxText(8, 8, 780, 'Finale eye: waiting for blackparasite', 14);
+	finaleEyeDebug.setFormat(null, 14, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+	finaleEyeDebug.scrollFactor.set();
+	finaleEyeDebug.cameras = [camGame];
+	finaleEyeDebug.zIndex = 10000;
+	add(finaleEyeDebug);
+	refreshZ();
 }
 
-function restoreOriginalBlackEye():Void
+function updateFinaleEyeDebug():Void
 {
-	// Disabled: this script no longer changes normal Black timeline elements.
+	if (finaleEyeDebug == null || finalemDestroying)
+		return;
+	var characterName:String = 'null';
+	var animationName:String = '';
+	var sourceHasLibrary:Bool = false;
+	var templateExists:Bool = false;
+	var overlayExists:Bool = dadEyeBlackP != null && dadEyeBlackP.exists;
+	try { if (dad != null) characterName = Std.string(dad.curCharacter); } catch (e:Dynamic) {}
+	var source:FunkinSprite = getBlackParasiteCharacter();
+	if (source != null)
+	{
+		try { animationName = source.getAnimName(); } catch (e:Dynamic) {}
+		try { sourceHasLibrary = source.library != null; } catch (e:Dynamic) {}
+	}
+	try { templateExists = dadGroup != null && dadGroup.map != null && dadGroup.map.get('blackparasite') != null; } catch (e:Dynamic) {}
+	finaleEyeDebug.text = 'Finale eye DEBUG\n'
+		+ 'dad: ' + characterName + ' | animation: ' + animationName + '\n'
+		+ 'source library: ' + sourceHasLibrary + ' | template: ' + templateExists + '\n'
+		+ 'overlay: ' + overlayExists + ' | mask layers: ' + finaleEyeDebugMaskCount + '\n'
+		+ 'hidden source elements: ' + dadEyeBlackPVisibilityBackup.length + ' | status: ' + finaleEyeDebugStatus
+		+ (finaleEyeDebugError != '' ? '\nerror: ' + finaleEyeDebugError : '');
 }
 
 function onUpdatePost(elapsed:Float)
 {
-	syncBlackEyeOverlay();
-	syncBlackParasiteEyeOverlay();
+	if (finalemDestroying)
+		return;
+	try
+	{
+		syncBlackParasiteEyeOverlay();
+	}
+	catch (e:Dynamic)
+	{
+		finaleEyeDebugStatus = 'sync exception';
+		finaleEyeDebugError = Std.string(e);
+	}
+	updateFinaleEyeDebug();
 }
 
 function onDestroy()
 {
-	restoreOriginalBlackEye();
-	restoreOriginalBlackParasiteEye();
-	if (dadEyeBlack != null)
+	if (finalemDestroying)
+		return;
+	finalemDestroying = true;
+	try { if (finaleDarkFG != null) FlxTween.cancelTweensOf(finaleDarkFG); } catch (e:Dynamic) {}
+
+	var blackParasiteOwner:FunkinSprite = dadEyeBlackPHiddenOwner;
+	try { restoreOriginalBlackParasiteEye(); } catch (e:Dynamic) {}
+	if (blackParasiteOwner != null)
 	{
-		dadEyeBlack.visible = false;
-		dadEyeBlack.active = false;
-		dadEyeBlack.destroy();
-		dadEyeBlack = null;
+		try { disableBlackParasiteRimlight(blackParasiteOwner); } catch (e:Dynamic) {}
 	}
+
 	if (dadEyeBlackP != null)
 	{
-		dadEyeBlackP.visible = false;
-		dadEyeBlackP.active = false;
-		dadEyeBlackP.destroy();
-		dadEyeBlackP = null;
+		try { dadEyeBlackP.visible = false; dadEyeBlackP.active = false; } catch (e:Dynamic) {}
 	}
-	dadEyeOverlay = null;
-	dadEyeAnim = '';
+	dadEyeBlackP = null;
 	dadEyeBlackPAnim = '';
 	dadEyeBlackPInitFailed = false;
-	dadEyeHiddenOwner = null;
 	dadEyeBlackPHiddenOwner = null;
+	dadEyeBlackPVisibilityBackup = [];
+	finaleEyeDebug = null;
 }
 
 function onBeatHit()
@@ -996,8 +866,6 @@ function onEvent(name, v1, v2)
 			
 		case 'Finale Drop':
 			finaleMode = true;
-			// Mask the BlackP eye before applying the copied rimlight shader to BF.
-			hideOriginalBlackParasiteEye();
 			applyInitialRimlightCopies();
 			camSpecialThing([500, 600], [700, 700]);
 			health = 0.2; // used to be 0.1 but im nicer

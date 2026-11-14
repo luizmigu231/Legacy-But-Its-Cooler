@@ -265,10 +265,6 @@ function onCreatePost()
 	addCharacterToList('black',1);
 	addCharacterToList('blackdk',1);
 
-	/*
-	 * O estado inicial desta música é BLACKDK.
-	 * O BLACK só é colocado pelo evento Defeat Retro 1.
-	 */
 	changeCharacter('blackdk',1);
 
 	snapCamToPos(750,500);
@@ -470,10 +466,6 @@ function createDadEyeOverlay(
 			PathsTestMode.LOOSE
 		);
 
-	/*
-	 * Esta é uma instância exclusiva para a
-	 * overlay. Nunca é colocada no dad real.
-	 */
 	var eyeFrames:FlxAnimateFrames =
 		FlxAnimateFrames.fromAnimate(
 			atlasPath,

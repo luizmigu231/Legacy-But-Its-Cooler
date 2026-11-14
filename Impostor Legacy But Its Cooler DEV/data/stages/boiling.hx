@@ -162,9 +162,6 @@ function maroonCollectEyeRoots(source:FunkinSprite):Array<String>
 	return roots;
 }
 
-// The eye atlas is a separate Animate copy. Keep only the two eye symbols
-// in that copy, recursively following nested symbols just like Defeat's
-// Black eye overlay does for its isolated character atlas.
 function maroonFilterEyeSymbol(overlay:FunkinSprite, symbolName:String, trail:Array<String>):Bool
 {
 	if (maroonIsEyePart(symbolName)) return true;
@@ -230,8 +227,6 @@ function maroonInvalidateRender(sprite:Dynamic):Void
 	try { Reflect.setField(sprite, '_renderTextureDirty', true); } catch (e:Dynamic) {}
 }
 
-// Hide the original eye instances in the live character. Every changed
-// parent frame is marked dirty as nested Animate symbols may be baked into it.
 function maroonHideEyePartsInSymbol(source:FunkinSprite, symbolName:String, trail:Array<String>):Int
 {
 	if (source == null || source.library == null || symbolName == null || symbolName == '') return 0;
@@ -562,9 +557,7 @@ function maroonSyncEyeSprite():Void
 	maroonEyeOverlay.flipX = source.flipX;
 	maroonEyeOverlay.flipY = source.flipY;
 	maroonEyeOverlay.alpha = source.alpha;
-	// Keep the separated eye at its original atlas colors. The character's
-	// FlxTween.color / sprite tint must never be inherited by this overlay.
-	maroonEyeOverlay.color = 0xFFFFFFFF;
+	maroonEyeOverlay.color = source.color;
 	maroonEyeOverlay.blend = source.blend;
 	maroonEyeOverlay.scrollFactor.set(source.scrollFactor.x, source.scrollFactor.y);
 	maroonEyeOverlay.antialiasing = source.antialiasing;
@@ -577,15 +570,14 @@ function maroonSyncEyeSprite():Void
 	maroonEyeOverlay.shader = null;
 	maroonEyeOverlay.useRenderTexture = false;
 	maroonEyeOverlay.cameras = [camGame];
-	// Neutral color transform: do not copy the parent's tint or color offsets.
-	maroonEyeOverlay.colorTransform.redMultiplier = 1;
-	maroonEyeOverlay.colorTransform.greenMultiplier = 1;
-	maroonEyeOverlay.colorTransform.blueMultiplier = 1;
-	maroonEyeOverlay.colorTransform.alphaMultiplier = 1;
-	maroonEyeOverlay.colorTransform.redOffset = 0;
-	maroonEyeOverlay.colorTransform.greenOffset = 0;
-	maroonEyeOverlay.colorTransform.blueOffset = 0;
-	maroonEyeOverlay.colorTransform.alphaOffset = 0;
+	maroonEyeOverlay.colorTransform.redMultiplier = source.colorTransform.redMultiplier;
+	maroonEyeOverlay.colorTransform.greenMultiplier = source.colorTransform.greenMultiplier;
+	maroonEyeOverlay.colorTransform.blueMultiplier = source.colorTransform.blueMultiplier;
+	maroonEyeOverlay.colorTransform.alphaMultiplier = source.colorTransform.alphaMultiplier;
+	maroonEyeOverlay.colorTransform.redOffset = source.colorTransform.redOffset;
+	maroonEyeOverlay.colorTransform.greenOffset = source.colorTransform.greenOffset;
+	maroonEyeOverlay.colorTransform.blueOffset = source.colorTransform.blueOffset;
+	maroonEyeOverlay.colorTransform.alphaOffset = source.colorTransform.alphaOffset;
 	try { maroonEyeOverlay.applyStageMatrix = source.applyStageMatrix; } catch (e:Dynamic) {}
 	try { maroonEyeOverlay.postStageMatrixApply = source.postStageMatrixApply; } catch (e:Dynamic) {}
 	maroonEyeOverlay.active = false;
@@ -670,8 +662,6 @@ function applyBoilingLightBlend(value:Float):Void
 	boilingLightProgress = Math.max(0, Math.min(1, value));
 	var hotAlpha:Float = boilingLightProgress;
 
-	// Keep the original sprite as the opaque base. Only fade the baked-light
-	// copy over it; fading both sprites caused the stage to lose opacity.
 	if (lava != null) lava.alpha = 1;
 	if (lavaHot != null) lavaHot.alpha = hotAlpha;
 	if (lava2 != null) lava2.alpha = 1;
@@ -855,8 +845,6 @@ function onSongStart()
 {
 	var dur = songLength / 1000;
 
-	// Preserve the original sinking motion: characters and platforms move down
-	// together over the song. The wall/lava layers stay at their original height.
 	FlxTween.tween(boyfriend, {y: boyfriend.y + 133 / 2}, dur);
 	FlxTween.tween(dad, {y: dad.y + 133 / 2}, dur);
 	FlxTween.tween(pet, {y: pet.y + 133 / 2}, dur);

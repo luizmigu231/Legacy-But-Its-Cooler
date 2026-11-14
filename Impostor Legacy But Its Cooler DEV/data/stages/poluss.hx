@@ -609,7 +609,6 @@ function beginPolusStageTransition(target:String, duration:Float):Void
 		{
 			var oldAlpha = i == 4 ? polusTransitionCameraStartAlpha : fromSceneAlphas[i];
 			polusScene[i].alpha = oldAlpha * (1 - t);
-			// Each objective sprite sits directly below its matching current sprite and stays at alpha 1.
 		}
 		for (i in 0...oldLighting.length)
 		{
@@ -675,7 +674,6 @@ function onLoad()
 	polusScene = [];
 	polusNextScene = [];
 
-	// SKY: variante atual por cima, objetivo logo abaixo.
 	sky = makePolusSceneSprite('night', 'polus_custom_sky', -400, -400, 0.5, 0.5, 1.4);
 	sky.zIndex = -599;
 	add(sky);
@@ -685,7 +683,6 @@ function onLoad()
 	polusScene.push(sky);
 	polusNextScene.push(skyN);
 
-	// ROCKS: variante atual por cima, objetivo logo abaixo.
 	rocks = makePolusSceneSprite('night', 'polusrocks', -700, -300, 0.6, 0.6, 1);
 	rocks.zIndex = -589;
 	add(rocks);
@@ -695,7 +692,6 @@ function onLoad()
 	polusScene.push(rocks);
 	polusNextScene.push(rocksN);
 
-	// HILLS: variante atual por cima, objetivo logo abaixo.
 	hills = makePolusSceneSprite('night', 'polusHills', -1050, -180.55, 0.9, 0.9, 1);
 	hills.zIndex = -579;
 	add(hills);
@@ -705,7 +701,6 @@ function onLoad()
 	polusScene.push(hills);
 	polusNextScene.push(hillsN);
 
-	// LAB: variante atual por cima, objetivo logo abaixo.
 	warehouse = makePolusSceneSprite('night', 'polus_custom_lab', 50, -400, 1, 1, 1);
 	warehouse.zIndex = -569;
 	add(warehouse);
@@ -715,7 +710,6 @@ function onLoad()
 	polusScene.push(warehouse);
 	polusNextScene.push(warehouseN);
 
-	// CAMERA: variante atual por cima, objetivo logo abaixo.
 	camOff = makePolusSceneSprite('night', 'cam_off_lab', 50 + 1123, -400 + 452, 1, 1, 1);
 	camOff.alpha = polusCameraVisible ? 1 : 0.001;
 	camOff.zIndex = -559;
@@ -727,7 +721,6 @@ function onLoad()
 	polusScene.push(camOff);
 	polusNextScene.push(camOffN);
 
-	// FLOOR: variante atual por cima, objetivo logo abaixo.
 	ground = makePolusSceneSprite('night', 'polus_custom_floor', -1350, 80, 1, 1, 1);
 	ground.zIndex = -549;
 	add(ground);
@@ -752,7 +745,6 @@ function onLoad()
 	snowEmitter.zIndex = 13;
 	snowEmitter.lifespan.set(5);
 
-	// Speaker: atual por cima, próximo atlas logo abaixo.
 	speaker = makePolusSpeaker('night');
 	speaker.alpha = 0;
 	speaker.zIndex = -89;
@@ -799,7 +791,6 @@ function onSongStart()
 	if (hasBfSkin && game.boyfriend.curCharacter == 'redp' && hasPet && pet.curPet == 'minicrewmate')
 		game.unlockAchievementPopup('red_handed');
 
-	// Night -> Midnight: same 3:05 transition window used by Normal -> Night.
 	beginPolusStageTransition('midnight', 3.05 * 60);
 }
 
