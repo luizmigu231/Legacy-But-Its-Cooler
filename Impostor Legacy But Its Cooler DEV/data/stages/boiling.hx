@@ -13,15 +13,25 @@ var emberEmitter:FlxEmitter;
 var ext = 'stages/polus/maroon/boiling/';
 var lavaOverlay:FlxSprite;
 var lava:FlxSprite;
+var lavaHot:FlxSprite;
 var lava2:FlxSprite;
+var lava2Hot:FlxSprite;
 var ground:FlxSprite;
+var groundHot:FlxSprite;
 var groundBroken1:FlxSprite;
+var groundBroken1Hot:FlxSprite;
 var groundBroken2:FlxSprite;
+var groundBroken2Hot:FlxSprite;
 var bubbles:FlxSprite;
+var bubblesHot:FlxSprite;
 var lavaSplash:FlxSprite;
 var playerBaseX:Array<Float> = [];
 var oppBaseX:Array<Float> = [];
 var startedSong:Bool = false;
+var boilingLightProgress:Float = 0;
+var boilingGroundFade:Float = 1;
+var boilingLightTween:Dynamic;
+var boilingGroundFadeTween:Dynamic;
 
 var blackRimlightBase:ExtraDropShadowShader;
 var bfRim:ExtraDropShadowShader;
@@ -31,7 +41,6 @@ var bfRimTarget:FlxSprite;
 var dadRimTarget:FlxSprite;
 var petRimTarget:FlxSprite;
 
-// Maroon eye split: keep the eyes out of dad's shader render and draw them separately.
 var maroonEyeSprite:FunkinSprite = null;
 var maroonEyeFrames:FlxAnimateFrames = null;
 var maroonEyeTarget:Dynamic = null;
@@ -220,8 +229,6 @@ function maroonCopyAnimDefinitions():Void
 		catch (e:Dynamic) {}
 	}
 
-	// Known exported symbols in the Maroon atlas. These fallbacks ensure that
-	// the overlay can follow Legacy's standard sing animation names.
 	maroonAddEyeAnim('idle', 'idle', 24, true);
 	maroonAddEyeAnim('singLEFT', 'left', 24, false);
 	maroonAddEyeAnim('singDOWN', 'down', 24, false);
@@ -343,7 +350,6 @@ function setupMaroonEyeSplit():Void
 
 	try
 	{
-		// unique=true is important: filtering this copy must not change dad's source library.
 		maroonEyeFrames = FlxAnimateFrames.fromAnimate(atlasPath, null, null, 'maroon_stage_eye_overlay', true, {cacheOnLoad: false});
 	}
 	catch (e:Dynamic)
@@ -405,7 +411,6 @@ function setupMaroonEyeSplit():Void
 		catch (e:Dynamic) {}
 	}
 
-	// Keep the unshaded eye overlay above the character in Legacy's z sorting.
 	try { maroonEyeSprite.zIndex = dad.zIndex + 100; } catch (e:Dynamic) {}
 	try { maroonEyeSprite.shader = null; } catch (e:Dynamic) {}
 	try { maroonEyeSprite.useRenderTexture = false; } catch (e:Dynamic) {}
@@ -472,45 +477,115 @@ function checkRimAttachments()
 	if (pet != null && (petRimTarget != pet || pet.shader != petRim)) setupPetRim();
 }
 
+function makeWallBPSprite(asset:String, x:Float, y:Float, layer:Int, alphaValue:Float):FlxSprite
+{
+	var spr = new FlxSprite(x, y);
+	spr.frames = Paths.getSparrowAtlas(ext + asset);
+	spr.animation.addByPrefix('bop', 'Back wall and lava', 24, true);
+	if (!ClientPrefs.lowQuality) spr.animation.play('bop');
+	spr.scrollFactor.set(0.8, 0.8);
+	spr.zIndex = layer;
+	spr.alpha = alphaValue;
+	add(spr);
+	return spr;
+}
+
+function applyBoilingLightBlend(value:Float):Void
+{
+	boilingLightProgress = Math.max(0, Math.min(1, value));
+	var hotAlpha:Float = boilingLightProgress;
+
+	// Keep the original sprite as the opaque base. Only fade the baked-light
+	// copy over it; fading both sprites caused the stage to lose opacity.
+	if (lava != null) lava.alpha = 1;
+	if (lavaHot != null) lavaHot.alpha = hotAlpha;
+	if (lava2 != null) lava2.alpha = 1;
+	if (lava2Hot != null) lava2Hot.alpha = hotAlpha;
+
+	if (ground != null) ground.alpha = boilingGroundFade;
+	if (groundHot != null) groundHot.alpha = hotAlpha * boilingGroundFade;
+	if (groundBroken1 != null) groundBroken1.alpha = 1;
+	if (groundBroken1Hot != null) groundBroken1Hot.alpha = hotAlpha;
+	if (groundBroken2 != null) groundBroken2.alpha = 1;
+	if (groundBroken2Hot != null) groundBroken2Hot.alpha = hotAlpha;
+	if (bubbles != null) bubbles.alpha = 1;
+	if (bubblesHot != null) bubblesHot.alpha = hotAlpha;
+}
+
+function syncWallAnimation(source:FlxSprite, target:FlxSprite):Void
+{
+	if (source == null || target == null) return;
+	if (source.animation == null || target.animation == null) return;
+	if (source.animation.curAnim == null || target.animation.curAnim == null) return;
+	try
+	{
+		if (target.animation.frameIndex != source.animation.frameIndex)
+			target.animation.frameIndex = source.animation.frameIndex;
+	}
+	catch (e:Dynamic) {}
+}
+
+function syncBoilingWallAnimations():Void
+{
+	syncWallAnimation(lava, lavaHot);
+	syncWallAnimation(lava, lava2);
+	syncWallAnimation(lava, lava2Hot);
+	syncWallAnimation(bubbles, bubblesHot);
+}
+
 function onLoad()
 {
-	lava = new FlxSprite(270, -330);
-	lava.frames = Paths.getSparrowAtlas(ext + 'wallBP');
-	lava.animation.addByPrefix('bop', 'Back wall and lava', 24, true);
-	if (!ClientPrefs.lowQuality) lava.animation.play('bop');
-	lava.scrollFactor.set(0.8, 0.8);
-	add(lava);
+	lava = makeWallBPSprite('wallBP', 270, -330, 0, 1);
+	lavaHot = makeWallBPSprite('wallBP_hot', 270, -330, 0, 0);
 
-	lava2 = new FlxSprite(270, -330);
-	lava2.frames = Paths.getSparrowAtlas(ext + 'wallBP');
-	lava2.animation.addByPrefix('bop', 'Back wall and lava', 24, true);
-	if (!ClientPrefs.lowQuality) lava2.animation.play('bop');
-	lava2.scrollFactor.set(0.8, 0.8);
-	lava2.zIndex = 2;
-	add(lava2);
+	lava2 = makeWallBPSprite('wallBP', 270, -330, 2, 1);
+	lava2Hot = makeWallBPSprite('wallBP_hot', 270, -330, 2, 0);
 
 	FlxTween.tween(lava, {y: -500}, 200);
+	FlxTween.tween(lavaHot, {y: -500}, 200);
 	FlxTween.tween(lava2, {y: -500}, 200);
+	FlxTween.tween(lava2Hot, {y: -500}, 200);
 
 	ground = new FlxSprite(1050, 650).loadGraphic(Paths.image(ext + 'platform'));
 	ground.alpha = 1;
 	add(ground);
 
+	groundHot = new FlxSprite(1050, 650).loadGraphic(Paths.image(ext + 'platform_hot'));
+	groundHot.alpha = 0;
+	add(groundHot);
+
 	var clip:Float = (ground.y - lava.y) + ground.height;
 	lava2.clipRect = new FlxRect(0, clip, lava.width, lava.height);
+	lava2Hot.clipRect = new FlxRect(0, clip, lavaHot.width, lavaHot.height);
 
 	groundBroken1 = new FlxSprite(1050, 640).loadGraphic(Paths.image(ext + 'platform-broken-left'));
 	add(groundBroken1);
+	groundBroken1.visible = false;
+
+	groundBroken1Hot = new FlxSprite(1050, 640).loadGraphic(Paths.image(ext + 'platform-broken-left_hot'));
+	add(groundBroken1Hot);
+	groundBroken1Hot.visible = false;
 
 	groundBroken2 = new FlxSprite(1050, 650).loadGraphic(Paths.image(ext + 'platform-broken-right'));
 	add(groundBroken2);
-	groundBroken1.visible = groundBroken2.visible = false;
+	groundBroken2.visible = false;
+
+	groundBroken2Hot = new FlxSprite(1050, 650).loadGraphic(Paths.image(ext + 'platform-broken-right_hot'));
+	add(groundBroken2Hot);
+	groundBroken2Hot.visible = false;
 
 	bubbles = new FlxSprite(800, 850);
 	bubbles.frames = Paths.getSparrowAtlas(ext + 'bubbles');
 	bubbles.animation.addByPrefix('bop', 'Lava Bubbles', 24, true);
 	bubbles.animation.play('bop');
 	add(bubbles);
+
+	bubblesHot = new FlxSprite(800, 850);
+	bubblesHot.frames = Paths.getSparrowAtlas(ext + 'bubbles_hot');
+	bubblesHot.animation.addByPrefix('bop', 'Lava Bubbles', 24, true);
+	bubblesHot.animation.play('bop');
+	bubblesHot.alpha = 0;
+	add(bubblesHot);
 
 	emberEmitter = new FlxEmitter(-1200, 1000);
 	for (i in 0...150)
@@ -550,6 +625,8 @@ function onLoad()
 	add(redscreen);
 
 	emberEmitter.start(false, FlxG.random.float(0.3, 0.4), 100000);
+	applyBoilingLightBlend(0);
+	syncBoilingWallAnimations();
 }
 
 function onCreatePost()
@@ -586,7 +663,6 @@ function onCreatePost()
 	snowEmitter.zIndex = 2;
 	redscreen.zIndex = 3;
 
-	// Split eyes after any stage-specific Change Character event has run.
 	setupMaroonEyeSplit();
 
 	if (ClientPrefs.shaders)
@@ -604,16 +680,35 @@ function onSongStart()
 {
 	var dur = songLength / 1000;
 
+	// Preserve the original sinking motion: characters and platforms move down
+	// together over the song. The wall/lava layers stay at their original height.
 	FlxTween.tween(boyfriend, {y: boyfriend.y + 133 / 2}, dur);
 	FlxTween.tween(dad, {y: dad.y + 133 / 2}, dur);
 	FlxTween.tween(pet, {y: pet.y + 133 / 2}, dur);
 	FlxTween.tween(ground, {y: ground.y + 133 / 2}, dur);
+	FlxTween.tween(groundHot, {y: groundHot.y + 133 / 2}, dur);
 	FlxTween.tween(groundBroken1, {y: groundBroken1.y + 133 / 2}, dur);
+	FlxTween.tween(groundBroken1Hot, {y: groundBroken1Hot.y + 133 / 2}, dur);
 	FlxTween.tween(groundBroken2, {y: groundBroken2.y + 133 / 2}, dur);
+	FlxTween.tween(groundBroken2Hot, {y: groundBroken2Hot.y + 133 / 2}, dur);
 
-	for (sprite in [lava, lava2, ground, groundBroken1, groundBroken2, bubbles])
-		FlxTween.color(sprite, dur, FlxColor.WHITE, 0xFFFF8A5A);
-	for (char in [boyfriend, dad, pet]) 
+	if (boilingLightTween != null)
+	{
+		try { boilingLightTween.cancel(); } catch (e:Dynamic) {}
+	}
+	if (boilingGroundFadeTween != null)
+	{
+		try { boilingGroundFadeTween.cancel(); } catch (e:Dynamic) {}
+	}
+	boilingGroundFade = 1;
+	applyBoilingLightBlend(0);
+
+	boilingLightTween = FlxTween.num(0, 1, dur, {ease: FlxEase.linear}, function(progress:Float)
+	{
+		applyBoilingLightBlend(progress);
+	});
+
+	for (char in [boyfriend, dad, pet])
 	{
 		FlxTween.color(char, 2.54 * 60, FlxColor.WHITE, 0xFFFF8A98);
 		tweenShadowLayer(char.shader.layers[0], [[
@@ -638,47 +733,63 @@ function onBeatHit()
 	if (curBeat == 220)
 	{
 		groundBroken1.visible = true;
-		FlxTween.tween(groundBroken1, {"alpha": 1}, 0.1, {ease: FlxEase.expoOut});
+		groundBroken1Hot.visible = true;
+		applyBoilingLightBlend(boilingLightProgress);
 	}
 	if (curBeat == 256)
 	{
 		groundBroken2.visible = true;
-		FlxTween.tween(groundBroken2, {"alpha": 1}, 0.1, {ease: FlxEase.expoOut});
+		groundBroken2Hot.visible = true;
+		applyBoilingLightBlend(boilingLightProgress);
 	}
 	if (curBeat == 288)
 	{
-		FlxTween.cancelTweensOf(ground);
-		FlxTween.cancelTweensOf(groundBroken1);
-		FlxTween.cancelTweensOf(groundBroken2);
-		FlxTween.cancelTweensOf(dad);
-		FlxTween.cancelTweensOf(boyfriend);
-		FlxTween.cancelTweensOf(pet);
-		FlxTween.tween(ground, {"alpha": 0}, 0.1, {ease: FlxEase.expoOut});
-		FlxTween.tween(groundBroken1, {"x": groundBroken1.x - 60}, 1, {ease: FlxEase.expoOut});
-		FlxTween.tween(groundBroken2, {"x": groundBroken2.x + 70}, 1, {ease: FlxEase.expoOut});
-		FlxTween.tween(groundBroken1, {"y": groundBroken1.y - 100}, 2, {ease: FlxEase.quadOut});
-		FlxTween.tween(groundBroken2, {"y": groundBroken2.y - 100}, 2, {ease: FlxEase.quadOut});
-		FlxTween.tween(boyfriend, {"x": boyfriend.x + 70}, 2, {ease: FlxEase.quadOut});
-		FlxTween.tween(dad, {"x": dad.x - 60}, 2, {ease: FlxEase.quadOut});
-		FlxTween.tween(boyfriend, {"y": boyfriend.y - 100}, 2, {ease: FlxEase.quadOut});
-		FlxTween.tween(dad, {"y": dad.y - 100}, 2, {ease: FlxEase.quadOut});
-		FlxTween.tween(pet, {"y": pet.y + 900}, 1, {ease: FlxEase.quadOut, startDelay: 0.3});
-		new FlxTimer().start(0.3, ()-> { lavaSplash.alpha = 1; lavaSplash.animation.play('splash'); });
+		for (sprite in [ground, groundHot, groundBroken1, groundBroken1Hot, groundBroken2, groundBroken2Hot, dad, boyfriend, pet])
+			FlxTween.cancelTweensOf(sprite);
+
+		if (boilingGroundFadeTween != null)
+		{
+			try { boilingGroundFadeTween.cancel(); } catch (e:Dynamic) {}
+		}
+		boilingGroundFadeTween = FlxTween.num(boilingGroundFade, 0, 0.1, {ease: FlxEase.expoOut}, function(value:Float)
+		{
+			boilingGroundFade = value;
+			applyBoilingLightBlend(boilingLightProgress);
+		});
+
+		FlxTween.tween(groundBroken1, {x: groundBroken1.x - 60}, 1, {ease: FlxEase.expoOut});
+		FlxTween.tween(groundBroken1Hot, {x: groundBroken1Hot.x - 60}, 1, {ease: FlxEase.expoOut});
+		FlxTween.tween(groundBroken2, {x: groundBroken2.x + 70}, 1, {ease: FlxEase.expoOut});
+		FlxTween.tween(groundBroken2Hot, {x: groundBroken2Hot.x + 70}, 1, {ease: FlxEase.expoOut});
+		FlxTween.tween(groundBroken1, {y: groundBroken1.y - 100}, 2, {ease: FlxEase.quadOut});
+		FlxTween.tween(groundBroken1Hot, {y: groundBroken1Hot.y - 100}, 2, {ease: FlxEase.quadOut});
+		FlxTween.tween(groundBroken2, {y: groundBroken2.y - 100}, 2, {ease: FlxEase.quadOut});
+		FlxTween.tween(groundBroken2Hot, {y: groundBroken2Hot.y - 100}, 2, {ease: FlxEase.quadOut});
+		FlxTween.tween(boyfriend, {x: boyfriend.x + 70}, 2, {ease: FlxEase.quadOut});
+		FlxTween.tween(dad, {x: dad.x - 60}, 2, {ease: FlxEase.quadOut});
+		FlxTween.tween(boyfriend, {y: boyfriend.y - 100}, 2, {ease: FlxEase.quadOut});
+		FlxTween.tween(dad, {y: dad.y - 100}, 2, {ease: FlxEase.quadOut});
+		FlxTween.tween(pet, {y: pet.y + 900}, 1, {ease: FlxEase.quadOut, startDelay: 0.3});
+		new FlxTimer().start(0.3, () -> { lavaSplash.alpha = 1; lavaSplash.animation.play('splash'); });
 		new FlxTimer().start(2, () ->
 		{
 			var curTime:Float = Math.max(0, Conductor.songPosition - ClientPrefs.noteOffset);
 
-			FlxTween.tween(groundBroken1, {"y": groundBroken1.y + 90}, 80);
-			FlxTween.tween(dad, {"y": dad.y + 90}, 80);
-			FlxTween.tween(groundBroken2, {"y": groundBroken2.y + 90}, 80);
-			FlxTween.tween(boyfriend, {"y": boyfriend.y + 90}, 80);
-	
-			FlxTween.tween(dadGroup, {"angle": -10}, (songLength - curTime) / 1000);
-			FlxTween.tween(groundBroken1, {"angle": -10}, (songLength - curTime) / 1000);
-	
+			FlxTween.tween(groundBroken1, {y: groundBroken1.y + 90}, 80);
+			FlxTween.tween(groundBroken1Hot, {y: groundBroken1Hot.y + 90}, 80);
+			FlxTween.tween(dad, {y: dad.y + 90}, 80);
+			FlxTween.tween(groundBroken2, {y: groundBroken2.y + 90}, 80);
+			FlxTween.tween(groundBroken2Hot, {y: groundBroken2Hot.y + 90}, 80);
+			FlxTween.tween(boyfriend, {y: boyfriend.y + 90}, 80);
+
+			FlxTween.tween(dadGroup, {angle: -10}, (songLength - curTime) / 1000);
+			FlxTween.tween(groundBroken1, {angle: -10}, (songLength - curTime) / 1000);
+			FlxTween.tween(groundBroken1Hot, {angle: -10}, (songLength - curTime) / 1000);
+
 			boyfriendGroup.origin.set(0,0);
-			FlxTween.tween(boyfriendGroup, {"angle": 10}, (songLength - curTime) / 1000);
-			FlxTween.tween(groundBroken2, {"angle": 10}, (songLength - curTime) / 1000);
+			FlxTween.tween(boyfriendGroup, {angle: 10}, (songLength - curTime) / 1000);
+			FlxTween.tween(groundBroken2, {angle: 10}, (songLength - curTime) / 1000);
+			FlxTween.tween(groundBroken2Hot, {angle: 10}, (songLength - curTime) / 1000);
 		});
 	}
 }
@@ -687,6 +798,7 @@ function onUpdatePost(elapsed:Float)
 {
 	if (maroonEyeTarget != dad && maroonEyeAttemptTarget != dad) setupMaroonEyeSplit();
 	maroonSyncEyeSprite();
+	syncBoilingWallAnimations();
 
 	if (ClientPrefs.shaders)
 	{
@@ -811,6 +923,17 @@ function onResume()
 
 function onSongRetry()
 {
+	if (boilingLightTween != null)
+	{
+		try { boilingLightTween.cancel(); } catch (e:Dynamic) {}
+	}
+	if (boilingGroundFadeTween != null)
+	{
+		try { boilingGroundFadeTween.cancel(); } catch (e:Dynamic) {}
+	}
+	boilingGroundFade = 1;
+	applyBoilingLightBlend(0);
+
 	bfRimTarget = null;
 	dadRimTarget = null;
 	petRimTarget = null;
@@ -829,6 +952,14 @@ function onSongRetry()
 
 function onGameOver()
 {
+	if (boilingLightTween != null)
+	{
+		try { boilingLightTween.cancel(); } catch (e:Dynamic) {}
+	}
+	if (boilingGroundFadeTween != null)
+	{
+		try { boilingGroundFadeTween.cancel(); } catch (e:Dynamic) {}
+	}
 	if (boyfriend != null) boyfriend.shader = null;
 	if (dad != null) dad.shader = null;
 	if (pet != null) pet.shader = null;
@@ -839,5 +970,13 @@ function onGameOver()
 
 function onDestroy()
 {
+	if (boilingLightTween != null)
+	{
+		try { boilingLightTween.cancel(); } catch (e:Dynamic) {}
+	}
+	if (boilingGroundFadeTween != null)
+	{
+		try { boilingGroundFadeTween.cancel(); } catch (e:Dynamic) {}
+	}
 	maroonDestroyEyeSplit(true);
 }

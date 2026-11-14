@@ -335,7 +335,7 @@ function onLoad()
 
 	bg.scrollFactor.x = 0.7;
 	bg.scale.set(0.75, 0.75);
-	bg.color = 0xFF5C6E91;
+	bg.color = 0xFFFFFFFF;
 	add(bg);
 
 	var cloud:FlxSprite = new FlxSprite(-100)
@@ -343,7 +343,7 @@ function onLoad()
 
 	cloud.scrollFactor.x = 0.9;
 	cloud.alpha = 0.9;
-	cloud.color = 0xFF7488A8;
+	cloud.color = 0xFFFFFFFF;
 	add(cloud);
 
 	var rocks:FlxSprite = new FlxSprite()
@@ -357,13 +357,13 @@ function onLoad()
 		.loadGraphic(Paths.image(ext + "backwall"));
 
 	backwall.scrollFactor.x = 0.9;
-	backwall.color = 0xFF566885;
+	backwall.color = 0xFFFFFFFF;
 	add(backwall);
 
 	var ground:FlxSprite = new FlxSprite()
 		.loadGraphic(Paths.image(ext + "newstage"));
 
-	ground.color = 0xFF5A6C8A;
+	ground.color = 0xFFFFFFFF;
 	add(ground);
 
 	snowEmitter = new SnowEmitter(
