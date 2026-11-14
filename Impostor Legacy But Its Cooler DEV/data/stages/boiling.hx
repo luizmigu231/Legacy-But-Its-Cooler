@@ -41,50 +41,186 @@ var bfRimTarget:FlxSprite;
 var dadRimTarget:FlxSprite;
 var petRimTarget:FlxSprite;
 
-var maroonEyeSprite:FunkinSprite = null;
-var maroonEyeFrames:FlxAnimateFrames = null;
-var maroonEyeTarget:Dynamic = null;
-var maroonEyeAttemptTarget:Dynamic = null;
-var maroonEyeGroup:Dynamic = null;
-var maroonEyeAddedToState:Bool = false;
+var maroonEyeOverlay:FunkinSprite = null;
+var maroonEyeOverlaySource:FunkinSprite = null;
+var maroonEyeOverlayCharacter:String = '';
+var maroonEyeOverlayImage:String = '';
+var maroonEyeAttemptSource:FunkinSprite = null;
 var maroonEyeAnim:String = '';
-var maroonHiddenObjects:Array<Dynamic> = [];
-var maroonHiddenValues:Array<Bool> = [];
-var maroonHiddenFrames:Array<Dynamic> = [];
+var maroonEyeHiddenOwner:FunkinSprite = null;
+var maroonEyeVisibilityBackup:Array<Dynamic> = [];
+var maroonEyeDirtyFrames:Array<Dynamic> = [];
 var maroonPoseSymbols:Array<String> = ['idle', 'left', 'up', 'right', 'down'];
 var maroonEyeElementNames:Array<String> = ['guh', 'glow shit'];
 
-function maroonNameOf(element:Dynamic):String
+function maroonIsEyePart(symbolName:String):Bool
 {
+	if (symbolName == null || symbolName.length == 0) return false;
+	var lowerName:String = StringTools.trim(symbolName).toLowerCase();
+	return maroonEyeElementNames.indexOf(lowerName) >= 0;
+}
+
+function maroonElementIsEyePart(element:Dynamic):Bool
+{
+	if (element == null) return false;
+	var names:Array<Dynamic> = [];
+	try { names.push(element.symbolName); } catch (e:Dynamic) {}
 	try
 	{
-		if (element != null && element.libraryItem != null && element.libraryItem.name != null)
-			return '' + element.libraryItem.name;
+		if (element.libraryItem != null) names.push(element.libraryItem.name);
 	}
 	catch (e:Dynamic) {}
+	try
+	{
+		if (element.frame != null) names.push(element.frame.name);
+	}
+	catch (e:Dynamic) {}
+	try { names.push(element.bitmap); } catch (e:Dynamic) {}
+	for (value in names)
+	{
+		if (value != null && maroonIsEyePart(Std.string(value))) return true;
+	}
+	return false;
+}
+
+function maroonGetElementSymbolName(element:Dynamic):String
+{
+	if (element == null) return '';
+
+	var value:Dynamic = null;
+	try { value = element.symbolName; } catch (e:Dynamic) {}
+	if (value == null) try { value = Reflect.field(element, 'symbolName'); } catch (e:Dynamic) {}
+	if (value != null && Std.string(value) != '') return Std.string(value);
+
+	var libraryItem:Dynamic = null;
+	try { libraryItem = element.libraryItem; } catch (e:Dynamic) {}
+	if (libraryItem == null) try { libraryItem = Reflect.field(element, 'libraryItem'); } catch (e:Dynamic) {}
+	if (libraryItem != null)
+	{
+		var itemName:Dynamic = null;
+		try { itemName = libraryItem.name; } catch (e:Dynamic) {}
+		if (itemName == null) try { itemName = Reflect.field(libraryItem, 'name'); } catch (e:Dynamic) {}
+		if (itemName != null && Std.string(itemName) != '') return Std.string(itemName);
+	}
+
+	var atlasFrame:Dynamic = null;
+	try { atlasFrame = element.frame; } catch (e:Dynamic) {}
+	if (atlasFrame == null) try { atlasFrame = Reflect.field(element, 'frame'); } catch (e:Dynamic) {}
+	if (atlasFrame != null)
+	{
+		var frameName:Dynamic = null;
+		try { frameName = atlasFrame.name; } catch (e:Dynamic) {}
+		if (frameName == null) try { frameName = Reflect.field(atlasFrame, 'name'); } catch (e:Dynamic) {}
+		if (frameName != null && Std.string(frameName) != '') return Std.string(frameName);
+	}
+
+	var bitmapName:Dynamic = null;
+	try { bitmapName = element.bitmap; } catch (e:Dynamic) {}
+	if (bitmapName == null) try { bitmapName = Reflect.field(element, 'bitmap'); } catch (e:Dynamic) {}
+	if (bitmapName != null && Std.string(bitmapName) != '') return Std.string(bitmapName);
+
 	return '';
 }
 
-function maroonIsEyeElement(element:Dynamic):Bool
+function maroonAddEyeRoot(roots:Array<String>, value:Dynamic):Void
 {
-	return maroonEyeElementNames.indexOf(maroonNameOf(element)) != -1;
+	if (roots == null || value == null) return;
+	var name:String = Std.string(value);
+	if (name == '' || name == 'null' || roots.indexOf(name) >= 0) return;
+	roots.push(name);
 }
 
-function maroonRemember(obj:Dynamic, frame:Dynamic = null):Void
+function maroonCollectEyeRoots(source:FunkinSprite):Array<String>
 {
-	if (obj == null || maroonHiddenObjects.indexOf(obj) != -1) return;
+	var roots:Array<String> = [];
+	if (source == null) return roots;
+
 	try
 	{
-		maroonHiddenObjects.push(obj);
-		maroonHiddenValues.push(obj.visible);
-		maroonHiddenFrames.push(frame);
+		if (source.library != null && source.library.timeline != null)
+			maroonAddEyeRoot(roots, source.library.timeline.name);
 	}
 	catch (e:Dynamic) {}
+
+	try
+	{
+		if (source.animations != null)
+		{
+			for (data in source.animations)
+			{
+				if (data == null) continue;
+				maroonAddEyeRoot(roots, data.name);
+				maroonAddEyeRoot(roots, data.anim);
+			}
+		}
+	}
+	catch (e:Dynamic) {}
+
+	for (poseName in maroonPoseSymbols)
+		maroonAddEyeRoot(roots, poseName);
+
+	return roots;
 }
 
-function maroonDirtyFrame(frame:Dynamic):Void
+// The eye atlas is a separate Animate copy. Keep only the two eye symbols
+// in that copy, recursively following nested symbols just like Defeat's
+// Black eye overlay does for its isolated character atlas.
+function maroonFilterEyeSymbol(overlay:FunkinSprite, symbolName:String, trail:Array<String>):Bool
+{
+	if (maroonIsEyePart(symbolName)) return true;
+	if (overlay == null || overlay.library == null || symbolName == null || symbolName == '') return false;
+	if (trail.indexOf(symbolName) >= 0) return false;
+
+	var symbol:Dynamic = null;
+	try { symbol = overlay.library.getSymbol(symbolName); } catch (e:Dynamic) {}
+	if (symbol == null || symbol.timeline == null) return false;
+
+	trail.push(symbolName);
+	var hasEyePart:Bool = false;
+	for (layer in symbol.timeline.layers)
+	{
+		if (layer == null) continue;
+		layer.forEachFrame(function(frame)
+		{
+			if (frame == null || frame.elements == null) return;
+
+			var frameChanged:Bool = false;
+			for (element in frame.elements)
+			{
+				var childName:String = maroonGetElementSymbolName(element);
+				var keep:Bool = maroonElementIsEyePart(element) || maroonIsEyePart(childName);
+				var nestedEye:Bool = false;
+				if (!keep && childName != '')
+				{
+					nestedEye = maroonFilterEyeSymbol(overlay, childName, trail);
+					keep = nestedEye;
+				}
+
+				if (element.visible != keep || nestedEye) frameChanged = true;
+				element.visible = keep;
+				if (keep) hasEyePart = true;
+			}
+			if (frameChanged) maroonMarkEyeFrameDirty(frame);
+		});
+	}
+	trail.pop();
+	return hasEyePart;
+}
+
+function maroonSaveEyeVisibility(element:Dynamic, frame:Dynamic):Void
+{
+	if (element == null) return;
+	for (entry in maroonEyeVisibilityBackup)
+	{
+		if (entry != null && entry.element == element) return;
+	}
+	maroonEyeVisibilityBackup.push({element:element, visible:element.visible, frame:frame});
+}
+
+function maroonMarkEyeFrameDirty(frame:Dynamic):Void
 {
 	if (frame == null) return;
+	if (maroonEyeDirtyFrames.indexOf(frame) < 0) maroonEyeDirtyFrames.push(frame);
 	try { frame.setDirty(); } catch (e:Dynamic) {}
 }
 
@@ -94,327 +230,366 @@ function maroonInvalidateRender(sprite:Dynamic):Void
 	try { Reflect.setField(sprite, '_renderTextureDirty', true); } catch (e:Dynamic) {}
 }
 
-function maroonFilterTimeline(timeline:Dynamic, eyeOnly:Bool):Bool
+// Hide the original eye instances in the live character. Every changed
+// parent frame is marked dirty as nested Animate symbols may be baked into it.
+function maroonHideEyePartsInSymbol(source:FunkinSprite, symbolName:String, trail:Array<String>):Int
 {
-	if (timeline == null || timeline.layers == null) return false;
-	var anyChanged:Bool = false;
+	if (source == null || source.library == null || symbolName == null || symbolName == '') return 0;
+	if (trail.indexOf(symbolName) >= 0) return 0;
 
-	for (layer in timeline.layers)
+	var symbol:Dynamic = null;
+	try { symbol = source.library.getSymbol(symbolName); } catch (e:Dynamic) {}
+	if (symbol == null || symbol.timeline == null) return 0;
+
+	trail.push(symbolName);
+	var hiddenCount:Int = 0;
+	for (layer in symbol.timeline.layers)
 	{
-		if (layer == null || layer.frames == null) continue;
-
-		var hasEyes:Bool = false;
-		var hasOther:Bool = false;
-		for (frame in layer.frames)
+		if (layer == null) continue;
+		layer.forEachFrame(function(frame)
 		{
-			if (frame == null || frame.elements == null) continue;
-			for (element in frame.elements)
-			{
-				if (maroonIsEyeElement(element)) hasEyes = true;
-				else hasOther = true;
-			}
-		}
+			if (frame == null || frame.elements == null) return;
 
-		if (eyeOnly)
-		{
-			var wantedLayerVisible:Bool = hasEyes;
-			if (layer.visible != wantedLayerVisible)
-			{
-				layer.visible = wantedLayerVisible;
-				anyChanged = true;
-			}
-
-			for (frame in layer.frames)
-			{
-				if (frame == null || frame.elements == null) continue;
-				var frameChanged:Bool = false;
-				for (element in frame.elements)
-				{
-					var wantedVisible:Bool = maroonIsEyeElement(element);
-					if (element.visible != wantedVisible)
-					{
-						element.visible = wantedVisible;
-						frameChanged = true;
-						anyChanged = true;
-					}
-				}
-				if (frameChanged) maroonDirtyFrame(frame);
-			}
-			continue;
-		}
-
-		if (!hasEyes) continue;
-		if (!hasOther)
-		{
-			if (layer.visible)
-			{
-				maroonRemember(layer, null);
-				layer.visible = false;
-				anyChanged = true;
-			}
-			continue;
-		}
-
-		for (frame in layer.frames)
-		{
-			if (frame == null || frame.elements == null) continue;
 			var frameChanged:Bool = false;
 			for (element in frame.elements)
 			{
-				if (!maroonIsEyeElement(element) || !element.visible) continue;
-				maroonRemember(element, frame);
-				element.visible = false;
-				frameChanged = true;
-				anyChanged = true;
+				var childName:String = maroonGetElementSymbolName(element);
+				if (maroonElementIsEyePart(element) || maroonIsEyePart(childName))
+				{
+					if (element.visible)
+					{
+						maroonSaveEyeVisibility(element, frame);
+						element.visible = false;
+						frameChanged = true;
+						hiddenCount++;
+					}
+				}
+				else if (childName != '')
+				{
+					var nestedHidden:Int = maroonHideEyePartsInSymbol(source, childName, trail);
+					if (nestedHidden > 0)
+					{
+						hiddenCount += nestedHidden;
+						frameChanged = true;
+					}
+				}
 			}
-			if (frameChanged) maroonDirtyFrame(frame);
-		}
+			if (frameChanged) maroonMarkEyeFrameDirty(frame);
+		});
 	}
-	return anyChanged;
+	trail.pop();
+	return hiddenCount;
 }
 
-function maroonFilterPose(library:Dynamic, symbolName:String, eyeOnly:Bool):Void
+function maroonHideOriginalEyes(source:FunkinSprite):Bool
 {
-	if (library == null) return;
-	var item:Dynamic = null;
-	try { item = library.getSymbol(symbolName); } catch (e:Dynamic) {}
-	if (item == null || item.timeline == null) return;
-	maroonFilterTimeline(item.timeline, eyeOnly);
+	if (source == null || source.library == null) return false;
+	if (maroonEyeHiddenOwner == source) return maroonEyeVisibilityBackup.length > 0;
+	if (maroonEyeHiddenOwner != null) maroonRestoreOriginalEyes();
+
+	var hiddenCount:Int = 0;
+	for (rootName in maroonCollectEyeRoots(source))
+		hiddenCount += maroonHideEyePartsInSymbol(source, rootName, []);
+
+	if (hiddenCount > 0 || maroonEyeVisibilityBackup.length > 0)
+	{
+		maroonEyeHiddenOwner = source;
+		maroonInvalidateRender(source);
+		return true;
+	}
+
+	maroonEyeHiddenOwner = null;
+	return false;
 }
 
 function maroonRestoreOriginalEyes():Void
 {
-	for (i in 0...maroonHiddenObjects.length)
+	var previousOwner:FunkinSprite = maroonEyeHiddenOwner;
+	for (entry in maroonEyeVisibilityBackup)
 	{
-		try { maroonHiddenObjects[i].visible = maroonHiddenValues[i]; } catch (e:Dynamic) {}
-		if (i < maroonHiddenFrames.length && maroonHiddenFrames[i] != null)
-			maroonDirtyFrame(maroonHiddenFrames[i]);
+		if (entry == null || entry.element == null) continue;
+		try { entry.element.visible = entry.visible; } catch (e:Dynamic) {}
+		if (entry.frame != null) maroonMarkEyeFrameDirty(entry.frame);
 	}
-	maroonHiddenObjects = [];
-	maroonHiddenValues = [];
-	maroonHiddenFrames = [];
-	if (maroonEyeTarget != null) maroonInvalidateRender(maroonEyeTarget);
+	for (frame in maroonEyeDirtyFrames)
+		try { frame.setDirty(); } catch (e:Dynamic) {}
+
+	maroonEyeVisibilityBackup = [];
+	maroonEyeDirtyFrames = [];
+	maroonEyeHiddenOwner = null;
+	if (previousOwner != null) maroonInvalidateRender(previousOwner);
 }
 
-function maroonAddEyeAnim(animName:String, symbolName:String, fps:Int, looped:Bool):Void
+function maroonCopyEyeAnimations(source:FunkinSprite, overlay:FunkinSprite):Bool
 {
-	if (maroonEyeSprite == null) return;
-	try { maroonEyeSprite.addAnimByPrefix(animName, symbolName, fps, looped); } catch (e:Dynamic) {}
-}
+	if (source == null || overlay == null || source.animations == null) return false;
+	var copied:Int = 0;
 
-function maroonCopyAnimDefinitions():Void
-{
-	if (dad == null || maroonEyeSprite == null || dad.animations == null) return;
-
-	for (data in dad.animations)
+	for (data in source.animations)
 	{
 		if (data == null) continue;
 		var animName:String = data.anim == null ? '' : '' + data.anim;
 		var symbolName:String = data.name == null ? '' : '' + data.name;
-		if (animName.length == 0 || symbolName.length == 0) continue;
+		if (animName.length == 0 || symbolName.length == 0 || overlay.hasAnim(animName)) continue;
+
 		var fps:Int = data.fps == null ? 24 : data.fps;
 		var looped:Bool = data.loop == true;
 		var flipX:Bool = data.flipX == true;
 		var flipY:Bool = data.flipY == true;
+		var indices:Array<Int> = data.indices == null ? [] : data.indices;
 		try
 		{
-			if (!maroonEyeSprite.hasAnim(animName))
-			{
-				maroonEyeSprite.addAnimByPrefix(animName, symbolName, fps, looped, flipX, flipY);
-				if (data.offsets != null && data.offsets.length > 1)
-					maroonEyeSprite.addOffset(animName, data.offsets[0], data.offsets[1]);
-				else maroonEyeSprite.addOffset(animName, 0, 0);
-			}
+			if (indices.length > 0)
+				overlay.addAnimByIndices(animName, symbolName, indices, fps, looped, flipX, flipY);
+			else
+				overlay.addAnimByPrefix(animName, symbolName, fps, looped, flipX, flipY);
+			if (data.offsets != null && data.offsets.length > 1)
+				overlay.addOffset(animName, data.offsets[0], data.offsets[1]);
+			else
+				overlay.addOffset(animName, 0, 0);
+			copied++;
 		}
 		catch (e:Dynamic) {}
 	}
-
-	maroonAddEyeAnim('idle', 'idle', 24, true);
-	maroonAddEyeAnim('singLEFT', 'left', 24, false);
-	maroonAddEyeAnim('singDOWN', 'down', 24, false);
-	maroonAddEyeAnim('singUP', 'up', 24, false);
-	maroonAddEyeAnim('singRIGHT', 'right', 24, false);
-	maroonAddEyeAnim('singLEFT-loop', 'left', 24, true);
-	maroonAddEyeAnim('singDOWN-loop', 'down', 24, true);
-	maroonAddEyeAnim('singUP-loop', 'up', 24, true);
-	maroonAddEyeAnim('singRIGHT-loop', 'right', 24, true);
+	return copied > 0 && overlay.hasAnim('idle');
 }
 
-function maroonSyncEyeSprite():Void
+function maroonIsEyeTarget(source:FunkinSprite):Bool
 {
-	if (maroonEyeSprite == null || maroonEyeTarget == null || dad == null || dad != maroonEyeTarget) return;
+	if (source == null) return false;
+	var characterName:String = '';
+	var imagePath:String = '';
+	try { characterName = Std.string(source.curCharacter).toLowerCase(); } catch (e:Dynamic) {}
+	try { imagePath = Std.string(source.imageFile).toLowerCase(); } catch (e:Dynamic) {}
+	return characterName.indexOf('maroon') >= 0
+		|| imagePath.indexOf('/maroon/') >= 0
+		|| imagePath.indexOf('maroonparasite') >= 0;
+}
 
-	var wanted:String = '';
-	try { wanted = dad.getAnimName(); } catch (e:Dynamic) {}
-	if (wanted == null || wanted.length == 0) wanted = 'idle';
+function maroonCreateEyeOverlay(source:FunkinSprite):Bool
+{
+	if (source == null || source.library == null) return false;
 
-	var currentName:String = '';
+	var atlasPath:String = '';
+	try { atlasPath = Paths.getPath('images/' + source.imageFile, null, PathsTestMode.LOOSE); } catch (e:Dynamic) {}
+	if (atlasPath == null || atlasPath.length == 0) return false;
+
+	var eyeFrames:FlxAnimateFrames = null;
 	try
 	{
-		if (maroonEyeSprite.animation != null && maroonEyeSprite.animation.curAnim != null)
-			currentName = maroonEyeSprite.animation.curAnim.name;
+		var uniqueImage:String = StringTools.replace(Std.string(source.imageFile), '/', '_');
+		var uniqueName:String = 'maroon_eye_unique_' + source.curCharacter + '_' + uniqueImage;
+		eyeFrames = FlxAnimateFrames.fromAnimate(atlasPath, null, null, uniqueName, true, {cacheOnLoad:false});
 	}
-	catch (e:Dynamic) {}
+	catch (e:Dynamic) { eyeFrames = null; }
+	if (eyeFrames == null) return false;
 
-	if (maroonEyeSprite.hasAnim(wanted) == false)
+	var overlay:FunkinSprite = new FunkinSprite(0, 0);
+	overlay.frames = eyeFrames;
+	if (!maroonCopyEyeAnimations(source, overlay))
 	{
-		if (wanted.indexOf('LEFT') != -1) wanted = 'singLEFT';
-		else if (wanted.indexOf('DOWN') != -1) wanted = 'singDOWN';
-		else if (wanted.indexOf('UP') != -1) wanted = 'singUP';
-		else if (wanted.indexOf('RIGHT') != -1) wanted = 'singRIGHT';
-		else wanted = 'idle';
+		overlay.destroy();
+		return false;
 	}
 
-	if (currentName != wanted)
+	overlay.scalableOffsets = source.scalableOffsets;
+	overlay.rotatableOffsets = source.rotatableOffsets;
+	overlay.skewableOffsets = source.skewableOffsets;
+	overlay.baseFlipX = source.baseFlipX;
+	overlay.baseFlipY = source.baseFlipY;
+	overlay.antialiasing = source.antialiasing;
+	overlay.shader = null;
+	overlay.useRenderTexture = false;
+	overlay.cameras = [camGame];
+	overlay.scrollFactor.set(source.scrollFactor.x, source.scrollFactor.y);
+	overlay.zIndex = source.zIndex + 0.01;
+	overlay.active = false;
+	overlay.visible = false;
+	try { overlay.applyStageMatrix = source.applyStageMatrix; } catch (e:Dynamic) {}
+	try { overlay.postStageMatrixApply = source.postStageMatrixApply; } catch (e:Dynamic) {}
+
+	var matched:Int = 0;
+	for (rootName in maroonCollectEyeRoots(source))
 	{
-		try { maroonEyeSprite.playAnim(wanted, true); } catch (e:Dynamic) {}
-		maroonEyeAnim = wanted;
+		if (maroonFilterEyeSymbol(overlay, rootName, [])) matched++;
 	}
-
-	try
+	if (matched == 0)
 	{
-		if (dad.animation != null && dad.animation.curAnim != null && maroonEyeSprite.animation != null && maroonEyeSprite.animation.curAnim != null && maroonEyeSprite.animation.frameIndex != dad.animation.frameIndex)
-			maroonEyeSprite.animation.frameIndex = dad.animation.frameIndex;
+		overlay.destroy();
+		return false;
 	}
-	catch (e:Dynamic) {}
 
-	maroonEyeSprite.x = dad.x;
-	maroonEyeSprite.y = dad.y;
-	maroonEyeSprite.scale.set(dad.scale.x, dad.scale.y);
-	maroonEyeSprite.angle = dad.angle;
-	maroonEyeSprite.flipX = dad.flipX;
-	maroonEyeSprite.flipY = dad.flipY;
-	maroonEyeSprite.origin.copyFrom(dad.origin);
-	maroonEyeSprite.offset.copyFrom(dad.offset);
-	maroonEyeSprite.scrollFactor.set(dad.scrollFactor.x, dad.scrollFactor.y);
-	maroonEyeSprite.alpha = dad.alpha;
-	maroonEyeSprite.color = dad.color;
-	maroonEyeSprite.antialiasing = dad.antialiasing;
-	maroonEyeSprite.cameras = dad.cameras;
-	maroonEyeSprite.visible = dad.visible && dad.exists && dad.active;
-	maroonEyeSprite.shader = null;
-	maroonEyeSprite.useRenderTexture = false;
-	try { maroonEyeSprite.skew.copyFrom(dad.skew); } catch (e:Dynamic) {}
-	try { maroonEyeSprite.spriteOffset.copyFrom(dad.spriteOffset); } catch (e:Dynamic) {}
-	try { maroonEyeSprite.animOffset.copyFrom(dad.animOffset); } catch (e:Dynamic) {}
-	try { maroonEyeSprite.baseScale.copyFrom(dad.baseScale); } catch (e:Dynamic) {}
-	try { maroonEyeSprite.baseFlipX = dad.baseFlipX; } catch (e:Dynamic) {}
-	try { maroonEyeSprite.baseFlipY = dad.baseFlipY; } catch (e:Dynamic) {}
-	try { maroonEyeSprite.scalableOffsets = dad.scalableOffsets; } catch (e:Dynamic) {}
-	try { maroonEyeSprite.rotatableOffsets = dad.rotatableOffsets; } catch (e:Dynamic) {}
-	try { maroonEyeSprite.skewableOffsets = dad.skewableOffsets; } catch (e:Dynamic) {}
-	try { maroonEyeSprite.applyStageMatrix = dad.applyStageMatrix; } catch (e:Dynamic) {}
-	try { maroonEyeSprite.postStageMatrixApply = dad.postStageMatrixApply; } catch (e:Dynamic) {}
+	if (!maroonHideOriginalEyes(source))
+	{
+		overlay.destroy();
+		return false;
+	}
+
+	try { dadGroup.add(overlay); }
+	catch (e:Dynamic)
+	{
+		maroonRestoreOriginalEyes();
+		overlay.destroy();
+		return false;
+	}
+
+	maroonEyeOverlay = overlay;
+	maroonEyeOverlaySource = source;
+	maroonEyeOverlayCharacter = Std.string(source.curCharacter);
+	maroonEyeOverlayImage = Std.string(source.imageFile);
+	maroonEyeAnim = '';
+	return true;
 }
 
 function maroonDestroyEyeSplit(restore:Bool = true):Void
 {
 	if (restore) maroonRestoreOriginalEyes();
-
-	if (maroonEyeSprite != null)
+	if (maroonEyeOverlay != null)
 	{
-		try
-		{
-			if (maroonEyeGroup != null) maroonEyeGroup.remove(maroonEyeSprite, true);
-			else if (maroonEyeAddedToState && FlxG.state != null) FlxG.state.remove(maroonEyeSprite, true);
-		}
-		catch (e:Dynamic) {}
-		try { maroonEyeSprite.destroy(); } catch (e:Dynamic) {}
+		var overlay:FunkinSprite = maroonEyeOverlay;
+		maroonEyeOverlay = null;
+		try { dadGroup.remove(overlay, true); }
+		catch (e:Dynamic) { try { overlay.destroy(); } catch (e2:Dynamic) {} }
 	}
-	maroonEyeSprite = null;
-	maroonEyeFrames = null;
-	maroonEyeTarget = null;
-	maroonEyeGroup = null;
-	maroonEyeAddedToState = false;
+	maroonEyeOverlaySource = null;
+	maroonEyeOverlayCharacter = '';
+	maroonEyeOverlayImage = '';
+	maroonEyeAttemptSource = null;
 	maroonEyeAnim = '';
 }
 
-function setupMaroonEyeSplit():Void
+function maroonSyncEyeAnimationClock(source:FunkinSprite, target:FunkinSprite):Void
 {
-	if (dad == null || dad.library == null) return;
-	if (maroonEyeTarget == dad && maroonEyeSprite != null) return;
-	if (maroonEyeAttemptTarget == dad) return;
+	if (source == null || target == null || source.isAnimNull() || target.isAnimNull()) return;
+	target.animCurFrame = source.animCurFrame;
 
-	maroonDestroyEyeSplit(true);
-	maroonEyeAttemptTarget = dad;
-
-	var testGuh:Dynamic = null;
-	var testGlow:Dynamic = null;
-	try { testGuh = dad.library.getSymbol('guh'); } catch (e:Dynamic) {}
-	try { testGlow = dad.library.getSymbol('glow shit'); } catch (e:Dynamic) {}
-	if (testGuh == null || testGlow == null) return;
-
-	var atlasPath:String = '';
-	try { atlasPath = Paths.getPath('images/' + dad.imageFile, PathsTestMode.LOOSE); } catch (e:Dynamic) {}
-	if (atlasPath == null || atlasPath.length == 0) return;
-
-	try
+	var sourceAnim:Dynamic = source.animation.curAnim;
+	var targetAnim:Dynamic = target.animation.curAnim;
+	if (sourceAnim != null && targetAnim != null)
 	{
-		maroonEyeFrames = FlxAnimateFrames.fromAnimate(atlasPath, null, null, 'maroon_stage_eye_overlay', true, {cacheOnLoad: false});
-	}
-	catch (e:Dynamic)
-	{
-		maroonEyeFrames = null;
-	}
-	if (maroonEyeFrames == null) return;
-
-	maroonEyeTarget = dad;
-	for (symbolName in maroonPoseSymbols)
-	{
-		maroonFilterPose(dad.library, symbolName, false);
-		maroonFilterPose(maroonEyeFrames, symbolName, true);
-	}
-	maroonInvalidateRender(dad);
-
-	maroonEyeSprite = new FunkinSprite(dad.x, dad.y);
-	maroonEyeSprite.frames = maroonEyeFrames;
-	maroonEyeSprite.shader = null;
-	maroonEyeSprite.useRenderTexture = false;
-	maroonEyeSprite.antialiasing = dad.antialiasing;
-	maroonEyeSprite.applyStageMatrix = dad.applyStageMatrix;
-	maroonEyeSprite.postStageMatrixApply = dad.postStageMatrixApply;
-	maroonCopyAnimDefinitions();
-
-	var hasIdle:Bool = false;
-	try { hasIdle = maroonEyeSprite.hasAnim('idle'); } catch (e:Dynamic) {}
-	if (!hasIdle)
-	{
-		try { maroonEyeSprite.addAnimByPrefix('idle', 'idle', 24, true); } catch (e:Dynamic) {}
-		try { hasIdle = maroonEyeSprite.hasAnim('idle'); } catch (e:Dynamic) {}
-	}
-	if (!hasIdle)
-	{
-		maroonDestroyEyeSplit(true);
-		return;
-	}
-
-	maroonEyeTarget = dad;
-	maroonEyeGroup = null;
-	maroonEyeAddedToState = false;
-	try
-	{
-		if (game != null && game.dadGroup != null)
+		for (field in ['frameTimer', 'finished', 'reversed'])
 		{
-			maroonEyeGroup = game.dadGroup;
-			maroonEyeGroup.add(maroonEyeSprite);
+			try
+			{
+				var value:Dynamic = Reflect.field(sourceAnim, field);
+				if (value != null) Reflect.setField(targetAnim, field, value);
+			}
+			catch (e:Dynamic) {}
 		}
-	}
-	catch (e:Dynamic) { maroonEyeGroup = null; }
-
-	if (maroonEyeGroup == null && FlxG.state != null)
-	{
 		try
 		{
-			FlxG.state.add(maroonEyeSprite);
-			maroonEyeAddedToState = true;
+			var displayedFrame:Int = source.animation.frameIndex;
+			if (target.animation.frameIndex != displayedFrame)
+				target.animation.frameIndex = displayedFrame;
 		}
 		catch (e:Dynamic) {}
 	}
+}
 
-	try { maroonEyeSprite.zIndex = dad.zIndex + 100; } catch (e:Dynamic) {}
-	try { maroonEyeSprite.shader = null; } catch (e:Dynamic) {}
-	try { maroonEyeSprite.useRenderTexture = false; } catch (e:Dynamic) {}
-	maroonSyncEyeSprite();
+function maroonSyncEyeSprite():Void
+{
+	var source:FunkinSprite = dad;
+	if (!maroonIsEyeTarget(source))
+	{
+		if (maroonEyeOverlay != null || maroonEyeHiddenOwner != null) maroonDestroyEyeSplit(true);
+		maroonEyeAttemptSource = null;
+		return;
+	}
+
+	var currentCharacter:String = Std.string(source.curCharacter);
+	var currentImage:String = Std.string(source.imageFile);
+	if (maroonEyeOverlaySource != null && (maroonEyeOverlaySource != source || maroonEyeOverlayCharacter != currentCharacter || maroonEyeOverlayImage != currentImage))
+		maroonDestroyEyeSplit(true);
+
+	if (maroonEyeOverlay == null)
+	{
+		if (source.library == null) return;
+		if (maroonEyeAttemptSource == source) return;
+		maroonEyeAttemptSource = source;
+		if (!maroonCreateEyeOverlay(source)) return;
+	}
+
+	if (maroonEyeHiddenOwner != source && !maroonHideOriginalEyes(source))
+	{
+		maroonEyeOverlay.visible = false;
+		maroonEyeOverlay.active = false;
+		return;
+	}
+
+	if (!source.exists || !source.visible || source.alpha <= 0 || source.isAnimNull())
+	{
+		maroonEyeOverlay.visible = false;
+		maroonEyeOverlay.active = false;
+		return;
+	}
+
+	var wanted:String = source.getAnimName();
+	if (wanted == null || wanted.length == 0) wanted = 'idle';
+	if (!maroonEyeOverlay.hasAnim(wanted))
+	{
+		if (wanted.indexOf('LEFT') != -1 && maroonEyeOverlay.hasAnim('singLEFT')) wanted = 'singLEFT';
+		else if (wanted.indexOf('DOWN') != -1 && maroonEyeOverlay.hasAnim('singDOWN')) wanted = 'singDOWN';
+		else if (wanted.indexOf('UP') != -1 && maroonEyeOverlay.hasAnim('singUP')) wanted = 'singUP';
+		else if (wanted.indexOf('RIGHT') != -1 && maroonEyeOverlay.hasAnim('singRIGHT')) wanted = 'singRIGHT';
+		else if (maroonEyeOverlay.hasAnim('idle')) wanted = 'idle';
+		else
+		{
+			maroonEyeOverlay.visible = false;
+			maroonEyeOverlay.active = false;
+			return;
+		}
+	}
+
+	if (maroonEyeAnim != wanted || maroonEyeOverlay.isAnimNull())
+	{
+		var sourceReversed:Bool = false;
+		try { sourceReversed = source.animation.curAnim.reversed; } catch (e:Dynamic) {}
+		maroonEyeOverlay.playAnim(wanted, true, sourceReversed, source.animCurFrame);
+		maroonEyeAnim = wanted;
+	}
+	maroonSyncEyeAnimationClock(source, maroonEyeOverlay);
+
+	maroonEyeOverlay.x = source.x;
+	maroonEyeOverlay.y = source.y;
+	maroonEyeOverlay.scale.set(source.scale.x, source.scale.y);
+	maroonEyeOverlay.baseScale.set(source.baseScale.x, source.baseScale.y);
+	maroonEyeOverlay.origin.set(source.origin.x, source.origin.y);
+	maroonEyeOverlay.offset.set(source.offset.x, source.offset.y);
+	maroonEyeOverlay.spriteOffset.set(source.spriteOffset.x, source.spriteOffset.y);
+	maroonEyeOverlay.animOffset.set(source.animOffset.x, source.animOffset.y);
+	maroonEyeOverlay.angle = source.angle;
+	maroonEyeOverlay.skew.set(source.skew.x, source.skew.y);
+	maroonEyeOverlay.flipX = source.flipX;
+	maroonEyeOverlay.flipY = source.flipY;
+	maroonEyeOverlay.alpha = source.alpha;
+	// Keep the separated eye at its original atlas colors. The character's
+	// FlxTween.color / sprite tint must never be inherited by this overlay.
+	maroonEyeOverlay.color = 0xFFFFFFFF;
+	maroonEyeOverlay.blend = source.blend;
+	maroonEyeOverlay.scrollFactor.set(source.scrollFactor.x, source.scrollFactor.y);
+	maroonEyeOverlay.antialiasing = source.antialiasing;
+	var eyeZ:Float = source.zIndex + 0.01;
+	if (maroonEyeOverlay.zIndex != eyeZ)
+	{
+		maroonEyeOverlay.zIndex = eyeZ;
+		refreshZ();
+	}
+	maroonEyeOverlay.shader = null;
+	maroonEyeOverlay.useRenderTexture = false;
+	maroonEyeOverlay.cameras = [camGame];
+	// Neutral color transform: do not copy the parent's tint or color offsets.
+	maroonEyeOverlay.colorTransform.redMultiplier = 1;
+	maroonEyeOverlay.colorTransform.greenMultiplier = 1;
+	maroonEyeOverlay.colorTransform.blueMultiplier = 1;
+	maroonEyeOverlay.colorTransform.alphaMultiplier = 1;
+	maroonEyeOverlay.colorTransform.redOffset = 0;
+	maroonEyeOverlay.colorTransform.greenOffset = 0;
+	maroonEyeOverlay.colorTransform.blueOffset = 0;
+	maroonEyeOverlay.colorTransform.alphaOffset = 0;
+	try { maroonEyeOverlay.applyStageMatrix = source.applyStageMatrix; } catch (e:Dynamic) {}
+	try { maroonEyeOverlay.postStageMatrixApply = source.postStageMatrixApply; } catch (e:Dynamic) {}
+	maroonEyeOverlay.active = false;
+	maroonEyeOverlay.visible = true;
 }
 
 function updateRimFrame(sprite:FlxSprite, shader:ExtraDropShadowShader)
@@ -663,7 +838,7 @@ function onCreatePost()
 	snowEmitter.zIndex = 2;
 	redscreen.zIndex = 3;
 
-	setupMaroonEyeSplit();
+	maroonSyncEyeSprite();
 
 	if (ClientPrefs.shaders)
 	{
@@ -796,7 +971,6 @@ function onBeatHit()
 
 function onUpdatePost(elapsed:Float)
 {
-	if (maroonEyeTarget != dad && maroonEyeAttemptTarget != dad) setupMaroonEyeSplit();
 	maroonSyncEyeSprite();
 	syncBoilingWallAnimations();
 
@@ -937,12 +1111,8 @@ function onSongRetry()
 	bfRimTarget = null;
 	dadRimTarget = null;
 	petRimTarget = null;
-	if (maroonEyeTarget != dad)
-	{
-		maroonEyeAttemptTarget = null;
-		setupMaroonEyeSplit();
-	}
-	else maroonSyncEyeSprite();
+	maroonDestroyEyeSplit(true);
+	maroonSyncEyeSprite();
 	if (!ClientPrefs.shaders) return;
 	if (blackRimlightBase == null) return;
 	setupBFRim();
@@ -952,6 +1122,7 @@ function onSongRetry()
 
 function onGameOver()
 {
+	maroonDestroyEyeSplit(true);
 	if (boilingLightTween != null)
 	{
 		try { boilingLightTween.cancel(); } catch (e:Dynamic) {}
