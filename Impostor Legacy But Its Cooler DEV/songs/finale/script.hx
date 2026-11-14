@@ -8,13 +8,15 @@ function onSubstateOpen()
 		{
 			var pause = PauseSubState.instance;
 			
+			var color = dad.healthColour;
+
 			for (option in pause.optionText)
 			{
-				option.color = FlxColor.RED;
+				option.color = color;
 			}
 			
-			pause.infoTitle.color = FlxColor.RED;
-			pause.infoSubtext.color = FlxColor.RED;
+			pause.infoTitle.color = color;
+			pause.infoSubtext.color = color;
 			pause.looksie.loadGraphic(Paths.image('menu/pause/looksie-defeat'));
 		}
 	});

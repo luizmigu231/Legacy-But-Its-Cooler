@@ -2,6 +2,7 @@ import funkin.game.shaders.ColorSwap;
 import flixel.effects.particles.FlxEmitterMode;
 import flixel.math.FlxRect;
 import flixel.addons.effects.FlxSkewedSprite;
+import funkin.states.substates.PauseSubState;
 
 public var ext:String = 'stages/mira/greenhouse/';
 
@@ -942,4 +943,26 @@ function onSongStart()
 			tweenShadowLayer(dad.shader.layers[1], [layerMatrix], dur, FlxEase.linear);
 		}
 	}
+}
+
+function onSubstateOpen()
+{
+	FlxG.signals.postUpdate.addOnce(() -> {
+		
+		if (PauseSubState.instance != null && pinkCanPulse)
+		{
+			var pause = PauseSubState.instance;
+			
+			var color = dad.healthColour;
+
+			for (option in pause.optionText)
+			{
+				option.color = color;
+			}
+			
+			pause.infoTitle.color = color;
+			pause.infoSubtext.color = color;
+			pause.looksie.loadGraphic(Paths.image('menu/pause/looksie-pink'));
+		}
+	});
 }
