@@ -56,6 +56,7 @@ var legPosY = [
 var airship:FlxSprite;
 var airshipDark:FlxSprite;
 var airshipDuplicate:FlxSprite;
+var fan:FlxSprite;
 var airshiplight:FlxSprite;
 var cloudlight:FlxSprite;
 var createRimLayers:Array<Dynamic> = [];
@@ -483,7 +484,7 @@ function onLoad()
 	airshipDuplicate.updateHitbox();
 	add(airshipDuplicate);
 
-	var fan:FlxSprite = new FlxSprite(2285.4, 102);
+	fan = new FlxSprite(2285.4, 102);
 	fan.frames = Paths.getSparrowAtlas('stages/airship/danger/airshipFan');
 	fan.animation.addByPrefix('idle', 'ala avion instance 1', 24, true);
 	fan.animation.play('idle');
@@ -1080,6 +1081,17 @@ function onUpdate(elapsed)
 			) *
 			0.6;
 	}
+
+	airship.x -=
+		delta * 0.4;
+
+	airshiplight.x -=
+		delta * 0.4;
+
+	fan.x -=
+		delta * 0.4;
+
+	airshipDark.x = airshipDuplicate.x = airship.x;
 
 	airFarClouds.x -=
 		delta * 10.5;

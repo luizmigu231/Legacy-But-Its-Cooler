@@ -6,6 +6,7 @@ import flixel.math.FlxRect;
 import funkin.game.shaders.DropShadowShader;
 import funkin.game.shaders.ExtraDropShadowShader;
 import funkin.objects.SnowEmitter;
+import funkin.states.substates.PauseSubState;
 
 var snowAlpha = 0.3;
 var snowEmitter:SnowEmitter;
@@ -1138,4 +1139,17 @@ function onDestroy()
 		try { boilingGroundFadeTween.cancel(); } catch (e:Dynamic) {}
 	}
 	maroonDestroyEyeSplit(true);
+}
+
+function onSubstateOpen()
+{
+	FlxG.signals.postUpdate.addOnce(() -> {
+		
+		if (PauseSubState.instance != null)
+		{
+			var pause = PauseSubState.instance;
+
+			pause.looksie.loadGraphic(Paths.image('menu/pause/looksie-boiling'));
+		}
+	});
 }
