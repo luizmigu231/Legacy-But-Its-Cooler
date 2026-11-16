@@ -16,7 +16,9 @@ function onUpdate(elapsed:Float)
 		botplayPositioned = true;
 	}
 
-	txt.y = botplayBaseY + botplayOffsetY;
+	var offsetY:Float = ClientPrefs.downScroll ? botplayOffsetY : -botplayOffsetY;
+	txt.y = botplayBaseY + offsetY;
+
 	if (!forcedBotColor) txt.color = playHUD.scoreTxt.color;
 	txt.text = "Be_Impostor.exe";
 	txt.size = 26;
