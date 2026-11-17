@@ -1,4 +1,5 @@
 import funkin.game.shaders.ExtraDropShadowShader;
+import funkin.states.substates.PauseSubState;
 import animate.FlxAnimateFrames;
 
 var intro:FunkinVideoSprite;
@@ -885,4 +886,17 @@ function onDestroy()
 		dadEyeOverlay.destroy();
 		dadEyeOverlay = null;
 	}
+}
+
+function onSubstateOpen()
+{
+	FlxG.signals.postUpdate.addOnce(() -> {
+		
+		if (PauseSubState.instance != null && game.subState == PauseSubState.instance && curBeat >= 64)
+		{
+			var pause = PauseSubState.instance;
+			pause.looksie.centerOrigin();
+			pause.looksie.angularVelocity = 750;
+		}
+	});
 }

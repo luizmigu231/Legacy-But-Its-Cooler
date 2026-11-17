@@ -1,5 +1,6 @@
 import funkin.game.shaders.ChromaticAbberation;
 import funkin.game.shaders.DropShadowShader;
+import funkin.states.substates.PauseSubState;
 import openfl.filters.ShaderFilter;
 import animate.FlxAnimateFrames;
 
@@ -1661,4 +1662,17 @@ function onDestroy()
 	}
 
 	greyThreatEyeAnim = '';
+}
+
+function onSubstateOpen()
+{
+	FlxG.signals.postUpdate.addOnce(() -> {
+		
+		if (PauseSubState.instance != null && game.subState == PauseSubState.instance)
+		{
+			var pause = PauseSubState.instance;
+
+			pause.looksie.loadGraphic(Paths.image('menu/pause/looksie-scared'));
+		}
+	});
 }

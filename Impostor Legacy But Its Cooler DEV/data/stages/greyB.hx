@@ -1,7 +1,9 @@
 import funkin.game.shaders.ChromaticAbberation;
 import funkin.game.shaders.DropShadowShader;
+import funkin.states.substates.PauseSubState;
 import openfl.filters.ShaderFilter;
 import animate.FlxAnimateFrames;
+
 var gfGhost:Character;
 var noob69Exe:FlxSprite;
 var bg:FlxSprite;
@@ -1249,4 +1251,17 @@ function onDestroy()
 		greyThreatEyeOverlay = null;
 	}
 	greyThreatEyeAnim = '';
+}
+
+function onSubstateOpen()
+{
+	FlxG.signals.postUpdate.addOnce(() -> {
+		
+		if (PauseSubState.instance != null && game.subState == PauseSubState.instance)
+		{
+			var pause = PauseSubState.instance;
+
+			pause.looksie.loadGraphic(Paths.image('menu/pause/looksie-scared'));
+		}
+	});
 }

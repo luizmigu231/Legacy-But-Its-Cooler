@@ -57,23 +57,10 @@
 			"name": "idle",
 			"indices": [],
 			"flipX": false
-		},
-		{
-			"offsets": [
-				50,
-				1401
-			],
-			"indices": [],
-			"fps": 24,
-			"flipX": false,
-			"flipY": false,
-			"anim": "fall",
-			"loop": false,
-			"name": "black anim"
 		}
 	],
 	"no_antialiasing": false,
-	"image": "characters/story/black/blackdk,characters/story/black/black_anim",
+	"image": "characters/story/black/blackdk",
 	"position": [
 		-270,
 		580

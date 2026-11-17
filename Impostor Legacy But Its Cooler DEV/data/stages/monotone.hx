@@ -1,4 +1,5 @@
 import funkin.data.ClientPrefs;
+import funkin.states.substates.PauseSubState;
 import flixel.FlxSprite;
 import flixel.addons.display.FlxBackdrop;
 import Reflect;
@@ -1279,4 +1280,17 @@ function defeatness(ya:Bool)
 
 		clearBlackShader();
 	}
+}
+
+function onSubstateOpen()
+{
+	FlxG.signals.postUpdate.addOnce(() -> {
+		
+		if (PauseSubState.instance != null && game.subState == PauseSubState.instance && curBeat < 96)
+		{
+			var pause = PauseSubState.instance;
+
+			pause.looksie.loadGraphic(Paths.image('menu/pause/looksie_extreme_demon'));
+		}
+	});
 }

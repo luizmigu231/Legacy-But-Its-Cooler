@@ -1,3 +1,5 @@
+import funkin.states.substates.PauseSubState;
+
 var ext = 'stages/mira/greenhouse/pretender/';
 
 var cloud1:FlxSprite;
@@ -627,4 +629,17 @@ function onSongStart()
 				0, 0, 0, 1, 0
 			], 90, 12, .025], dur, FlxEase.linear);
 		}
+}
+
+function onSubstateOpen()
+{
+	FlxG.signals.postUpdate.addOnce(() -> {
+		
+		if (PauseSubState.instance != null && game.subState == PauseSubState.instance)
+		{
+			var pause = PauseSubState.instance;
+
+			pause.looksie.loadGraphic(Paths.image('menu/pause/looksie-defeat'));
+		}
+	});
 }

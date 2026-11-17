@@ -532,26 +532,31 @@ function onEvent(eventName, value1, value2)
 
 function onSubstateOpen()
 {
-	if (!isDark)
-		return;
-	
 	FlxG.signals.postUpdate.addOnce(() -> {
 		
-		if (PauseSubState.instance != null)
+		if (PauseSubState.instance != null && game.subState == PauseSubState.instance)
 		{
 			var pause = PauseSubState.instance;
 			
-			for (option in pause.optionText)
+			var looksieSuffix = 'scared';
+
+			if (isDark)
 			{
-				option.color = FlxColor.BLACK;
-				option.borderColor = FlxColor.WHITE;
-			}
+				looksieSuffix += '-dark';
+
+				for (option in pause.optionText)
+				{
+					option.color = FlxColor.BLACK;
+					option.borderColor = FlxColor.WHITE;
+				}
 			
-			pause.infoTitle.color = FlxColor.BLACK;
-			pause.infoTitle.borderColor = FlxColor.WHITE;
-			pause.infoSubtext.color = FlxColor.BLACK;
-			pause.infoSubtext.borderColor = FlxColor.WHITE;
-			pause.looksie.loadGraphic(Paths.image('menu/pause/looksie-dark'));
+				pause.infoTitle.color = FlxColor.BLACK;
+				pause.infoTitle.borderColor = FlxColor.WHITE;
+				pause.infoSubtext.color = FlxColor.BLACK;
+				pause.infoSubtext.borderColor = FlxColor.WHITE;
+			}
+
+			pause.looksie.loadGraphic(Paths.image('menu/pause/looksie-${looksieSuffix}'));
 		}
 	});
 }

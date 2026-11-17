@@ -1,4 +1,5 @@
 import flixel.math.FlxMath;
+import funkin.states.substates.PauseSubState;
 import funkin.game.shaders.ExtraDropShadowShader;
 import animate.FlxAnimateFrames;
 
@@ -1204,4 +1205,20 @@ function onDestroy()
     }
 
     blackDkEyeAnim = '';
+}
+
+function onSubstateOpen()
+{
+	FlxG.signals.postUpdate.addOnce(() -> {
+		
+		if (PauseSubState.instance != null && game.subState == PauseSubState.instance)
+		{
+			var pause = PauseSubState.instance;
+
+			if (curBeat >= 852 && curBeat < 980)
+				pause.looksie.loadGraphic(Paths.image('menu/pause/looksie-scared'));
+			else if (curBeat >= 980)
+				pause.looksie.loadGraphic(Paths.image('menu/pause/looksie-defeat'));
+		}
+	});
 }

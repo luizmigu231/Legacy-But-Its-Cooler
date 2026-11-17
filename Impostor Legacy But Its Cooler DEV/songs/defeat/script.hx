@@ -240,7 +240,7 @@ function onSubstateOpen()
 {
 	FlxG.signals.postUpdate.addOnce(() -> {
 		
-		if (PauseSubState.instance != null)
+		if (PauseSubState.instance != null && game.subState == PauseSubState.instance)
 		{
 			var pause = PauseSubState.instance;
 			

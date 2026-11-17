@@ -949,7 +949,7 @@ function onSubstateOpen()
 {
 	FlxG.signals.postUpdate.addOnce(() -> {
 		
-		if (PauseSubState.instance != null && pinkCanPulse)
+		if (PauseSubState.instance != null && game.subState == PauseSubState.instance && pinkCanPulse)
 		{
 			var pause = PauseSubState.instance;
 			
