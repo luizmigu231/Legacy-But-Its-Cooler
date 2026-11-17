@@ -615,7 +615,7 @@ function psBuildManager(manager:Dynamic, source:Dynamic):Bool
 	return true;
 }
 
-function createPartSeparator(source:FunkinSprite, ownerGroup:Dynamic, config:Dynamic):Dynamic
+public function createPartSeparator(source:FunkinSprite, ownerGroup:Dynamic, config:Dynamic):Dynamic
 {
 	if (source == null || ownerGroup == null || config == null) return null;
 	for (existing in partSeparatorManagers)
@@ -833,7 +833,7 @@ function psSyncPart(source:Dynamic, part:Dynamic):Void
 	sprite.visible = shouldShow;
 }
 
-function updatePartSeparator(manager:Dynamic, source:FunkinSprite = null):Void
+public function updatePartSeparator(manager:Dynamic, source:FunkinSprite = null):Void
 {
 	if (manager == null || manager.active != true) return;
 	var currentSource:FunkinSprite = source != null ? source : manager.source;
@@ -859,18 +859,18 @@ function updatePartSeparator(manager:Dynamic, source:FunkinSprite = null):Void
 		psSyncPart(currentSource, part);
 }
 
-function getSeparatedPart(manager:Dynamic, partId:String):FunkinSprite
+public function getSeparatedPart(manager:Dynamic, partId:String):FunkinSprite
 {
 	var part:Dynamic = psFindPart(manager, partId);
 	return part == null ? null : part.sprite;
 }
 
-function getPartSeparatorError(manager:Dynamic = null):String
+public function getPartSeparatorError(manager:Dynamic = null):String
 {
 	return manager != null ? psString(psField(manager, 'lastError')) : partSeparatorLastError;
 }
 
-function setSeparatedPartShader(manager:Dynamic, partId:String, shader:Dynamic, useRenderTexture:Bool = false):Bool
+public function setSeparatedPartShader(manager:Dynamic, partId:String, shader:Dynamic, useRenderTexture:Bool = false):Bool
 {
 	var part:Dynamic = psFindPart(manager, partId);
 	if (part == null || part.sprite == null) return false;
@@ -888,7 +888,7 @@ function setSeparatedPartShader(manager:Dynamic, partId:String, shader:Dynamic, 
 	return true;
 }
 
-function destroyPartSeparator(manager:Dynamic):Void
+public function destroyPartSeparator(manager:Dynamic):Void
 {
 	if (manager == null || manager.active != true) return;
 	psRestoreSource(manager);
