@@ -7,6 +7,7 @@ public var hudDarkShader:ExtraDropShadowShader;
 public var darkShader:ExtraDropShadowShader;
 public var vignette:Bool = false;
 
+var vignetteFilter = null;
 var isDark:Bool = false;
 var noshader:Bool = false;
 var noteShader = newShader('blacknotes');
@@ -86,13 +87,22 @@ function onCreatePost()
 	if (gf.getFlag('lightsDownSpeaker'))
 		ldSpeaker.alpha = 0.001;
 
+	
+	if (ClientPrefs.shaders)
+	{
+		var vignetteOverlay = new funkin.game.shaders.OverlayShader();
+		vignetteOverlay.setBitmapOverlay(Paths.image('stages/jorsawsee/o2/vignetteOverlay').bitmap);
+		vignetteFilter = new openfl.filters.ShaderFilter(vignetteOverlay);
+		camHUD.filters = [vignetteFilter];
+	}
+
 	miraGradient = new FlxSprite(0, 0).loadGraphic(Paths.image('stages/mira/cafeteria/MiraGradient'));
 	miraGradient.scrollFactor.set(0, 0);
 	miraGradient.setGraphicSize(FlxG.width, FlxG.height);
 	miraGradient.screenCenter();
 	miraGradient.alpha = 0;
 	miraGradient.cameras = [camHUD];
-	add(miraGradient);
+	stage.insert(0, miraGradient);
 }
 
 function applyDarkShader(sprite:FlxSprite)
@@ -237,6 +247,7 @@ function onEvent(eventName, value1, value2)
 				0.35
 			);
 			
+			camHUD.filters = [];
 			gf.alpha = 0;
 			pet.alpha = 0;
 			loBlack.alpha = 1;
@@ -312,6 +323,8 @@ function onEvent(eventName, value1, value2)
 			
 			isDark = false;
 			
+			if (ClientPrefs.shaders) camHUD.filters = [vignetteFilter];
+
 			gf.alpha = 1;
 			pet.alpha = 1;
 			
