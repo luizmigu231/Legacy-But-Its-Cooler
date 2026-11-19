@@ -2,7 +2,9 @@ var ext = 'stages/jorsawsee/voting-time/';
 var sprites:Array<FlxSprite> = [];
 var voting5:FlxSprite;
 var voting6:FlxSprite;
+var jorsa:Character;
 var redmungus:Character;
+var redmadgus:Character;
 var headlights:Array<FlxSprite> = [];
 function onLoad()
 {
@@ -50,23 +52,39 @@ function onLoad()
 	
 	sprites = [voting1, voting2, jorsawsee, votinguh, voting3, voting4];
 
-	redmungus = new Character(1760, 225, 'madgus');
+	jorsa = new Character(1500, 200, 'jorsawghost');
+	game.startCharacterPos(jorsa);
+	jorsa.alpha = 0;
+	add(jorsa);
+	jorsa.flipX = true;
+	jorsa.danceEveryNumBeats = 2;
+
+	redmungus = new Character(1760, 225, 'mungus');
 	game.startCharacterPos(redmungus);
 	add(redmungus);
 	redmungus.scale.set(1.2, 1.2);
 	redmungus.danceEveryNumBeats = 1;
+
+	redmadgus = new Character(1760, 225, 'madgus');
+	game.startCharacterPos(redmadgus);
+	add(redmadgus);
+	redmadgus.alpha = 0.001;
+	redmadgus.scale.set(1.2, 1.2);
+	redmadgus.danceEveryNumBeats = 1;
 }
 
 function onCreatePost()
 {
 	pet.zIndex = 1;
 	redmungus.zIndex = 2;
+	redmadgus.zIndex = 2;
 	for (playField in playFields)
 		if (playField.ID != 0) playField.playerControls = false;
 	
 	pet.scrollFactor.set(.95, .94);
 	gf.scrollFactor.set(1.05, 1);
 	redmungus.scrollFactor.set(.96, 1);
+	redmadgus.scrollFactor.set(.96, 1);
 	boyfriend.scrollFactor.set(.95 /* genius! */, 1.05);
 	dad.scrollFactor.set(1.05, 1.05);
 	
@@ -85,7 +103,7 @@ function onCreatePost()
 		var pos = switch(i)
 		{
 			case 0: [dadGroup.x - 80, dadGroup.y, 0];
-			case 1: [boyfriendGroup.x + 140, boyfriendGroup.y, 3];
+			case 1: [boyfriendGroup.x + 150, boyfriendGroup.y, 3];
 			case 2: [redmungus.x - 20, redmungus.y - 300, 2];
 		}	
 
@@ -125,7 +143,7 @@ function onCreatePost()
 	
 	playFields.members[2].owner = game.gf;
 	playFields.members[2].isPlayer = playFields.members[3].isPlayer = false;
-	playFields.members[3].owner = redmungus;
+	playFields.members[3].singers = [redmungus, redmadgus];
 	
 	for (i in playFields.members)
 	{
@@ -172,7 +190,9 @@ function onCountdownTick(tick:Int)
 
 function onBeatHit()
 {
+	redmadgus.onBeatHit(curBeat);
 	redmungus.onBeatHit(curBeat);
+	jorsa.onBeatHit(curBeat);
 
 	switch(curBeat)
 	{
@@ -195,11 +215,24 @@ function onBeatHit()
 			doTheThing(dad, true);
 			doTheThing(redmungus, true);
 		case 64:
-			for (sprite in sprites) sprite.color = FlxColor.WHITE;
+			for (sprite in sprites) FlxTween.color(sprite, 0.7, sprite.color, FlxColor.WHITE, {ease:FlxEase.quadOut});
 			sprites[7].alpha = 1;
-			gf.color = FlxColor.WHITE;
+			FlxTween.color(gf, 0.7, gf.color, FlxColor.WHITE, {ease:FlxEase.quadOut});
 			gf.alpha = 1;
 			for (headlight in headlights) headlight.alpha = 0;
+		case 228:
+			for (sprite in sprites) FlxTween.color(sprite, 4, FlxColor.WHITE, 0xFF2c385e, {ease:FlxEase.quadOut});
+			FlxTween.color(boyfriend, 4, FlxColor.WHITE, 0x002c385e, {ease:FlxEase.quadOut});
+			FlxTween.tween(jorsa, {alpha: 0.7}, 13, {ease:FlxEase.quadOut});
+			FlxTween.tween(headlights[2], {alpha: 0.6}, 4, {ease:FlxEase.quadOut});
+		case 260:
+			for (sprite in sprites) FlxTween.color(sprite, 2, 0xFF2c385e, FlxColor.WHITE, {ease:FlxEase.quadOut});
+			FlxTween.color(boyfriend, 2, 0xFF2c385e, FlxColor.WHITE, {ease:FlxEase.quadOut});
+			FlxTween.tween(jorsa, {alpha: 0}, 2, {ease:FlxEase.quadOut});
+			FlxTween.tween(headlights[2], {alpha: 0}, 2, {ease:FlxEase.quadOut});
+		case 292:
+			redmungus.alpha = 0;
+			redmadgus.alpha = 1;
 	}
 }
 
@@ -224,13 +257,13 @@ function doTheThing(char:Character, yes:Bool)
 
 	if (yes)
 	{
-		FlxTween.color(char, 0.6, 0x002c385e, FlxColor.WHITE, {ease:FlxEase.quadOut});
-		FlxTween.tween(headlight, {alpha: 0.5}, 0.6, {ease:FlxEase.quadOut});
+		FlxTween.color(char, 0.4, 0x002c385e, FlxColor.WHITE, {ease:FlxEase.quadOut});
+		FlxTween.tween(headlight, {alpha: 0.5}, 0.4, {ease:FlxEase.quadOut});
 	}
 	else
 	{
-		FlxTween.color(char, 0.6, FlxColor.WHITE, 0xF002c385e, {ease:FlxEase.quadOut});
-		FlxTween.tween(headlight, {alpha: 0}, 0.6, {ease:FlxEase.quadOut});
+		FlxTween.color(char, 0.4, FlxColor.WHITE, 0xF002c385e, {ease:FlxEase.quadOut});
+		FlxTween.tween(headlight, {alpha: 0}, 0.4, {ease:FlxEase.quadOut});
 	}
 
 }
@@ -282,8 +315,8 @@ function onEvent(eventName, value1, value2)
 		case 'Play Animation':
 			if (value1 == 'redmungus')
 			{
-				redmungus.playAnim(value2, true);
-				redmungus.specialAnim = true;
+				redmadgus.playAnim(value2, true);
+				redmadgus.specialAnim = true;
 			}
 	}
 }
