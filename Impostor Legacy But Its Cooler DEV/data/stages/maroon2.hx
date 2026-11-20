@@ -19,6 +19,8 @@ var snowAlpha = 0.4;
 var snowEmitter:SnowEmitter;
 
 var ext:String = 'stages/polus/maroon/';
+var darkStageVariant:Bool = false;
+var stageLightsOutActive:Bool = false;
 
 var boilingShader:HeatwaveShader =
 	(ClientPrefs.shaders ? new HeatwaveShader() : null);
@@ -27,6 +29,15 @@ var boilingFilter:ShaderFilter =
 	(boilingShader != null
 		? new ShaderFilter(boilingShader.shader)
 		: null);
+
+function maroonStageImage(name:String):String
+{
+	if (darkStageVariant && PlayState.SONG.stage == 'maroon2'
+		&& (name == 'newsky' || name == 'newcloud' || name == 'backwall' || name == 'newstage'))
+		return ext + name + '_lightsdown';
+
+	return ext + name;
+}
 
 function setBoiling(enabled:Bool)
 {
@@ -92,6 +103,76 @@ function createRim2(angleX:Float, angleY:Float):ExtraDropShadowShader
 	return rim;
 }
 
+function createDarkRim(angleX:Float, angleY:Float):ExtraDropShadowShader
+{
+	var rim = new ExtraDropShadowShader();
+
+	rim.threshold = 0.045;
+	rim.strength = 0.80;
+	rim.operation = 'replace';
+
+	// Near-black wine fill: restores a little internal depth without brightening the character.
+	rim.setColorMatrix([
+		0.045, 0.010, 0.000, 0, 0,
+		0.005, 0.025, 0.000, 0, 0,
+		0.000, 0.002, 0.015, 0, 0,
+		0.000, 0.000, 0.000, 1, 0
+	]);
+
+	var layerMatrix = [
+		8, 18,  0, -1,   0,
+		0.3, 2.5, -1.5, 0, 85,
+		0, -1.5, -5.5, 0, -5,
+		0,  9,   0,  9,  0
+	];
+
+	// Main rim: preserves the original Maroon Layer color and direction.
+	rim.addLayer(layerMatrix, angleX + 86, angleY + 10, 0.08, 0.50);
+
+	// Soft bounce: a wider, low-energy copy that gives the rim more depth.
+	rim.addLayer(layerMatrix, angleX + 86, angleY + 17, 0.16, 0.07);
+
+	// Edge detail: a narrow, faint pass to keep small shapes readable.
+	rim.addLayer(layerMatrix, angleX + 86, angleY + 5, 0.025, 0.04);
+
+	return rim;
+}
+
+function createDarkRim2(angleX:Float, angleY:Float):ExtraDropShadowShader
+{
+	var rim = new ExtraDropShadowShader();
+
+	rim.threshold = 0.045;
+	rim.strength = 0.80;
+	rim.operation = 'replace';
+
+	// Near-black wine fill: restores a little internal depth without brightening the character.
+	rim.setColorMatrix([
+		0.045, 0.010, 0.000, 0, 0,
+		0.005, 0.025, 0.000, 0, 0,
+		0.000, 0.002, 0.015, 0, 0,
+		0.000, 0.000, 0.000, 1, 0
+	]);
+
+	var layerMatrix = [
+		8, 18,  0, -1,   0,
+		0.3, 2.5, -1.5, 0, 85,
+		0, -1.5, -5.5, 0, -5,
+		0,  9,   0,  9,  0
+	];
+
+	// Main rim: preserves the original Maroon Layer color and direction.
+	rim.addLayer(layerMatrix, angleX + 86, angleY + 10, 0.08, 0.60);
+
+	// Soft bounce: a wider, low-energy copy that gives the rim more depth.
+	rim.addLayer(layerMatrix, angleX + 86, angleY + 17, 0.16, 0.07);
+
+	// Edge detail: a narrow, faint pass to keep small shapes readable.
+	rim.addLayer(layerMatrix, angleX + 86, angleY + 5, 0.025, 0.04);
+
+	return rim;
+}
+
 function updateRimFrame(sprite:FlxSprite, rim:ExtraDropShadowShader)
 {
 	if (sprite == null)
@@ -117,13 +198,14 @@ function setupBFRim()
 	if (bfRim == null)
 	{
 		if (boyfriend.flipX)
-			bfRim = createRim(320, 6);
+			bfRim = darkStageVariant ? createDarkRim(320, 6) : createRim(320, 6);
 		else
-			bfRim = createRim(380, 6);
+			bfRim = darkStageVariant ? createDarkRim(380, 6) : createRim(380, 6);
 	}
 
 	boyfriend.useRenderTexture = true;
 	bfRim.attachedSprite = boyfriend;
+	boyfriend.shader = bfRim;
 	bfRimTarget = boyfriend;
 
 	updateRimFrame(boyfriend, bfRim);
@@ -138,10 +220,11 @@ function setupGFRim()
 		return;
 
 	if (gfRim == null)
-		gfRim = createRim2(180, -28);
+		gfRim = darkStageVariant ? createDarkRim2(180, -28) : createRim2(180, -28);
 
 	gf.useRenderTexture = true;
 	gfRim.attachedSprite = gf;
+	gf.shader = gfRim;
 	gfRimTarget = gf;
 
 	updateRimFrame(gf, gfRim);
@@ -156,10 +239,11 @@ function setupDadRim()
 		return;
 
 	if (dadRim == null)
-		dadRim = createRim(320, 6);
+		dadRim = darkStageVariant ? createDarkRim(320, 6) : createRim(320, 6);
 
 	dad.useRenderTexture = true;
 	dadRim.attachedSprite = dad;
+	dad.shader = dadRim;
 	dadRimTarget = dad;
 
 	updateRimFrame(dad, dadRim);
@@ -177,10 +261,11 @@ function setupPetRim()
 		return;
 
 	if (petRim == null)
-		petRim = createRim(380, 6);
+		petRim = darkStageVariant ? createDarkRim(380, 6) : createRim(380, 6);
 
 	pet.useRenderTexture = true;
 	petRim.attachedSprite = pet;
+	pet.shader = petRim;
 	petRimTarget = pet;
 
 	updateRimFrame(pet, petRim);
@@ -201,6 +286,7 @@ function reapplyBFRim()
 	{
 		boyfriend.useRenderTexture = true;
 		bfRim.attachedSprite = boyfriend;
+		boyfriend.shader = bfRim;
 		bfRimTarget = boyfriend;
 
 		updateRimFrame(boyfriend, bfRim);
@@ -212,6 +298,7 @@ function reapplyBFRim()
 	{
 		boyfriend.useRenderTexture = true;
 		bfRim.attachedSprite = boyfriend;
+		boyfriend.shader = bfRim;
 		bfRimTarget = boyfriend;
 
 		updateRimFrame(boyfriend, bfRim);
@@ -233,6 +320,7 @@ function reapplyGFRim()
 	{
 		gf.useRenderTexture = true;
 		gfRim.attachedSprite = gf;
+		gf.shader = gfRim;
 		gfRimTarget = gf;
 
 		updateRimFrame(gf, gfRim);
@@ -244,6 +332,7 @@ function reapplyGFRim()
 	{
 		gf.useRenderTexture = true;
 		gfRim.attachedSprite = gf;
+		gf.shader = gfRim;
 		gfRimTarget = gf;
 
 		updateRimFrame(gf, gfRim);
@@ -265,6 +354,7 @@ function reapplyDadRim()
 	{
 		dad.useRenderTexture = true;
 		dadRim.attachedSprite = dad;
+		dad.shader = dadRim;
 		dadRimTarget = dad;
 
 		updateRimFrame(dad, dadRim);
@@ -276,6 +366,7 @@ function reapplyDadRim()
 	{
 		dad.useRenderTexture = true;
 		dadRim.attachedSprite = dad;
+		dad.shader = dadRim;
 		dadRimTarget = dad;
 
 		updateRimFrame(dad, dadRim);
@@ -300,6 +391,7 @@ function reapplyPetRim()
 	{
 		pet.useRenderTexture = true;
 		petRim.attachedSprite = pet;
+		pet.shader = petRim;
 		petRimTarget = pet;
 
 		updateRimFrame(pet, petRim);
@@ -311,6 +403,7 @@ function reapplyPetRim()
 	{
 		pet.useRenderTexture = true;
 		petRim.attachedSprite = pet;
+		pet.shader = petRim;
 		petRimTarget = pet;
 
 		updateRimFrame(pet, petRim);
@@ -322,6 +415,9 @@ function checkRimAttachments()
 	if (!ClientPrefs.shaders)
 		return;
 
+	if (stageLightsOutActive)
+		return;
+
 	reapplyBFRim();
 	reapplyGFRim();
 	reapplyDadRim();
@@ -330,8 +426,10 @@ function checkRimAttachments()
 
 function onLoad()
 {
+	darkStageVariant = PlayState.SONG.stage == 'maroon2' && FlxG.random.int(1, 4) == 1;
+
 	var bg:FlxSprite = new FlxSprite(-200)
-		.loadGraphic(Paths.image(ext + "newsky"));
+		.loadGraphic(Paths.image(maroonStageImage("newsky")));
 
 	bg.scrollFactor.x = 0.7;
 	bg.scale.set(0.75, 0.75);
@@ -339,7 +437,7 @@ function onLoad()
 	add(bg);
 
 	var cloud:FlxSprite = new FlxSprite(-100)
-		.loadGraphic(Paths.image(ext + "newcloud"));
+		.loadGraphic(Paths.image(maroonStageImage("newcloud")));
 
 	cloud.scrollFactor.x = 0.9;
 	cloud.alpha = 0.9;
@@ -354,14 +452,14 @@ function onLoad()
 	add(rocks);
 
 	var backwall:FlxSprite = new FlxSprite()
-		.loadGraphic(Paths.image(ext + "backwall"));
+		.loadGraphic(Paths.image(maroonStageImage("backwall")));
 
 	backwall.scrollFactor.x = 0.9;
 	backwall.color = 0xFFFFFFFF;
 	add(backwall);
 
 	var ground:FlxSprite = new FlxSprite()
-		.loadGraphic(Paths.image(ext + "newstage"));
+		.loadGraphic(Paths.image(maroonStageImage("newstage")));
 
 	ground.color = 0xFFFFFFFF;
 	add(ground);
@@ -413,6 +511,14 @@ function onUpdatePost(elapsed:Float)
 		boilingShader.update(elapsed);
 
 	checkRimAttachments();
+}
+
+function onEvent(eventName, value1, value2)
+{
+	if (eventName == 'Lights out')
+		stageLightsOutActive = true;
+	else if (eventName == 'Lights on')
+		stageLightsOutActive = false;
 }
 
 function goodNoteHit(note)
@@ -500,7 +606,7 @@ function onCreatePost()
 
 	mainoverlay.scrollFactor.set(1, 1);
 	mainoverlay.scale.set(0.75, 0.75);
-	mainoverlay.alpha = 0.80;
+	mainoverlay.alpha = darkStageVariant ? 0.12 : 0.80;
 	mainoverlay.blend = 0;
 
 	if (!ClientPrefs.lowQuality)
@@ -509,6 +615,7 @@ function onCreatePost()
 
 function onSongRetry()
 {
+	stageLightsOutActive = false;
 	bfRimTarget = null;
 	gfRimTarget = null;
 	dadRimTarget = null;
@@ -517,6 +624,9 @@ function onSongRetry()
 
 function onResume()
 {
+	if (stageLightsOutActive)
+		return;
+
 	if (!ClientPrefs.shaders)
 		return;
 
@@ -524,6 +634,7 @@ function onResume()
 	{
 		boyfriend.useRenderTexture = true;
 		bfRim.attachedSprite = boyfriend;
+		boyfriend.shader = bfRim;
 		bfRimTarget = boyfriend;
 		updateRimFrame(boyfriend, bfRim);
 	}
@@ -532,6 +643,7 @@ function onResume()
 	{
 		gf.useRenderTexture = true;
 		gfRim.attachedSprite = gf;
+		gf.shader = gfRim;
 		gfRimTarget = gf;
 		updateRimFrame(gf, gfRim);
 	}
@@ -540,6 +652,7 @@ function onResume()
 	{
 		dad.useRenderTexture = true;
 		dadRim.attachedSprite = dad;
+		dad.shader = dadRim;
 		dadRimTarget = dad;
 		updateRimFrame(dad, dadRim);
 	}
@@ -548,6 +661,7 @@ function onResume()
 	{
 		pet.useRenderTexture = true;
 		petRim.attachedSprite = pet;
+		pet.shader = petRim;
 		petRimTarget = pet;
 		updateRimFrame(pet, petRim);
 	}
@@ -555,6 +669,7 @@ function onResume()
 
 function onGameOver()
 {
+	stageLightsOutActive = false;
 	bfRimTarget = null;
 	gfRimTarget = null;
 	dadRimTarget = null;
