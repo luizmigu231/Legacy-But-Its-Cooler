@@ -1,3 +1,4 @@
+import flixel.math.FlxRect;
 var ext = 'stages/jorsawsee/voting-time/';
 var sprites:Array<FlxSprite> = [];
 var voting5:FlxSprite;
@@ -6,6 +7,11 @@ var jorsa:Character;
 var redmungus:Character;
 var redmadgus:Character;
 var headlights:Array<FlxSprite> = [];
+var bfIcon:FlxSprite;
+var warIcon:FlxSprite;
+var jelqIcon:FlxSprite;
+var redIcon:FlxSprite;
+
 function onLoad()
 {
 	var bars:FlxSpriteGroup = new FlxSpriteGroup();
@@ -97,6 +103,35 @@ function onCreatePost()
 	game.boyfriend.updateHitbox();
 	game.boyfriend.offset.set();
 	game.boyfriend.dance();
+
+	bfIcon = new FlxSprite(1920, 520).loadGraphic(Paths.image("icons/icon-bf"));
+	bfIcon.zIndex = 2;
+	bfIcon.scrollFactor.set(.96, 1);
+	bfIcon.clipRect = new FlxRect(0, 0, 150, 150);
+	add(bfIcon);
+	bfIcon.alpha = 0;
+
+	warIcon = new FlxSprite(1800, 520).loadGraphic(Paths.image("icons/icon-warchief"));
+	warIcon.zIndex = 2;
+	warIcon.scrollFactor.set(.96, 1);
+	warIcon.clipRect = new FlxRect(0, 0, 150, 150);
+	add(warIcon);
+	warIcon.alpha = 0;
+
+	jelqIcon = new FlxSprite(2040, 520).loadGraphic(Paths.image("icons/icon-thejelqer"));
+	jelqIcon.zIndex = 2;
+	jelqIcon.scrollFactor.set(.96, 1);
+	jelqIcon.clipRect = new FlxRect(0, 0, 150, 150);
+	add(jelqIcon);
+	jelqIcon.alpha = 0;
+
+	redIcon = new FlxSprite(2100, 580).loadGraphic(Paths.image("icons/icon-redmungus"));
+	redIcon.zIndex = 3;
+	redIcon.scale.set(1.2, 1.2);
+	redIcon.scrollFactor.set(.95, 1.05);
+	redIcon.clipRect = new FlxRect(0, 0, 150, 150);
+	add(redIcon);
+	redIcon.alpha = 0;
 
 	for (i in 0...3)
 	{
@@ -227,12 +262,20 @@ function onBeatHit()
 			FlxTween.tween(headlights[2], {alpha: 0.6}, 4, {ease:FlxEase.quadOut});
 		case 260:
 			for (sprite in sprites) FlxTween.color(sprite, 2, 0xFF2c385e, FlxColor.WHITE, {ease:FlxEase.quadOut});
-			FlxTween.color(boyfriend, 2, 0xFF2c385e, FlxColor.WHITE, {ease:FlxEase.quadOut});
+			FlxTween.color(boyfriend, 2, 0x002c385e, FlxColor.WHITE, {ease:FlxEase.quadOut});
 			FlxTween.tween(jorsa, {alpha: 0}, 2, {ease:FlxEase.quadOut});
 			FlxTween.tween(headlights[2], {alpha: 0}, 2, {ease:FlxEase.quadOut});
 		case 292:
 			redmungus.alpha = 0;
 			redmadgus.alpha = 1;
+		case 324:
+			FlxTween.tween(warIcon, {alpha: 1}, 0.7, {ease:FlxEase.quadOut});
+		case 325:
+			FlxTween.tween(redIcon, {alpha: 1}, 0.7, {ease:FlxEase.quadOut});
+		case 326:
+			FlxTween.tween(bfIcon, {alpha: 1}, 0.7, {ease:FlxEase.quadOut});
+		case 327:
+			FlxTween.tween(jelqIcon, {alpha: 1}, 0.7, {ease:FlxEase.quadOut});
 	}
 }
 
