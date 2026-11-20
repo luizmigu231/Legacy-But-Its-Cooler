@@ -55,123 +55,97 @@ function setBoiling(enabled:Bool)
 	}
 }
 
-function createRim(angleX:Float, angleY:Float):ExtraDropShadowShader
+function createRim(angle:Float):ExtraDropShadowShader
 {
 	var rim = new ExtraDropShadowShader();
-
 	rim.threshold = 0.05;
 	rim.strength = 0.85;
-
 	rim.setColorMatrix([
 		0.70, 0.10,  0.00, 0, -5,
 		0.00, 0.70, -0.25, 0,  0,
 		0.00,-0.15, 0.75, 0, -1,
 		0.00, 0.80, 0.00, 1,  0
 	]);
-
-	rim.addLayer([
+	var layerMatrix = [
 		8, 18,  0, -1,   0,
 		0.3, 2.5, -1.5, 0, 85,
 		0, -1.5, -5.5, 0, -5,
 		0,  9,   0,  9,  0
-	], angleX + 86, angleY + 10, 0.08, 0.50);
-
+	];
+	rim.addLayer(layerMatrix, angle, 16, 0.08, 0.30, 1.00);
 	return rim;
 }
 
-function createRim2(angleX:Float, angleY:Float):ExtraDropShadowShader
+
+function createRim2(angle:Float):ExtraDropShadowShader
 {
 	var rim = new ExtraDropShadowShader();
-
 	rim.threshold = 0.05;
 	rim.strength = 0.85;
-
 	rim.setColorMatrix([
 		0.70, 0.10,  0.00, 0, -5,
 		0.00, 0.70, -0.25, 0,  0,
 		0.00,-0.15, 0.75, 0, -1,
 		0.00, 0.80, 0.00, 1,  0
 	]);
-
-	rim.addLayer([
-		8, 18,  0, -1,   0,
-		0.3, 2.5, -1.5, 0, 85,
-		0, -1.5, -5.5, 0, -5,
-		0,  9,   0,  9,  0
-	], angleX + 86, angleY + 10, 0.08, 0.60);
-
-	return rim;
-}
-
-function createDarkRim(angleX:Float, angleY:Float):ExtraDropShadowShader
-{
-	var rim = new ExtraDropShadowShader();
-
-	rim.threshold = 0.045;
-	rim.strength = 0.80;
-	rim.operation = 'replace';
-
-	// Near-black wine fill: restores a little internal depth without brightening the character.
-	rim.setColorMatrix([
-		0.045, 0.010, 0.000, 0, 0,
-		0.005, 0.025, 0.000, 0, 0,
-		0.000, 0.002, 0.015, 0, 0,
-		0.000, 0.000, 0.000, 1, 0
-	]);
-
 	var layerMatrix = [
 		8, 18,  0, -1,   0,
 		0.3, 2.5, -1.5, 0, 85,
 		0, -1.5, -5.5, 0, -5,
 		0,  9,   0,  9,  0
 	];
-
-	// Main rim: preserves the original Maroon Layer color and direction.
-	rim.addLayer(layerMatrix, angleX + 86, angleY + 10, 0.08, 0.50);
-
-	// Soft bounce: a wider, low-energy copy that gives the rim more depth.
-	rim.addLayer(layerMatrix, angleX + 86, angleY + 17, 0.16, 0.07);
-
-	// Edge detail: a narrow, faint pass to keep small shapes readable.
-	rim.addLayer(layerMatrix, angleX + 86, angleY + 5, 0.025, 0.04);
-
+	rim.addLayer(layerMatrix, angle, 16, 0.08, 0.40, 1.00);
 	return rim;
 }
 
-function createDarkRim2(angleX:Float, angleY:Float):ExtraDropShadowShader
+
+function createDarkRim(angle:Float):ExtraDropShadowShader
 {
 	var rim = new ExtraDropShadowShader();
-
 	rim.threshold = 0.045;
 	rim.strength = 0.80;
 	rim.operation = 'replace';
-
-	// Near-black wine fill: restores a little internal depth without brightening the character.
 	rim.setColorMatrix([
 		0.045, 0.010, 0.000, 0, 0,
 		0.005, 0.025, 0.000, 0, 0,
 		0.000, 0.002, 0.015, 0, 0,
 		0.000, 0.000, 0.000, 1, 0
 	]);
-
 	var layerMatrix = [
 		8, 18,  0, -1,   0,
 		0.3, 2.5, -1.5, 0, 85,
 		0, -1.5, -5.5, 0, -5,
 		0,  9,   0,  9,  0
 	];
-
-	// Main rim: preserves the original Maroon Layer color and direction.
-	rim.addLayer(layerMatrix, angleX + 86, angleY + 10, 0.08, 0.60);
-
-	// Soft bounce: a wider, low-energy copy that gives the rim more depth.
-	rim.addLayer(layerMatrix, angleX + 86, angleY + 17, 0.16, 0.07);
-
-	// Edge detail: a narrow, faint pass to keep small shapes readable.
-	rim.addLayer(layerMatrix, angleX + 86, angleY + 5, 0.025, 0.04);
-
+	rim.addLayer(layerMatrix, angle, 18, 0.045, 0.58, 0.95);
 	return rim;
 }
+
+
+
+function createDarkRim2(angle:Float):ExtraDropShadowShader
+{
+	var rim = new ExtraDropShadowShader();
+	rim.threshold = 0.045;
+	rim.strength = 0.80;
+	rim.operation = 'replace';
+	rim.setColorMatrix([
+		0.045, 0.010, 0.000, 0, 0,
+		0.005, 0.025, 0.000, 0, 0,
+		0.000, 0.002, 0.015, 0, 0,
+		0.000, 0.000, 0.000, 1, 0
+	]);
+	var layerMatrix = [
+		8, 18,  0, -1,   0,
+		0.3, 2.5, -1.5, 0, 85,
+		0, -1.5, -5.5, 0, -5,
+		0,  9,   0,  9,  0
+	];
+	rim.addLayer(layerMatrix, angle, 18, 0.045, 0.64, 0.95);
+	return rim;
+}
+
+
 
 function updateRimFrame(sprite:FlxSprite, rim:ExtraDropShadowShader)
 {
@@ -198,9 +172,9 @@ function setupBFRim()
 	if (bfRim == null)
 	{
 		if (boyfriend.flipX)
-			bfRim = darkStageVariant ? createDarkRim(320, 6) : createRim(320, 6);
+			bfRim = darkStageVariant ? createDarkRim(46) : createRim(46);
 		else
-			bfRim = darkStageVariant ? createDarkRim(380, 6) : createRim(380, 6);
+			bfRim = darkStageVariant ? createDarkRim(106) : createRim(106);
 	}
 
 	boyfriend.useRenderTexture = true;
@@ -220,7 +194,7 @@ function setupGFRim()
 		return;
 
 	if (gfRim == null)
-		gfRim = darkStageVariant ? createDarkRim2(180, -28) : createRim2(180, -28);
+		gfRim = darkStageVariant ? createDarkRim2(266) : createRim2(266);
 
 	gf.useRenderTexture = true;
 	gfRim.attachedSprite = gf;
@@ -239,7 +213,7 @@ function setupDadRim()
 		return;
 
 	if (dadRim == null)
-		dadRim = darkStageVariant ? createDarkRim(320, 6) : createRim(320, 6);
+		dadRim = darkStageVariant ? createDarkRim(46) : createRim(46);
 
 	dad.useRenderTexture = true;
 	dadRim.attachedSprite = dad;
@@ -261,7 +235,7 @@ function setupPetRim()
 		return;
 
 	if (petRim == null)
-		petRim = darkStageVariant ? createDarkRim(380, 6) : createRim(380, 6);
+		petRim = darkStageVariant ? createDarkRim(106) : createRim(106);
 
 	pet.useRenderTexture = true;
 	petRim.attachedSprite = pet;
