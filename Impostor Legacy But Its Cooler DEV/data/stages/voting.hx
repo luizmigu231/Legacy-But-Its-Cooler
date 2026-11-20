@@ -7,6 +7,12 @@ var jorsa:Character;
 var redmungus:Character;
 var redmadgus:Character;
 var headlights:Array<FlxSprite> = [];
+
+var votedbf:FlxSprite;
+var votedwar:FlxSprite;
+var votedjelq:FlxSprite;
+var votedred:FlxSprite;
+
 var bfIcon:FlxSprite;
 var warIcon:FlxSprite;
 var jelqIcon:FlxSprite;
@@ -104,8 +110,31 @@ function onCreatePost()
 	game.boyfriend.offset.set();
 	game.boyfriend.dance();
 
+	votedbf = new FlxSprite(2190, 580).loadGraphic(Paths.image("Voted"));
+	votedbf.zIndex = 3;
+	votedbf.scale.set(1.2, 1.2);
+	votedbf.alpha = 0;
+	add(votedbf);
+
+	votedwar = new FlxSprite(-110, 580).loadGraphic(Paths.image("Voted"));
+	votedwar.zIndex = 2;
+	votedwar.scale.set(1.2, 1.2);
+	votedwar.alpha = 0;
+	add(votedwar);
+
+	votedjelq = new FlxSprite(250, 460).loadGraphic(Paths.image("Voted"));
+	votedjelq.scale.set(1, 1);
+	votedjelq.alpha = 0;
+	stage.insert(stage.members.indexOf(dadGroup), votedjelq);
+
+	votedred = new FlxSprite(1890, 520).loadGraphic(Paths.image("Voted"));
+	votedred.zIndex = 2;
+	votedred.scale.set(1, 1);
+	votedred.alpha = 0;
+	add(votedred);
+
 	bfIcon = new FlxSprite(1920, 520).loadGraphic(Paths.image("icons/icon-bf"));
-	bfIcon.zIndex = 2;
+	bfIcon.zIndex = 3;
 	bfIcon.scrollFactor.set(.96, 1);
 	bfIcon.clipRect = new FlxRect(0, 0, 150, 150);
 	add(bfIcon);
@@ -269,12 +298,24 @@ function onBeatHit()
 			redmungus.alpha = 0;
 			redmadgus.alpha = 1;
 		case 324:
-			FlxTween.tween(warIcon, {alpha: 1}, 0.7, {ease:FlxEase.quadOut});
+			votedwar.alpha = 1;
 		case 325:
-			FlxTween.tween(redIcon, {alpha: 1}, 0.7, {ease:FlxEase.quadOut});
+			votedbf.alpha = 1;
 		case 326:
-			FlxTween.tween(bfIcon, {alpha: 1}, 0.7, {ease:FlxEase.quadOut});
+			votedjelq.alpha = 1;
 		case 327:
+			votedred.alpha = 1;
+		case 328:
+			votedwar.alpha = 0;
+			votedbf.alpha = 0;
+			votedjelq.alpha = 0;
+			votedred.alpha = 0;
+
+			FlxTween.tween(warIcon, {alpha: 1}, 0.7, {ease:FlxEase.quadOut});
+			FlxTween.tween(redIcon, {alpha: 1}, 0.7, {ease:FlxEase.quadOut});
+		case 329:
+			FlxTween.tween(bfIcon, {alpha: 1}, 0.7, {ease:FlxEase.quadOut});
+		case 330:
 			FlxTween.tween(jelqIcon, {alpha: 1}, 0.7, {ease:FlxEase.quadOut});
 	}
 }
