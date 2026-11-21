@@ -1,11 +1,15 @@
 import StringTools;
-import funkin.game.shaders.ExtraDropShadowShader;
 import funkin.objects.SnowEmitter;
 
-var bfRim:ExtraDropShadowShader;
-var gfRim:ExtraDropShadowShader;
-var dadRim:ExtraDropShadowShader;
-var petRim:ExtraDropShadowShader;
+var bfDirectionalLook:Dynamic;
+var dadDirectionalLook:Dynamic;
+var petDirectionalLook:Dynamic;
+var bfDirectionalTarget:FlxSprite;
+var dadDirectionalTarget:FlxSprite;
+var petDirectionalTarget:FlxSprite;
+var directionalLUTBitmap:Dynamic;
+var gfLook:Dynamic;
+var gfLookTarget:FlxSprite;
 var snowAlpha = 0.3;
 var snowEmitter:SnowEmitter;
 var ext:String = 'stages/polus/maroon/';
@@ -13,225 +17,339 @@ var darkStageVariant:Bool = false;
 
 function maroonStageImage(name:String):String
 {
-	if (darkStageVariant && (name == 'newsky' || name == 'newcloud' || name == 'backwall' || name == 'newstage'))
-		return ext + name + '_lightsdown';
+    if (darkStageVariant && (name == 'newsky' || name == 'newcloud' || name == 'backwall' || name == 'newstage'))
+        return ext + name + '_lightsdown';
 
-	return ext + name;
+    return ext + name;
 }
 
-function createRim(angle:Float):ExtraDropShadowShader
+function getDirectionalLUTBitmap():Dynamic
 {
-	var rim = new ExtraDropShadowShader();
-	rim.threshold = 0.05;
-	rim.strength = 0.85;
-	rim.setColorMatrix([
-		0.70, 0.10,  0.00, 0, -5,
-		0.00, 0.70, -0.25, 0,  0,
-		0.00,-0.15, 0.75, 0, -1,
-		0.00, 0.80, 0.00, 1,  0
-	]);
-	var layerMatrix = [
-		8, 18,  0, -1,   0,
-		0.3, 2.5, -1.5, 0, 85,
-		0, -1.5, -5.5, 0, -5,
-		0,  9,   0,  9,  0
-	];
-	rim.addLayer(layerMatrix, angle, 16, 0.08, 0.30, 1.00);
-	return rim;
+    if (directionalLUTBitmap == null)
+    {
+        var lutGraphic = Paths.image('looks/polus-directional-layer', null, false);
+        if (lutGraphic != null)
+            directionalLUTBitmap = lutGraphic.bitmap;
+    }
+
+    return directionalLUTBitmap;
 }
 
-
-function createRim2(angle:Float):ExtraDropShadowShader
+function createDirectionalLook():Dynamic
 {
-	var rim = new ExtraDropShadowShader();
-	rim.threshold = 0.05;
-	rim.strength = 0.85;
-	rim.setColorMatrix([
-		0.70, 0.10,  0.00, 0, -5,
-		0.00, 0.70, -0.25, 0,  0,
-		0.00,-0.15, 0.75, 0, -1,
-		0.00, 0.80, 0.00, 1,  0
-	]);
-	var layerMatrix = [
-		8, 18,  0, -1,   0,
-		0.3, 2.5, -1.5, 0, 85,
-		0, -1.5, -5.5, 0, -5,
-		0,  9,   0,  9,  0
-	];
-	rim.addLayer(layerMatrix, angle, 16, 0.08, 0.40, 1.00);
-	return rim;
+    var lutBitmap = getDirectionalLUTBitmap();
+    if (lutBitmap == null)
+        return null;
+
+    var shader = newShader('directionalLayerLUT');
+    if (shader == null)
+        return null;
+
+    shader.setBitmapData('uDirectionalLUT', lutBitmap);
+
+    if (darkStageVariant)
+    {
+        shader.setFloatArray('uBaseRow0', [0.045, 0.010, 0.000, 0.000]);
+        shader.setFloatArray('uBaseRow1', [0.005, 0.025, 0.000, 0.000]);
+        shader.setFloatArray('uBaseRow2', [0.000, 0.002, 0.015, 0.000]);
+        shader.setFloatArray('uBaseRow3', [0.000, 0.000, 0.000, 1.000]);
+        shader.setFloatArray('uBaseOffset', [0.0, 0.0, 0.0, 0.0]);
+        shader.setFloatArray('uBaseStrength', [0.80]);
+        shader.setFloatArray('uBaseThreshold', [0.045]);
+        shader.setFloatArray('uBaseRoughness', [1.0]);
+
+        shader.setFloatArray('uLayerDistance', [18.0]);
+        shader.setFloatArray('uLayerThreshold', [0.045]);
+        shader.setFloatArray('uLayerStrength', [0.58]);
+        shader.setFloatArray('uLayerRoughness', [0.95]);
+    }
+    else
+    {
+        shader.setFloatArray('uBaseRow0', [0.70, 0.10, 0.00, 0.00]);
+        shader.setFloatArray('uBaseRow1', [0.00, 0.70, -0.25, 0.00]);
+        shader.setFloatArray('uBaseRow2', [0.00, -0.15, 0.75, 0.00]);
+        shader.setFloatArray('uBaseRow3', [0.00, 0.80, 0.00, 1.00]);
+        shader.setFloatArray('uBaseOffset', [-5.0 / 255.0, 0.0, -1.0 / 255.0, 0.0]);
+        shader.setFloatArray('uBaseStrength', [0.85]);
+        shader.setFloatArray('uBaseThreshold', [0.05]);
+        shader.setFloatArray('uBaseRoughness', [1.0]);
+
+        shader.setFloatArray('uLayerDistance', [16.0]);
+        shader.setFloatArray('uLayerThreshold', [0.08]);
+        shader.setFloatArray('uLayerStrength', [0.30]);
+        shader.setFloatArray('uLayerRoughness', [1.00]);
+    }
+
+    return shader;
 }
 
-
-function createDarkRim(angle:Float):ExtraDropShadowShader
+function updateDirectionalLook(sprite:FlxSprite, shader:Dynamic, angle:Float)
 {
-	var rim = new ExtraDropShadowShader();
-	rim.threshold = 0.045;
-	rim.strength = 0.80;
-	rim.operation = 'replace';
-	rim.setColorMatrix([
-		0.045, 0.010, 0.000, 0, 0,
-		0.005, 0.025, 0.000, 0, 0,
-		0.000, 0.002, 0.015, 0, 0,
-		0.000, 0.000, 0.000, 1, 0
-	]);
-	var layerMatrix = [
-		8, 18,  0, -1,   0,
-		0.3, 2.5, -1.5, 0, 85,
-		0, -1.5, -5.5, 0, -5,
-		0,  9,   0,  9,  0
-	];
-	rim.addLayer(layerMatrix, angle, 18, 0.045, 0.58, 0.95);
-	return rim;
+    if (sprite == null || shader == null || sprite.frame == null || sprite.frame.uv == null)
+        return;
+
+    var uv = sprite.frame.uv;
+    var frameAngle:Float = 0.0;
+    if (sprite.frame.angle != null)
+        frameAngle = sprite.frame.angle * 0.017453292519943295;
+
+    shader.setFloatArray('uAngle', [angle]);
+    shader.setFloatArray('uFrameAngle', [frameAngle]);
+    shader.setFloatArray('uScale', [sprite.scale.x, sprite.scale.y]);
+    shader.setFloatArray('uFrameBounds', [uv.left, uv.top, uv.right, uv.bottom]);
 }
 
-
-
-function createDarkRim2(angle:Float):ExtraDropShadowShader
+function setupBFDirectionalLUT()
 {
-	var rim = new ExtraDropShadowShader();
-	rim.threshold = 0.045;
-	rim.strength = 0.80;
-	rim.operation = 'replace';
-	rim.setColorMatrix([
-		0.045, 0.010, 0.000, 0, 0,
-		0.005, 0.025, 0.000, 0, 0,
-		0.000, 0.002, 0.015, 0, 0,
-		0.000, 0.000, 0.000, 1, 0
-	]);
-	var layerMatrix = [
-		8, 18,  0, -1,   0,
-		0.3, 2.5, -1.5, 0, 85,
-		0, -1.5, -5.5, 0, -5,
-		0,  9,   0,  9,  0
-	];
-	rim.addLayer(layerMatrix, angle, 18, 0.045, 0.64, 0.95);
-	return rim;
+    if (!ClientPrefs.shaders || boyfriend == null)
+        return;
+
+    if (bfDirectionalLook == null)
+        bfDirectionalLook = createDirectionalLook();
+
+    if (bfDirectionalLook == null)
+        return;
+
+    if (bfDirectionalTarget != boyfriend || boyfriend.shader != bfDirectionalLook)
+    {
+        boyfriend.useRenderTexture = true;
+        boyfriend.shader = bfDirectionalLook;
+        bfDirectionalTarget = boyfriend;
+    }
+
+    updateDirectionalLook(boyfriend, bfDirectionalLook, boyfriend.flipX ? 46 : 106);
 }
 
+function setupDadDirectionalLUT()
+{
+    if (!ClientPrefs.shaders || dad == null)
+        return;
 
+    if (dadDirectionalLook == null)
+        dadDirectionalLook = createDirectionalLook();
+
+    if (dadDirectionalLook == null)
+        return;
+
+    if (dadDirectionalTarget != dad || dad.shader != dadDirectionalLook)
+    {
+        dad.useRenderTexture = true;
+        dad.shader = dadDirectionalLook;
+        dadDirectionalTarget = dad;
+    }
+
+    updateDirectionalLook(dad, dadDirectionalLook, 46);
+}
+
+function setupPetDirectionalLUT()
+{
+    if (!ClientPrefs.shaders || !hasPet || pet == null)
+        return;
+
+    if (petDirectionalLook == null)
+        petDirectionalLook = createDirectionalLook();
+
+    if (petDirectionalLook == null)
+        return;
+
+    if (petDirectionalTarget != pet || pet.shader != petDirectionalLook)
+    {
+        pet.useRenderTexture = true;
+        pet.shader = petDirectionalLook;
+        petDirectionalTarget = pet;
+    }
+
+    updateDirectionalLook(pet, petDirectionalLook, 106);
+}
+
+function setupGFLook()
+{
+    if (!ClientPrefs.shaders || gf == null)
+        return;
+
+    if (gfLook == null)
+    {
+        var rimLut = Paths.image('looks/gfpolus-lava-rim', null, false);
+
+        if (rimLut == null || rimLut.bitmap == null)
+            return;
+
+        gfLook = newShader('characterLookRim');
+        if (gfLook == null)
+            return;
+
+        gfLook.setBitmapData('lutRim', rimLut.bitmap);
+
+        if (darkStageVariant)
+        {
+            gfLook.setFloatArray('uMatrixRow0', [0.045, 0.010, 0.000, 0.000]);
+            gfLook.setFloatArray('uMatrixRow1', [0.005, 0.025, 0.000, 0.000]);
+            gfLook.setFloatArray('uMatrixRow2', [0.000, 0.002, 0.015, 0.000]);
+            gfLook.setFloatArray('uMatrixOffset', [0.0, 0.0, 0.0, 0.0]);
+            gfLook.setFloatArray('uMatrixStrength', [0.80]);
+            gfLook.setFloatArray('uMatrixThreshold', [0.045]);
+            gfLook.setFloatArray('uMatrixRoughness', [4.0]);
+        }
+        else
+        {
+            gfLook.setFloatArray('uMatrixRow0', [0.70, 0.10, 0.00, 0.00]);
+            gfLook.setFloatArray('uMatrixRow1', [0.00, 0.70, -0.25, 0.00]);
+            gfLook.setFloatArray('uMatrixRow2', [0.00, -0.15, 0.75, 0.00]);
+            gfLook.setFloatArray('uMatrixOffset', [-5.0 / 255.0, 0.0, -1.0 / 255.0, 0.0]);
+            gfLook.setFloatArray('uMatrixStrength', [0.85]);
+            gfLook.setFloatArray('uMatrixThreshold', [0.05]);
+            gfLook.setFloatArray('uMatrixRoughness', [4.0]);
+        }
+        gfLook.setFloatArray('uStrength', [darkStageVariant ? 0.70 : 0.82]);
+        gfLook.setFloatArray('uRimGain', [darkStageVariant ? 1.08 : 1.5]);
+        gfLook.setFloatArray('uRimAmount', [darkStageVariant ? 0.90 : 1.0]);
+        gfLook.setFloatArray('uRimSpread', [darkStageVariant ? 4.0 : 5.2]);
+        gfLook.setFloatArray('uRimCurve', [1.05]);
+        gfLook.setFloatArray('uGlowCurve', [0.55]);
+        gfLook.setFloatArray('uGlowAmount', [0.78]);
+    }
+
+    if (gfLookTarget != gf || gf.shader != gfLook)
+    {
+        gf.useRenderTexture = true;
+        gf.shader = gfLook;
+        gfLookTarget = gf;
+    }
+
+    updateGFLookFrame();
+}
+
+function updateGFLookFrame()
+{
+    if (gf == null || gfLook == null || gf.frame == null || gf.frame.uv == null)
+        return;
+
+    var uv = gf.frame.uv;
+    gfLook.setFloatArray('uFrameLeft', [uv.left]);
+    gfLook.setFloatArray('uFrameTop', [uv.top]);
+    gfLook.setFloatArray('uFrameRight', [uv.right]);
+    gfLook.setFloatArray('uFrameBottom', [uv.bottom]);
+}
 
 function onLoad()
 {
-	darkStageVariant = PlayState.SONG.stage == 'maroon' && FlxG.random.int(1, 4) == 1;
+    darkStageVariant = PlayState.SONG.stage == 'maroon' && FlxG.random.int(1, 4) == 1;
 
-	var bg:FlxSprite = new FlxSprite(-200).loadGraphic(Paths.image(maroonStageImage("newsky")));
-	bg.scrollFactor.x = 0.7;
-	bg.scale.set(0.75, 0.75);
-	bg.color = 0xFFFFFFFF;
-	add(bg);
+    var bg:FlxSprite = new FlxSprite(-200).loadGraphic(Paths.image(maroonStageImage("newsky")));
+    bg.scrollFactor.x = 0.7;
+    bg.scale.set(0.75, 0.75);
+    bg.color = 0xFFFFFFFF;
+    add(bg);
 
-	var cloud:FlxSprite = new FlxSprite(-100).loadGraphic(Paths.image(maroonStageImage("newcloud")));
-	cloud.scrollFactor.x = 0.9;
-	cloud.alpha = 0.9;
-	cloud.color = 0xFFFFFFFF;
-	add(cloud);
+    var cloud:FlxSprite = new FlxSprite(-100).loadGraphic(Paths.image(maroonStageImage("newcloud")));
+    cloud.scrollFactor.x = 0.9;
+    cloud.alpha = 0.9;
+    cloud.color = 0xFFFFFFFF;
+    add(cloud);
 
-	var rocks:FlxSprite = new FlxSprite().loadGraphic(Paths.image(ext + "newrocks"));
-	rocks.alpha = 0.49;
-	rocks.color = 0xFF4F5E7C;
-	add(rocks);
+    var rocks:FlxSprite = new FlxSprite().loadGraphic(Paths.image(ext + "newrocks"));
+    rocks.alpha = 0.49;
+    rocks.color = 0xFF4F5E7C;
+    add(rocks);
 
-	var backwall:FlxSprite = new FlxSprite().loadGraphic(Paths.image(maroonStageImage("backwall")));
-	backwall.scrollFactor.x = 0.9;
-	backwall.color = 0xFFFFFFFF;
-	add(backwall);
+    var backwall:FlxSprite = new FlxSprite().loadGraphic(Paths.image(maroonStageImage("backwall")));
+    backwall.scrollFactor.x = 0.9;
+    backwall.color = 0xFFFFFFFF;
+    add(backwall);
 
-	var ground:FlxSprite = new FlxSprite().loadGraphic(Paths.image(maroonStageImage("newstage")));
-	ground.color = 0xFFFFFFFF;
-	add(ground);
+    var ground:FlxSprite = new FlxSprite().loadGraphic(Paths.image(maroonStageImage("newstage")));
+    ground.color = 0xFFFFFFFF;
+    add(ground);
 
-	snowEmitter = new SnowEmitter(1000, 800, 2700);
-	snowEmitter.start(false, ClientPrefs.lowQuality ? 0.1 : 0.04);
-	snowEmitter.scrollFactor.x.set(1, 1.5);
-	snowEmitter.scrollFactor.y.set(1, 1.5);
-	add(snowEmitter);
-	snowEmitter.alpha.active = false;
-	snowEmitter.onEmit.add((particle) ->
-	{
-		particle.alpha = snowAlpha;
-		particle.color = 0xFFFFF2EA;
-	});
-	snowEmitter.zIndex = 13;
-	snowEmitter.speed.set(1000, 1500);
+    snowEmitter = new SnowEmitter(1000, 800, 2700);
+    snowEmitter.start(false, ClientPrefs.lowQuality ? 0.1 : 0.04);
+    snowEmitter.scrollFactor.x.set(1, 1.5);
+    snowEmitter.scrollFactor.y.set(1, 1.5);
+    add(snowEmitter);
+    snowEmitter.alpha.active = false;
+    snowEmitter.onEmit.add((particle) ->
+    {
+        particle.alpha = snowAlpha;
+        particle.color = 0xFFFFF2EA;
+    });
+    snowEmitter.zIndex = 13;
+    snowEmitter.speed.set(1000, 1500);
 
-	var lava:FlxSprite = new FlxSprite().loadGraphic(Paths.image(ext + "newlava"));
-	lava.blend = BlendMode.ADD;
-	lava.color = 0xFFFFF2EA;
-	add(lava);
+    var lava:FlxSprite = new FlxSprite().loadGraphic(Paths.image(ext + "newlava"));
+    lava.blend = BlendMode.ADD;
+    lava.color = 0xFFFFF2EA;
+    add(lava);
 
-	for (i in [bg, cloud, rocks, backwall, ground, lava])
-	{
-		i.scale.set(0.75, 0.75);
-	}
+    for (i in [bg, cloud, rocks, backwall, ground, lava])
+        i.scale.set(0.75, 0.75);
 }
 
 function goodNoteHit(note)
 {
-	if (note.noteType == 'Hey!')
-	{
-		game.boyfriend.playAnim('hey', true);
-		game.boyfriend.specialAnim = true;
-	}
+    if (note.noteType == 'Hey!')
+    {
+        game.boyfriend.playAnim('hey', true);
+        game.boyfriend.specialAnim = true;
+    }
 }
 
 function opponentNoteHit(note)
 {
-	game.defaultCamZoom = 0.7;
+    game.defaultCamZoom = 0.7;
 }
 
 function onCreatePost()
 {
-	if (hasBfSkin && game.boyfriend.curCharacter == 'bfpolus')
-	{
-		triggerEventNote('Change Character', 'boyfriend', 'bfpolusblow');
-	}
+    if (hasBfSkin && game.boyfriend.curCharacter == 'bfpolus')
+        triggerEventNote('Change Character', 'boyfriend', 'bfpolusblow');
 
-	camSpecialThing([1600, 1300], [1800, 1300]);
+    camSpecialThing([1600, 1300], [1800, 1300]);
 
-	boyfriend.color = 0xFF8A9BC0;
-	gf.color = 0xFF8A9BC0;
-	dad.color = 0xFF8A9BC0;
-	pet.color = 0xFF8A9BC0;
+    boyfriend.color = 0xFF8A9BC0;
+    gf.color = 0xFF8A9BC0;
+    dad.color = 0xFF8A9BC0;
+    pet.color = 0xFF8A9BC0;
 
-	if (ClientPrefs.shaders)
-	{
-		boyfriend.useRenderTexture = true;
+    if (ClientPrefs.shaders)
+    {
+        setupBFDirectionalLUT();
+        if (hasPet)
+            setupPetDirectionalLUT();
+        setupDadDirectionalLUT();
+        setupGFLook();
+    }
 
-		if (boyfriend.flipX)
-			bfRim = darkStageVariant ? createDarkRim(46) : createRim(46);
-		else
-			bfRim = darkStageVariant ? createDarkRim(106) : createRim(106);
+    var mainoverlay:FlxSprite = new FlxSprite(0, 0);
+    mainoverlay.loadGraphic(Paths.image(ext + "newoverlay"));
+    mainoverlay.scrollFactor.set(1, 1);
+    mainoverlay.scale.set(0.75, 0.75);
+    mainoverlay.alpha = darkStageVariant ? 0.12 : 0.60;
+    mainoverlay.blend = 0;
 
-		bfRim.attachedSprite = boyfriend;
-		boyfriend.shader = bfRim;
+    if (!ClientPrefs.lowQuality)
+        add(mainoverlay);
+}
 
-		if (hasPet)
-		{
-			pet.useRenderTexture = true;
-			petRim = darkStageVariant ? createDarkRim(106) : createRim(106);
-			petRim.attachedSprite = pet;
-			pet.shader = petRim;
-		}
+function onUpdatePost(elapsed:Float)
+{
+    if (ClientPrefs.shaders)
+    {
+        setupBFDirectionalLUT();
+        setupDadDirectionalLUT();
+        if (hasPet)
+            setupPetDirectionalLUT();
+        setupGFLook();
+    }
+}
 
-		gf.useRenderTexture = true;
-		gfRim = darkStageVariant ? createDarkRim2(266) : createRim2(266);
-		gfRim.attachedSprite = gf;
-		gf.shader = gfRim;
-
-		dad.useRenderTexture = true;
-		dadRim = darkStageVariant ? createDarkRim(46) : createRim(46);
-		dadRim.attachedSprite = dad;
-		dad.shader = dadRim;
-	}
-
-	var mainoverlay:FlxSprite = new FlxSprite(0, 0);
-	mainoverlay.loadGraphic(Paths.image(ext + "newoverlay"));
-	mainoverlay.scrollFactor.set(1, 1);
-	mainoverlay.scale.set(0.75, 0.75);
-	mainoverlay.alpha = darkStageVariant ? 0.12 : 0.60;
-	mainoverlay.blend = 0;
-
-	if (!ClientPrefs.lowQuality)
-		add(mainoverlay);
+function onResume()
+{
+    if (ClientPrefs.shaders)
+    {
+        setupBFDirectionalLUT();
+        setupDadDirectionalLUT();
+        if (hasPet)
+            setupPetDirectionalLUT();
+        setupGFLook();
+    }
 }
