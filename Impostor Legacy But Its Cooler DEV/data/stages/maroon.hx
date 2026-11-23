@@ -17,7 +17,7 @@ var darkStageVariant:Bool = false;
 
 function maroonStageImage(name:String):String
 {
-    if (darkStageVariant && (name == 'newsky' || name == 'newcloud' || name == 'backwall' || name == 'newstage'))
+    if (darkStageVariant && (name == 'newcloud' || name == 'backwall' || name == 'newstage'))
         return ext + name + '_lightsdown';
 
     return ext + name;
@@ -41,7 +41,7 @@ function createDirectionalLook():Dynamic
     if (lutBitmap == null)
         return null;
 
-    var shader = newShader('directionalLayerLUT');
+    var shader = newShader('directionalRimLook');
     if (shader == null)
         return null;
 
@@ -58,19 +58,19 @@ function createDirectionalLook():Dynamic
         shader.setFloatArray('uBaseThreshold', [0.045]);
         shader.setFloatArray('uBaseRoughness', [1.0]);
 
-        shader.setFloatArray('uLayerDistance', [18.0]);
+        shader.setFloatArray('uLayerDistance', [16.0]);
         shader.setFloatArray('uLayerThreshold', [0.045]);
-        shader.setFloatArray('uLayerStrength', [0.58]);
+        shader.setFloatArray('uLayerStrength', [0.36]);
         shader.setFloatArray('uLayerRoughness', [0.95]);
     }
     else
     {
-        shader.setFloatArray('uBaseRow0', [0.70, 0.10, 0.00, 0.00]);
-        shader.setFloatArray('uBaseRow1', [0.00, 0.70, -0.25, 0.00]);
-        shader.setFloatArray('uBaseRow2', [0.00, -0.15, 0.75, 0.00]);
+        shader.setFloatArray('uBaseRow0', [0.78, 0.08, 0.00, 0.00]);
+        shader.setFloatArray('uBaseRow1', [0.00, 0.78, -0.16, 0.00]);
+        shader.setFloatArray('uBaseRow2', [0.00, -0.10, 0.82, 0.00]);
         shader.setFloatArray('uBaseRow3', [0.00, 0.80, 0.00, 1.00]);
-        shader.setFloatArray('uBaseOffset', [-5.0 / 255.0, 0.0, -1.0 / 255.0, 0.0]);
-        shader.setFloatArray('uBaseStrength', [0.85]);
+        shader.setFloatArray('uBaseOffset', [-3.0 / 255.0, 0.0, -0.5 / 255.0, 0.0]);
+        shader.setFloatArray('uBaseStrength', [0.80]);
         shader.setFloatArray('uBaseThreshold', [0.05]);
         shader.setFloatArray('uBaseRoughness', [1.0]);
 
@@ -79,6 +79,13 @@ function createDirectionalLook():Dynamic
         shader.setFloatArray('uLayerStrength', [0.30]);
         shader.setFloatArray('uLayerRoughness', [1.00]);
     }
+    var directionalWidth:Float;
+    if (PlayState.SONG.stage == 'maroon2')
+        directionalWidth = darkStageVariant ? 45.6 : 60.0;
+    else
+        directionalWidth = darkStageVariant ? 43.2 : 62.4;
+
+    shader.setFloatArray('uLayerWidth', [directionalWidth]);
 
     return shader;
 }
@@ -174,7 +181,7 @@ function setupGFLook()
         if (rimLut == null || rimLut.bitmap == null)
             return;
 
-        gfLook = newShader('characterLookRim');
+        gfLook = newShader('characterRimLook');
         if (gfLook == null)
             return;
 
@@ -200,13 +207,13 @@ function setupGFLook()
             gfLook.setFloatArray('uMatrixThreshold', [0.05]);
             gfLook.setFloatArray('uMatrixRoughness', [4.0]);
         }
-        gfLook.setFloatArray('uStrength', [darkStageVariant ? 0.70 : 0.82]);
-        gfLook.setFloatArray('uRimGain', [darkStageVariant ? 1.08 : 1.5]);
+        gfLook.setFloatArray('uStrength', [darkStageVariant ? 0.70 : 0.72]);
+        gfLook.setFloatArray('uRimGain', [darkStageVariant ? 1.02 : 1.28]);
         gfLook.setFloatArray('uRimAmount', [darkStageVariant ? 0.90 : 1.0]);
         gfLook.setFloatArray('uRimSpread', [darkStageVariant ? 4.0 : 5.2]);
         gfLook.setFloatArray('uRimCurve', [1.05]);
         gfLook.setFloatArray('uGlowCurve', [0.55]);
-        gfLook.setFloatArray('uGlowAmount', [0.78]);
+        gfLook.setFloatArray('uGlowAmount', [darkStageVariant ? 0.57 : 0.62]);
     }
 
     if (gfLookTarget != gf || gf.shader != gfLook)
