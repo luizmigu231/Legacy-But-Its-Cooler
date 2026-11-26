@@ -135,6 +135,20 @@ function onSectionPost(curMonth) {
 
     if (stealthExists) return;
 
+    final neverSong:SongInformation = [
+        "Never Win",
+        "player",
+        "player",
+        FlxColor.fromRGB(255, 0, 0),
+        "special",
+        ["ashes"],
+        0,
+        "Tulpkun",
+        "beans",
+        false,
+        "never-win"
+    ];
+
     final stealthSong:SongInformation = [
         "Stealth",
         "maroon",
@@ -149,11 +163,14 @@ function onSectionPost(curMonth) {
         "stealth"
     ];
 
-    var stealthIndex = 2;
+    var stealthIndex = 3;
     if (stealthIndex > week_songs.length) stealthIndex = week_songs.length;
 
     final isLocked:Bool = checkLock(stealthSong);
     var animate:Bool = false;
+
+    ws_lock.insert(0, checkLock(neverSong));
+    week_songs.insert(0, neverSong);
 
     ws_lock.insert(stealthIndex, isLocked);
     week_songs.insert(stealthIndex, stealthSong);
@@ -170,7 +187,8 @@ function onSectionPost(curMonth) {
     Mods.currentModDirectory = stealthSong.mod;
 
     for (card in cards.members) {
-        if (card.ID >= stealthIndex) card.ID++;
+        if (card.ID >= 2) card.ID++;
+	card.ID++;
     }
 
     var c = cachedCards.recycle(FreeplayCard);
@@ -179,11 +197,15 @@ function onSectionPost(curMonth) {
     cards.insert(stealthIndex, c);
     c.zIndex = 5;
 
+    var c = cachedCards.recycle(FreeplayCard);
+    c.initCard(neverSong, ws_lock[0] || animate);
+    c.ID = 0;
+    cards.insert(0, c);
+    c.zIndex = 5;
+
     for (card in cards.members) {
-        if (card.ID >= stealthIndex) {
             moveCard(card, smoothSelect, true);
             card.x -= 700;
-        }
     }
 
     if (animate) animateCards.push(c);

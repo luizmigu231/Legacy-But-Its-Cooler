@@ -1,6 +1,7 @@
 import StringTools;
 import funkin.game.shaders.HeatwaveShader;
 import funkin.objects.SnowEmitter;
+import funkin.game.shaders.ExtraDropShadowShader;
 
 import openfl.filters.ShaderFilter;
 
@@ -40,6 +41,132 @@ function maroonStageImage(name:String):String
     return ext + name;
 }
 
+function createRim(angle:Float):ExtraDropShadowShader
+{
+	var rim = new ExtraDropShadowShader();
+	rim.threshold = 0.05;
+	rim.strength = 0.85;
+	rim.setColorMatrix([
+		0.70, 0.10,  0.00, 0, -5,
+		0.00, 0.70, -0.25, 0,  0,
+		0.00,-0.15, 0.75, 0, -1,
+		0.00, 0.80, 0.00, 1,  0
+	]);
+	var layerMatrix = [
+		8, 18,  0, -1,   0,
+		0.3, 2.5, -1.5, 0, 85,
+		0, -1.5, -5.5, 0, -5,
+		0,  9,   0,  9,  0
+	];
+	rim.addLayer(layerMatrix, angle, 16, 0.08, 0.30, 1.00);
+	return rim;
+}
+
+function createRim2(angle:Float):ExtraDropShadowShader
+{
+	var rim = new ExtraDropShadowShader();
+	rim.threshold = 0.05;
+	rim.strength = 0.85;
+	rim.setColorMatrix([
+		0.70, 0.10,  0.00, 0, -5,
+		0.00, 0.70, -0.25, 0,  0,
+		0.00,-0.15, 0.75, 0, -1,
+		0.00, 0.80, 0.00, 1,  0
+	]);
+	var layerMatrix = [
+		8, 18,  0, -1,   0,
+		0.3, 2.5, -1.5, 0, 85,
+		0, -1.5, -5.5, 0, -5,
+		0,  9,   0,  9,  0
+	];
+	rim.addLayer(layerMatrix, angle, 16, 0.08, 0.40, 1.00);
+	return rim;
+}
+
+function setupBFRim()
+{
+	if (!ClientPrefs.shaders)
+		return;
+
+	if (boyfriend == null)
+		return;
+
+	var bfRim = boyfriend.shader;
+
+	if (bfRim == null)
+	{
+		if (boyfriend.flipX)
+			bfRim = darkStageVariant ? createDarkRim(46) : createRim(46);
+		else
+			bfRim = darkStageVariant ? createDarkRim(106) : createRim(106);
+	}
+
+	boyfriend.useRenderTexture = true;
+	bfRim.attachedSprite = boyfriend;
+	boyfriend.shader = bfRim;
+	bfRimTarget = boyfriend;
+}
+
+function setupGFRim()
+{
+	if (!ClientPrefs.shaders)
+		return;
+
+	if (gf == null)
+		return;
+
+	var gfRim = gf.shader;
+
+	if (gfRim == null)
+		gfRim = darkStageVariant ? createDarkRim2(266) : createRim2(266);
+
+	gf.useRenderTexture = true;
+	gfRim.attachedSprite = gf;
+	gf.shader = gfRim;
+	gfRimTarget = gf;
+}
+
+function setupDadRim()
+{
+	if (!ClientPrefs.shaders)
+		return;
+
+	if (dad == null)
+		return;
+
+	var dadRim = dad.shader;
+
+	if (dadRim == null)
+		dadRim = createRim(46);
+
+	dad.useRenderTexture = true;
+	dadRim.attachedSprite = dad;
+	dad.shader = dadRim;
+	dadRimTarget = dad;
+}
+
+function setupPetRim()
+{
+	if (!ClientPrefs.shaders)
+		return;
+
+	if (!hasPet)
+		return;
+
+	if (pet == null)
+		return;
+
+	var petRim = pet.shader;
+
+	if (petRim == null)
+		petRim = darkStageVariant ? createDarkRim(106) : createRim(106);
+
+	pet.useRenderTexture = true;
+	petRim.attachedSprite = pet;
+	pet.shader = petRim;
+	petRimTarget = pet;
+}
+
 function setBoiling(enabled:Bool)
 {
     if (boilingFilter == null)
@@ -74,7 +201,7 @@ function createDirectionalLook():Dynamic
     if (lutBitmap == null)
         return null;
 
-    var shader = newShader('directionalRimLook');
+    var shader = newShader('directionalLayerLUT');
     if (shader == null)
         return null;
 
@@ -214,7 +341,7 @@ function setupGFLook()
         if (rimLut == null || rimLut.bitmap == null)
             return;
 
-        gfLook = newShader('characterRimLook');
+        gfLook = newShader('characterLookRim');
         if (gfLook == null)
             return;
 
@@ -284,7 +411,7 @@ function checkRimAttachments()
 
 function onLoad()
 {
-    darkStageVariant = PlayState.SONG.stage == 'maroon2' && FlxG.random.int(1, 4) == 1;
+    darkStageVariant = !PlayState.isStoryMode && PlayState.SONG.stage == 'maroon2' && FlxG.random.int(1, 4) == 1;
 
     var bg:FlxSprite = new FlxSprite(-200)
         .loadGraphic(Paths.image(maroonStageImage("newsky")));
@@ -346,7 +473,7 @@ function onUpdatePost(elapsed:Float)
     if (boilingShader != null)
         boilingShader.update(elapsed);
 
-    checkRimAttachments();
+    if (darkStageVariant) checkRimAttachments();
 }
 
 function onEvent(eventName, value1, value2)
@@ -404,6 +531,10 @@ function onCreatePost()
 
     camSpecialThing([1600, 1300], [1800, 1300]);
 
+    var player:FlxSprite = new FlxSprite(dadGroup.x - 280, dadGroup.y + 440).loadGraphic(Paths.image(ext + 'player'));
+    player.color = darkStageVariant ? 0xff060a1a : 0xFF8A9BC0;
+    stage.insert(stage.members.indexOf(dadGroup), player);
+
     boyfriend.color = 0xFF8A9BC0;
     gf.color = 0xFF8A9BC0;
     dad.color = 0xFF8A9BC0;
@@ -413,12 +544,24 @@ function onCreatePost()
 
     if (ClientPrefs.shaders)
     {
-        setupBFDirectionalLUT();
-        setupGFLook();
-        setupDadDirectionalLUT();
+	if (darkStageVariant)
+	{
+        	setupBFDirectionalLUT();
+        	setupGFLook();
+        	setupDadDirectionalLUT();
 
-        if (hasPet)
-            setupPetDirectionalLUT();
+        	if (hasPet)
+        	    setupPetDirectionalLUT();
+	}
+	else
+	{
+		setupBFRim();
+		setupGFRim();
+		setupDadRim();
+
+		if (hasPet)
+			setupPetRim();
+	}
     }
 
     var mainoverlay:FlxSprite = new FlxSprite(0, 0);
@@ -443,7 +586,7 @@ function onSongRetry()
 
 function onResume()
 {
-    if (stageLightsOutActive || !ClientPrefs.shaders)
+    if (stageLightsOutActive || !ClientPrefs.shaders || !darkStageVariant)
         return;
 
     setupBFDirectionalLUT();

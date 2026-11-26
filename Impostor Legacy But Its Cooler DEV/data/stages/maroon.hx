@@ -1,5 +1,6 @@
 import StringTools;
 import funkin.objects.SnowEmitter;
+import funkin.game.shaders.ExtraDropShadowShader;
 
 var bfDirectionalLook:Dynamic;
 var dadDirectionalLook:Dynamic;
@@ -23,6 +24,49 @@ function maroonStageImage(name:String):String
     return ext + name;
 }
 
+function createRim(angle:Float):ExtraDropShadowShader
+{
+	var rim = new ExtraDropShadowShader();
+	rim.threshold = 0.05;
+	rim.strength = 0.85;
+	rim.setColorMatrix([
+		0.70, 0.10,  0.00, 0, -5,
+		0.00, 0.70, -0.25, 0,  0,
+		0.00,-0.15, 0.75, 0, -1,
+		0.00, 0.80, 0.00, 1,  0
+	]);
+	var layerMatrix = [
+		8, 18,  0, -1,   0,
+		0.3, 2.5, -1.5, 0, 85,
+		0, -1.5, -5.5, 0, -5,
+		0,  9,   0,  9,  0
+	];
+	rim.addLayer(layerMatrix, angle, 16, 0.08, 0.30, 1.00);
+	return rim;
+}
+
+
+function createRim2(angle:Float):ExtraDropShadowShader
+{
+	var rim = new ExtraDropShadowShader();
+	rim.threshold = 0.05;
+	rim.strength = 0.85;
+	rim.setColorMatrix([
+		0.70, 0.10,  0.00, 0, -5,
+		0.00, 0.70, -0.25, 0,  0,
+		0.00,-0.15, 0.75, 0, -1,
+		0.00, 0.80, 0.00, 1,  0
+	]);
+	var layerMatrix = [
+		8, 18,  0, -1,   0,
+		0.3, 2.5, -1.5, 0, 85,
+		0, -1.5, -5.5, 0, -5,
+		0,  9,   0,  9,  0
+	];
+	rim.addLayer(layerMatrix, angle, 16, 0.08, 0.40, 1.00);
+	return rim;
+}
+
 function getDirectionalLUTBitmap():Dynamic
 {
     if (directionalLUTBitmap == null)
@@ -41,7 +85,7 @@ function createDirectionalLook():Dynamic
     if (lutBitmap == null)
         return null;
 
-    var shader = newShader('directionalRimLook');
+    var shader = newShader('directionalLayerLUT');
     if (shader == null)
         return null;
 
@@ -181,7 +225,7 @@ function setupGFLook()
         if (rimLut == null || rimLut.bitmap == null)
             return;
 
-        gfLook = newShader('characterRimLook');
+        gfLook = newShader('characterLookRim');
         if (gfLook == null)
             return;
 
@@ -240,7 +284,7 @@ function updateGFLookFrame()
 
 function onLoad()
 {
-    darkStageVariant = PlayState.SONG.stage == 'maroon' && FlxG.random.int(1, 4) == 1;
+    darkStageVariant = !PlayState.isStoryMode && PlayState.SONG.stage == 'maroon' && FlxG.random.int(1, 4) == 1;
 
     var bg:FlxSprite = new FlxSprite(-200).loadGraphic(Paths.image(maroonStageImage("newsky")));
     bg.scrollFactor.x = 0.7;
@@ -312,6 +356,10 @@ function onCreatePost()
 
     camSpecialThing([1600, 1300], [1800, 1300]);
 
+    var player:FlxSprite = new FlxSprite(dadGroup.x - 280, dadGroup.y + 440).loadGraphic(Paths.image(ext + 'player'));
+    player.color = darkStageVariant ? 0xff060a1a : 0xFF8A9BC0;
+    if (dad.curCharacter != "player") stage.insert(stage.members.indexOf(dadGroup), player);
+
     boyfriend.color = 0xFF8A9BC0;
     gf.color = 0xFF8A9BC0;
     dad.color = 0xFF8A9BC0;
@@ -319,11 +367,44 @@ function onCreatePost()
 
     if (ClientPrefs.shaders)
     {
-        setupBFDirectionalLUT();
-        if (hasPet)
-            setupPetDirectionalLUT();
-        setupDadDirectionalLUT();
-        setupGFLook();
+        if (darkStageVariant)
+	{
+	   	setupBFDirectionalLUT();
+           	if (hasPet)
+        		setupPetDirectionalLUT();
+        	setupDadDirectionalLUT();
+        	setupGFLook();
+	}
+	else
+	{
+		boyfriend.useRenderTexture = true;
+
+		if (boyfriend.flipX)
+			bfRim = createRim(46);
+		else
+			bfRim = createRim(106);
+
+		bfRim.attachedSprite = boyfriend;
+		boyfriend.shader = bfRim;
+
+		if (hasPet)
+		{
+			pet.useRenderTexture = true;
+			petRim = createRim(106);
+			petRim.attachedSprite = pet;
+			pet.shader = petRim;
+		}
+
+		gf.useRenderTexture = true;
+		gfRim = createRim2(266);
+		gfRim.attachedSprite = gf;
+		gf.shader = gfRim;
+
+		dad.useRenderTexture = true;
+		dadRim = createRim(46);
+		dadRim.attachedSprite = dad;
+		dad.shader = dadRim;
+	}
     }
 
     var mainoverlay:FlxSprite = new FlxSprite(0, 0);
@@ -339,7 +420,7 @@ function onCreatePost()
 
 function onUpdatePost(elapsed:Float)
 {
-    if (ClientPrefs.shaders)
+    if (ClientPrefs.shaders && darkStageVariant)
     {
         setupBFDirectionalLUT();
         setupDadDirectionalLUT();
@@ -351,7 +432,7 @@ function onUpdatePost(elapsed:Float)
 
 function onResume()
 {
-    if (ClientPrefs.shaders)
+    if (ClientPrefs.shaders && darkStageVariant)
     {
         setupBFDirectionalLUT();
         setupDadDirectionalLUT();
